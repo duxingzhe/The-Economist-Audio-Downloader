@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <include android:id="@+id/title" layout="@layout/include_common_text_title"/>
+
+    <LinearLayout
+        android:id="@+id/downloadPanel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/title"
+        >
+
+        <Button
+            android:id="@+id/input"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="输入"
+            />
+        <Button
+            android:id="@+id/download"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="下载"
+            />
+        <Button
+            android:id="@+id/unzip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="解压"
+            />
+
+        <Button
+            android:id="@+id/delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="删除"
+            />
+    </LinearLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerview"
+        android:layout_below="@+id/downloadPanel"
+        android:layout_above="@+id/ly_mini_player"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <LinearLayout
+        android:id="@+id/ly_mini_player"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_alignParentBottom="true">
+        <include
+            layout="@layout/include_common_playstatus_layout"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ly_data_load"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/title"
+        android:orientation="vertical"
+        android:visibility="gone">
+        <include layout="@layout/loading_layout"/>
+    </LinearLayout>
+</RelativeLayout>
