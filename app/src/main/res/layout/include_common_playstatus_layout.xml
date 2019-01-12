@@ -38,14 +38,18 @@
             android:padding="5dp"
             android:layout_centerVertical="true"/>
     </LinearLayout>
+
     <ImageView
         android:id="@+id/iv_mini_bg"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:padding="1dp"
-        android:layout_margin="5dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="5dp"
         android:background="@drawable/gray_border"
-        />
+        android:padding="1dp" />
     <LinearLayout
         android:layout_toRightOf="@+id/iv_mini_bg"
         android:layout_width="match_parent"

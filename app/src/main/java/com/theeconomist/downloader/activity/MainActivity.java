@@ -8,6 +8,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 
 import com.theeconomist.downloader.R;
 import com.theeconomist.downloader.dialog.AddDialog;
@@ -29,6 +30,7 @@ public class MainActivity extends BaseActivity {
     public Button unzipButton;
     private RecyclerView recyclerView;
 
+    private LinearLayout bottomPlayStatusLayout;
     private Context mContext;
 
     public final int START_SCANNING_FILE=0x1;
@@ -54,6 +56,7 @@ public class MainActivity extends BaseActivity {
 
         downloadButton=(Button)findViewById(R.id.download);
         recyclerView=(RecyclerView)findViewById(R.id.recyclerview);
+        bottomPlayStatusLayout=(LinearLayout)findViewById(R.id.ly_status);
 
         inputButton.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -103,6 +106,13 @@ public class MainActivity extends BaseActivity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
+
+        bottomPlayStatusLayout.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                startActivity(MainActivity.this, PlayerActivity.class);
+            }
+        });
     }
 
     private void startScanningFile(){

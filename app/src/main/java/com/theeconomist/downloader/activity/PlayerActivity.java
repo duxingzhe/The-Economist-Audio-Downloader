@@ -158,7 +158,7 @@ public class PlayerActivity extends BaseMusicActivity {
     }
 
     private void playRadio() {
-        if(!getPlayBean().getUrl().equals(playUrl)) {
+        /*if(!getPlayBean().getUrl().equals(playUrl)) {
             setCdRodio(0f);
             if(eventNextBean == null) {
                 eventNextBean = new EventBusBean(EventType.MUSIC_NEXT, getPlayBean().getUrl());
@@ -170,7 +170,7 @@ public class PlayerActivity extends BaseMusicActivity {
             playUrl = getPlayBean().getUrl();
             getTimeBean().setTotalSecs(0);
             getTimeBean().setCurrSecs(0);
-        }
+        }*/
         initTime();
     }
 
