@@ -79,12 +79,9 @@ public class PlayerActivity extends BaseMusicActivity {
         setTitleLine(R.color.color_trans);
         setRightView(R.drawable.svg_menu_white);
         setTitle(getPlayBean().getName());
-        if(getPlayBean().getTiming() == 0)
-        {
+        if(getPlayBean().getTiming() == 0) {
             tvTip.setText("（回放）");
-        }
-        else if(getPlayBean().getTiming() == 1)
-        {
+        } else if(getPlayBean().getTiming() == 1) {
             tvTip.setText("（直播）");
         }
         tvSubTitle.setText(getPlayBean().getSubname());
@@ -109,10 +106,8 @@ public class PlayerActivity extends BaseMusicActivity {
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                if(eventSeekBean == null)
-                {
-                    if(seekBean == null)
-                    {
+                if(eventSeekBean == null) {
+                    if(seekBean == null) {
                         seekBean = new SeekBean();
                     }
                     seekBean.setPosition(position);
@@ -120,11 +115,8 @@ public class PlayerActivity extends BaseMusicActivity {
                     seekBean.setShowTime(false);
 
                     eventSeekBean = new EventBusBean(EventType.MUSIC_SEEK_TIME, seekBean);
-                }
-                else
-                {
-                    if(seekBean == null)
-                    {
+                } else {
+                    if(seekBean == null) {
                         seekBean = new SeekBean();
                     }
                     seekBean.setPosition(position);
@@ -140,10 +132,8 @@ public class PlayerActivity extends BaseMusicActivity {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 MyLog.d("position:" + position);
-                if(eventSeekBean == null)
-                {
-                    if(seekBean == null)
-                    {
+                if(eventSeekBean == null) {
+                    if(seekBean == null) {
                         seekBean = new SeekBean();
                     }
                     seekBean.setPosition(position);
@@ -151,11 +141,8 @@ public class PlayerActivity extends BaseMusicActivity {
                     seekBean.setShowTime(false);
 
                     eventSeekBean = new EventBusBean(EventType.MUSIC_SEEK_TIME, seekBean);
-                }
-                else
-                {
-                    if(seekBean == null)
-                    {
+                } else {
+                    if(seekBean == null) {
                         seekBean = new SeekBean();
                     }
                     seekBean.setPosition(position);
@@ -170,17 +157,12 @@ public class PlayerActivity extends BaseMusicActivity {
         playRadio();
     }
 
-    private void playRadio()
-    {
-        if(!getPlayBean().getUrl().equals(playUrl))
-        {
+    private void playRadio() {
+        if(!getPlayBean().getUrl().equals(playUrl)) {
             setCdRodio(0f);
-            if(eventNextBean == null)
-            {
+            if(eventNextBean == null) {
                 eventNextBean = new EventBusBean(EventType.MUSIC_NEXT, getPlayBean().getUrl());
-            }
-            else
-            {
+            } else {
                 eventNextBean.setType(EventType.MUSIC_NEXT);
                 eventNextBean.setObject(getPlayBean().getUrl());
             }
@@ -195,11 +177,9 @@ public class PlayerActivity extends BaseMusicActivity {
     @Override
     public void onMusicStatus(int status) {
         super.onMusicStatus(status);
-        switch (status)
-        {
+        switch (status) {
             case PLAY_STATUS_ERROR:
-                if(ivPoint.getRotation() == 0f)
-                {
+                if(ivPoint.getRotation() == 0f) {
                     startPointAnimat(0f, -40f);
                 }
                 ivStatus.setImageResource(R.drawable.play_selector);
@@ -207,8 +187,7 @@ public class PlayerActivity extends BaseMusicActivity {
             case PLAY_STATUS_LOADING:
                 pbLoad.setVisibility(View.VISIBLE);
                 ivStatus.setVisibility(View.GONE);
-                if(ivPoint.getRotation() == -40f)
-                {
+                if(ivPoint.getRotation() == -40f) {
                     rlCd.setRotation(getCdRodio());
                     startPointAnimat(-40f, 0f);
                 }
@@ -219,16 +198,14 @@ public class PlayerActivity extends BaseMusicActivity {
                 ivStatus.setVisibility(View.VISIBLE);
                 break;
             case PLAY_STATUS_PLAYING:
-                if(ivPoint.getRotation() == -40f)
-                {
+                if(ivPoint.getRotation() == -40f) {
                     rlCd.setRotation(getCdRodio());
                     startPointAnimat(-40f, 0f);
                 }
                 ivStatus.setImageResource(R.drawable.pause_selector);
                 break;
             case PLAY_STATUS_PAUSE:
-                if(ivPoint.getRotation() == 0f)
-                {
+                if(ivPoint.getRotation() == 0f) {
                     startPointAnimat(0f, -40f);
                 }
                 ivStatus.setImageResource(R.drawable.play_selector);
@@ -236,8 +213,7 @@ public class PlayerActivity extends BaseMusicActivity {
             case PLAY_STATUS_RESUME:
                 break;
             case PLAY_STATUS_COMPLETE:
-                if(ivPoint.getRotation() == 0f)
-                {
+                if(ivPoint.getRotation() == 0f) {
                     startPointAnimat(0f, -40f);
                 }
                 ivStatus.setImageResource(R.drawable.play_selector);
@@ -257,12 +233,9 @@ public class PlayerActivity extends BaseMusicActivity {
     @Override
     public void onPlayHistoryChange() {
         super.onPlayHistoryChange();
-        if(getPlayBean().getTiming() == 0)
-        {
+        if(getPlayBean().getTiming() == 0) {
             tvTip.setText("（回放）");
-        }
-        else if(getPlayBean().getTiming() == 1)
-        {
+        } else if(getPlayBean().getTiming() == 1) {
             tvTip.setText("（直播）");
         }
         tvSubTitle.setText(getPlayBean().getSubname());
@@ -293,24 +266,17 @@ public class PlayerActivity extends BaseMusicActivity {
     }
 
     @OnClick(R.id.iv_status)
-    public void onClickStatus(View view)
-    {
-        if(musicStatus == PLAY_STATUS_PLAYING)
-        {
+    public void onClickStatus(View view) {
+        if(musicStatus == PLAY_STATUS_PLAYING) {
             pauseMusic(true);
             ivStatus.setImageResource(R.drawable.play_selector);
-        }
-        else if(musicStatus == PLAY_STATUS_PAUSE)
-        {
+        } else if(musicStatus == PLAY_STATUS_PAUSE) {
             pauseMusic(false);
             ivStatus.setImageResource(R.drawable.pause_selector);
-            if(ivPoint.getRotation() == -40f)
-            {
+            if(ivPoint.getRotation() == -40f) {
                 startPointAnimat(-40f, 0f);
             }
-        }
-        else if(musicStatus == PLAY_STATUS_ERROR || musicStatus == PLAY_STATUS_COMPLETE)
-        {
+        } else if(musicStatus == PLAY_STATUS_ERROR || musicStatus == PLAY_STATUS_COMPLETE) {
             playUrl = "";
             playRadio();
         }
@@ -332,8 +298,7 @@ public class PlayerActivity extends BaseMusicActivity {
     /**
      * 初始化指针动画
      */
-    private void initPointAnimat()
-    {
+    private void initPointAnimat() {
         ivPoint.setPivotX(CommonUtil.dip2px(PlayerActivity.this, 17));
         ivPoint.setPivotY(CommonUtil.dip2px(PlayerActivity.this, 15));
         pointAnimator = ValueAnimator.ofFloat(0, 0);
@@ -386,21 +351,14 @@ public class PlayerActivity extends BaseMusicActivity {
      * @param from
      * @param end
      */
-    private void startPointAnimat(float from, float end)
-    {
-        if(pointAnimator != null)
-        {
-            if(from < end)
-            {
-                if(!isPlaying())
-                {
+    private void startPointAnimat(float from, float end) {
+        if(pointAnimator != null) {
+            if(from < end) {
+                if(!isPlaying()) {
                     return;
                 }
-            }
-            else
-            {
-                if(isPlaying())
-                {
+            } else {
+                if(isPlaying()) {
                     return;
                 }
             }
@@ -412,8 +370,7 @@ public class PlayerActivity extends BaseMusicActivity {
     /**
      * 初始化CD动画
      */
-    private void initCDAnimat()
-    {
+    private void initCDAnimat() {
         cdAnimator = ValueAnimator.ofFloat(rlCd.getRotation(), 360f + rlCd.getRotation());
         cdAnimator.setTarget(rlCd);
         cdAnimator.setRepeatCount(ValueAnimator.INFINITE);
@@ -432,10 +389,8 @@ public class PlayerActivity extends BaseMusicActivity {
     /**
      * 开始cd动画
      */
-    private void resumeCDanimat()
-    {
-        if(cdAnimator != null && !cdAnimator.isRunning())
-        {
+    private void resumeCDanimat() {
+        if(cdAnimator != null && !cdAnimator.isRunning()) {
             cdAnimator.setFloatValues(rlCd.getRotation(), 360f + rlCd.getRotation());
             cdAnimator.start();
         }
@@ -444,31 +399,22 @@ public class PlayerActivity extends BaseMusicActivity {
     /**
      * 暂停CD动画
      */
-    private void pauseCDanimat()
-    {
-        if(cdAnimator != null && cdAnimator.isRunning())
-        {
+    private void pauseCDanimat() {
+        if(cdAnimator != null && cdAnimator.isRunning()) {
             cdAnimator.cancel();
         }
     }
 
-    private void updateTime(TimeBean timeBean)
-    {
-        if(timeBean != null)
-        {
-            if(timeBean.getTotalSecs() <= 0)
-            {
-                if(seekBar.getVisibility() == View.VISIBLE)
-                {
+    private void updateTime(TimeBean timeBean) {
+        if(timeBean != null) {
+            if(timeBean.getTotalSecs() <= 0) {
+                if(seekBar.getVisibility() == View.VISIBLE) {
                     seekBar.setVisibility(View.GONE);
                     tvTotalTime.setVisibility(View.GONE);
                 }
                 tvNowTime.setText(WlTimeUtil.secdsToDateFormat(timeBean.getCurrSecs(), timeBean.getTotalSecs()));
-            }
-            else
-            {
-                if(seekBar.getVisibility() == View.GONE)
-                {
+            } else {
+                if(seekBar.getVisibility() == View.GONE) {
                     seekBar.setVisibility(View.VISIBLE);
                     tvTotalTime.setVisibility(View.VISIBLE);
                 }
@@ -480,21 +426,17 @@ public class PlayerActivity extends BaseMusicActivity {
     }
 
     private void initTime() {
-        if(getTimeBean().getTotalSecs() > 0)
-        {
+        if(getTimeBean().getTotalSecs() > 0) {
             seekBar.setVisibility(View.VISIBLE);
             tvTotalTime.setVisibility(View.VISIBLE);
             seekBar.setProgress(getProgress());
-        }
-        else
-        {
+        } else {
             seekBar.setVisibility(View.GONE);
             tvTotalTime.setVisibility(View.GONE);
         }
     }
 
-    private void playNext(boolean next)
-    {
+    private void playNext(boolean next) {
 
     }
 }
