@@ -5,6 +5,7 @@ import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
@@ -158,19 +159,21 @@ public class PlayerActivity extends BaseMusicActivity {
     }
 
     private void playRadio() {
-        /*if(!getPlayBean().getUrl().equals(playUrl)) {
-            setCdRodio(0f);
-            if(eventNextBean == null) {
-                eventNextBean = new EventBusBean(EventType.MUSIC_NEXT, getPlayBean().getUrl());
-            } else {
-                eventNextBean.setType(EventType.MUSIC_NEXT);
-                eventNextBean.setObject(getPlayBean().getUrl());
+        if(!TextUtils.isEmpty(getPlayBean().getUrl())) {
+            if (!getPlayBean().getUrl().equals(playUrl)) {
+                setCdRodio(0f);
+                if (eventNextBean == null) {
+                    eventNextBean = new EventBusBean(EventType.MUSIC_NEXT, getPlayBean().getUrl());
+                } else {
+                    eventNextBean.setType(EventType.MUSIC_NEXT);
+                    eventNextBean.setObject(getPlayBean().getUrl());
+                }
+                EventBus.getDefault().post(eventNextBean);
+                playUrl = getPlayBean().getUrl();
+                getTimeBean().setTotalSecs(0);
+                getTimeBean().setCurrSecs(0);
             }
-            EventBus.getDefault().post(eventNextBean);
-            playUrl = getPlayBean().getUrl();
-            getTimeBean().setTotalSecs(0);
-            getTimeBean().setCurrSecs(0);
-        }*/
+        }
         initTime();
     }
 

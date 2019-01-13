@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -77,14 +78,17 @@ public class MainActivity extends BaseActivity {
 
             @Override
             public void onClick(View view){
-                DownloadDialog inputDialog=new DownloadDialog(mContext, R.style.StyleDialog, new DownloadDialog.OnDownloadListener() {
-                    @Override
-                    public void onUnZip(File file) {
-                        FileUtil.file=file;
-                    }
-                });
 
-                inputDialog.show();
+                if(!TextUtils.isEmpty(FileUtil.url)) {
+                    DownloadDialog inputDialog = new DownloadDialog(mContext, R.style.StyleDialog, new DownloadDialog.OnDownloadListener() {
+                        @Override
+                        public void onUnZip(File file) {
+                            FileUtil.file = file;
+                        }
+                    });
+
+                    inputDialog.show();
+                }
             }
         });
 
@@ -92,14 +96,16 @@ public class MainActivity extends BaseActivity {
 
             @Override
             public void onClick(View view){
-                UnZipDialog unZipDialog=new UnZipDialog(mContext, R.style.StyleDialog, new UnZipDialog.OnUnZipListener() {
-                    @Override
-                    public void onUnZipSuccess() {
-                        handler.sendEmptyMessage(START_SCANNING_FILE);
-                    }
-                });
+                if(FileUtil.file!=null&&FileUtil.file.exists()) {
+                    UnZipDialog unZipDialog = new UnZipDialog(mContext, R.style.StyleDialog, new UnZipDialog.OnUnZipListener() {
+                        @Override
+                        public void onUnZipSuccess() {
+                            handler.sendEmptyMessage(START_SCANNING_FILE);
+                        }
+                    });
 
-                unZipDialog.show();
+                    unZipDialog.show();
+                }
             }
         });
 

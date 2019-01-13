@@ -5,7 +5,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
+import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.theeconomist.downloader.R;
 import com.theeconomist.downloader.utils.DownloadUtil;
@@ -19,6 +21,9 @@ public class DownloadDialog extends BaseDialog {
 
     @BindView(R.id.file_operation_progress)
     public ProgressBar fileOperationProgressBar;
+
+    private TextView mExitTextView;
+    private TextView mDownloadTextView;
 
     private OnDownloadListener mListener;
 
@@ -59,6 +64,16 @@ public class DownloadDialog extends BaseDialog {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.file_operation_dialog);
         downloadFiles();
+
+        mDownloadTextView=(TextView)findViewById(R.id.download);
+        mExitTextView=(TextView)findViewById(R.id.exit);
+
+        mExitTextView.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                dismiss();
+            }
+        });
     }
 
     private void downloadFiles(){
