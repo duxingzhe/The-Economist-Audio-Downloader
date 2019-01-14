@@ -5,14 +5,17 @@
     android:gravity="center">
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
         android:background="@drawable/white_right_drawable_r4"
         >
+
         <LinearLayout
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:weightSum="2"
@@ -22,7 +25,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="期刊"
+                android:textColor="@color/color_222222"
+                android:text="期刊号"
                 />
             <EditText
                 android:id="@+id/issue"
@@ -33,8 +37,6 @@
         </LinearLayout>
 
         <LinearLayout
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:weightSum="2"
@@ -44,6 +46,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:textColor="@color/color_222222"
                 android:text="年"
                 />
             <EditText
@@ -55,8 +58,6 @@
         </LinearLayout>
 
         <LinearLayout
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:weightSum="2"
@@ -66,6 +67,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:textColor="@color/color_222222"
                 android:text="月"
                 />
             <EditText
@@ -79,8 +81,6 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp"
             android:weightSum="2"
             android:orientation="horizontal"
             >
@@ -89,6 +89,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:textColor="@color/color_222222"
                 android:text="日"
                 />
             <EditText
@@ -122,7 +123,9 @@
                 android:text="确定"
                 android:gravity="center"
                 android:textSize="14sp"
+                android:textColor="@color/color_ec4c48"
                 />
         </LinearLayout>
+
     </LinearLayout>
 </LinearLayout>
