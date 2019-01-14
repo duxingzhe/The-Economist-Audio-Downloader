@@ -110,7 +110,7 @@
                 android:layout_height="45dp"
                 android:text="取消"
                 android:gravity="center"
-                android:textSize="14dp"
+                android:textSize="14sp"
                 android:textColor="@color/color_222222"
                 />
 
@@ -119,9 +119,9 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="45dp"
-                android:text="下载"
+                android:text="确定"
                 android:gravity="center"
-                android:textSize="14dp"
+                android:textSize="14sp"
                 />
         </LinearLayout>
     </LinearLayout>

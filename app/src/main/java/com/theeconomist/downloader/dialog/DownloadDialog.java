@@ -65,8 +65,8 @@ public class DownloadDialog extends BaseDialog {
         setContentView(R.layout.file_operation_dialog);
         downloadFiles();
 
-        mDownloadTextView=(TextView)findViewById(R.id.download);
-        mExitTextView=(TextView)findViewById(R.id.exit);
+        mDownloadTextView=(TextView)findViewById(R.id.cancel);
+        mExitTextView=(TextView)findViewById(R.id.ok);
 
         mExitTextView.setOnClickListener(new View.OnClickListener(){
             @Override

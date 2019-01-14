@@ -75,6 +75,7 @@ public class InputDialog extends BaseDialog {
                     String fileName="Issue_"+issueEditText.getText().toString() + "_" + date +"_The_Economist_Full_edition.zip";
 
                     mListener.downloadFile(downloadUrl,fileName);
+                    dismiss();
                 }
             }
         });
