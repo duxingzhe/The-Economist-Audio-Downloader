@@ -57,8 +57,6 @@ public class BaseActivity extends Activity {
     @BindView(R.id.ly_data_load)
     LinearLayout lyDataLoad;
 
-
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

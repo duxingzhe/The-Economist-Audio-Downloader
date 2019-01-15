@@ -217,14 +217,19 @@ public abstract class BaseMusicActivity extends BaseActivity{
         EventBus.getDefault().post(eventPauseResumeBean);
     }
 
-    public void timeInfo(TimeBean timeBean){}
+    public void timeInfo(TimeBean timeBean){
 
-    public void onLoad(boolean load){}
+    }
 
-    public void onPlayHistoryChange(){}
+    public void onLoad(boolean load){
 
-    public boolean isPlaying()
-    {
+    }
+
+    public void onPlayHistoryChange(){
+
+    }
+
+    public boolean isPlaying() {
         return isPlaying;
     }
 
@@ -232,15 +237,13 @@ public abstract class BaseMusicActivity extends BaseActivity{
         cdRodio = rodio;
     }
 
-    public float getCdRodio()
-    {
+    public float getCdRodio() {
         return cdRodio;
     }
 
 
     public PlayBean getPlayBean() {
-        if(playBean == null)
-        {
+        if(playBean == null) {
             playBean = new PlayBean();
         }
         MyLog.d("url is :" + playBean.getUrl());
@@ -248,26 +251,21 @@ public abstract class BaseMusicActivity extends BaseActivity{
     }
 
     public static TimeBean getTimeBean() {
-        if(timeBean == null)
-        {
+        if(timeBean == null) {
             timeBean = new TimeBean();
         }
         return timeBean;
     }
 
-    public int getProgress()
-    {
-        if(timeBean != null && timeBean.getTotalSecs() > 0)
-        {
+    public int getProgress() {
+        if(timeBean != null && timeBean.getTotalSecs() > 0) {
             return timeBean.getCurrSecs() * 100 / timeBean.getTotalSecs();
         }
         return 0;
     }
 
-    public void onMusicStatus(int status)
-    {
-        switch (status)
-        {
+    public void onMusicStatus(int status) {
+        switch (status) {
             case PLAY_STATUS_ERROR:
                 if(ivMiniPlayStatus != null) {
                     ivMiniPlayStatus.setImageResource(R.drawable.svg_play);
@@ -325,17 +323,12 @@ public abstract class BaseMusicActivity extends BaseActivity{
         }
     }
 
-    private void replayRadio()
-    {
-        if(!getPlayBean().getUrl().equals(playUrl))
-        {
+    private void replayRadio() {
+        if(!getPlayBean().getUrl().equals(playUrl)) {
             setCdRodio(0f);
-            if(eventNextBean == null)
-            {
+            if(eventNextBean == null) {
                 eventNextBean = new EventBusBean(EventType.MUSIC_NEXT, getPlayBean().getUrl());
-            }
-            else
-            {
+            } else {
                 eventNextBean.setType(EventType.MUSIC_NEXT);
                 eventNextBean.setObject(getPlayBean().getUrl());
             }
@@ -346,8 +339,7 @@ public abstract class BaseMusicActivity extends BaseActivity{
         }
     }
 
-    public void onRelease()
-    {
+    public void onRelease() {
         eventPauseResumeBean = null;
         cdRodio = 0f;
         playBean = null;
