@@ -29,6 +29,7 @@ public class MainActivity extends BaseActivity {
     @BindView(R.id.input)
     public Button inputButton;
     private Button downloadButton;
+    private Button scanButton;
     @BindView(R.id.unzip)
     public Button unzipButton;
     private RecyclerView recyclerView;
@@ -60,6 +61,7 @@ public class MainActivity extends BaseActivity {
         downloadButton=(Button)findViewById(R.id.download);
         recyclerView=(RecyclerView)findViewById(R.id.recyclerview);
         bottomPlayStatusLayout=(LinearLayout)findViewById(R.id.ly_status);
+        scanButton=(Button)findViewById(R.id.scan);
 
         inputButton.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -108,6 +110,13 @@ public class MainActivity extends BaseActivity {
 
                     unZipDialog.show();
                 }
+            }
+        });
+
+        scanButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                startScanningFile();
             }
         });
 

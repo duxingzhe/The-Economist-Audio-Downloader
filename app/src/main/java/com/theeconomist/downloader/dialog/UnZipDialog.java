@@ -1,6 +1,7 @@
 package com.theeconomist.downloader.dialog;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.widget.ProgressBar;
@@ -50,13 +51,24 @@ public class UnZipDialog extends BaseDialog {
     public UnZipDialog(Context context, int style, OnUnZipListener listener){
         super(context, style);
         mListener=listener;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.file_operation_dialog);
         unZipFile();
     }
 
     private void unZipFile(){
         if(FileUtil.file!=null&&FileUtil.file.exists()) {
             totalSize = FileUtil.getZipTrueSize(FileUtil.file.getAbsolutePath());
-            FileUtil.unZip(FileUtil.file, FileUtil.path, mHandler);
+            new Thread(){
+                @Override
+                public void run(){
+                    FileUtil.unZip(FileUtil.file, FileUtil.path, mHandler);
+                }
+            }.run();
         }
     }
 

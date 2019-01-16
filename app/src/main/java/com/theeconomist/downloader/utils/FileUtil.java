@@ -1,5 +1,8 @@
 package com.theeconomist.downloader.utils;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -115,4 +118,13 @@ public class FileUtil {
         }
         return size;
     }
+
+    public static Bitmap loadMp3Cover(String path) {
+        MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
+        mediaMetadataRetriever.setDataSource(path);
+        byte[] cover = mediaMetadataRetriever.getEmbeddedPicture();
+        Bitmap bitmap = BitmapFactory.decodeByteArray(cover, 0, cover.length);
+        return bitmap;
+    }
+
 }
