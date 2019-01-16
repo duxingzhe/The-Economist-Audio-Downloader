@@ -51,16 +51,16 @@ public class InputDialog extends BaseDialog {
             @Override
             public void onClick(View view){
                 if(!TextUtils.isEmpty(issueEditText.getText().toString())
-                        ||!TextUtils.isEmpty(yearEditText.getText().toString())
-                        ||!TextUtils.isEmpty(monthEditText.getText().toString())
-                        ||!TextUtils.isEmpty(dayEditText.getText().toString())){
+                        || !TextUtils.isEmpty(yearEditText.getText().toString())
+                        || !TextUtils.isEmpty(monthEditText.getText().toString())
+                        || !TextUtils.isEmpty(dayEditText.getText().toString())){
 
                     String day, month;
 
                     if(monthEditText.getText().toString().length()<=1){
-                        month="0"+dayEditText.getText().toString();
+                        month = "0" + monthEditText.getText().toString();
                     }else{
-                        month=dayEditText.getText().toString();
+                        month = monthEditText.getText().toString();
                     }
 
                     if(dayEditText.getText().toString().length()<=1){
