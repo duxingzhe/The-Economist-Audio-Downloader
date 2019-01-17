@@ -1,5 +1,7 @@
 package com.theeconomist.downloader.utils;
 
+import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
@@ -7,7 +9,10 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.util.Log;
+
+import com.theeconomist.downloader.bean.Mp3FileBean;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -125,6 +130,41 @@ public class FileUtil {
         byte[] cover = mediaMetadataRetriever.getEmbeddedPicture();
         Bitmap bitmap = BitmapFactory.decodeByteArray(cover, 0, cover.length);
         return bitmap;
+    }
+
+    public static void scanMusic(Context context, Mp3FileBean mp3File) {
+        // 查询媒体数据库
+        Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                null, MediaStore.Audio.Media.DATA + "=?",new String[]{mp3File.path},
+                MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
+        // 遍历媒体数据库
+        if (cursor.moveToFirst()) {
+            while (!cursor.isAfterLast()) {
+                // 歌曲标题
+                mp3File.title = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE));
+                // 歌曲的总播放时长：MediaStore.Audio.Media.DURATION
+                mp3File.duration = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION));
+                // 歌曲文件的大小 ：MediaStore.Audio.Media.SIZE
+                mp3File.fileSize = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE));
+                // 歌曲文件显示名字
+                mp3File.name = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME));
+                cursor.moveToNext();
+            }
+            cursor.close();
+        }
+    }
+
+    public static void deleteMusic(Context context, String musicPath){
+// 查询媒体数据库
+        Cursor cursor = context.getContentResolver().query(MediaStore.Files.getContentUri("external"),
+                null, MediaStore.Files.FileColumns.DATA + "=?",new String[]{musicPath},
+                MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
+        // 遍历普通文件数据库并删除
+        if (cursor!=null) {
+            context.getContentResolver().delete(MediaStore.Files.getContentUri("external"),
+                    MediaStore.Files.FileColumns.DATA + "=?",new String[]{musicPath});
+            cursor.close();
+        }
     }
 
 }

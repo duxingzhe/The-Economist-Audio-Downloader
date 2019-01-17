@@ -1,75 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="275dp"
-    android:layout_height="160dp"
-    android:background="@drawable/round_corner_drawable"
-    android:orientation="vertical">
-    <TextView
-        android:id="@+id/dialog_title"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:textColor="#666666"
-        android:textSize="18sp"/>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:background="#acacac"/>
-
-    <TextView
-        android:id="@+id/progress_info"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:paddingLeft="20dp"
-        android:textColor="#666666"
-        android:textSize="18sp"/>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:background="#acacac"/>
-
-    <ProgressBar
-        android:id="@+id/file_operation_progress"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:paddingTop="3dp"
-        android:paddingBottom="3dp"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:progressDrawable="@drawable/add_file_progress_drawable"
-        android:layout_width="match_parent"
-        android:layout_height="10dp" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:background="#acacac"/>
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center">
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="horizontal">
+        android:layout_width="275dp"
+        android:layout_height="160dp"
+        android:background="@drawable/round_corner_drawable"
+        android:orientation="vertical">
         <TextView
-            android:id="@+id/cancel"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:id="@+id/dialog_title"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="取消"
             android:textColor="#666666"
-            android:textSize="15sp"/>
+            android:textSize="18sp"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="#acacac"/>
+
         <TextView
-            android:id="@+id/ok"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:id="@+id/progress_info"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:layout_weight="1"
-            android:gravity="center"
-            android:text="确认"
-            android:textColor="#fe6000"
-            android:textSize="15sp"/>
+            android:paddingLeft="20dp"
+            android:textColor="#666666"
+            android:textSize="18sp"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="#acacac"/>
+
+        <ProgressBar
+            android:id="@+id/file_operation_progress"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:progressDrawable="@drawable/add_file_progress_drawable"
+            android:layout_width="match_parent"
+            android:layout_height="10dp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="#acacac"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+            <TextView
+                android:id="@+id/cancel"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="取消"
+                android:textColor="#666666"
+                android:textSize="15sp"/>
+            <TextView
+                android:id="@+id/ok"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="确认"
+                android:textColor="#fe6000"
+                android:textSize="15sp"/>
+        </LinearLayout>
     </LinearLayout>
+
 </LinearLayout>

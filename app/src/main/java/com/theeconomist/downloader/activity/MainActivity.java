@@ -14,13 +14,16 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 
 import com.theeconomist.downloader.R;
+import com.theeconomist.downloader.bean.Mp3FileBean;
 import com.theeconomist.downloader.dialog.AddDialog;
 import com.theeconomist.downloader.dialog.DownloadDialog;
 import com.theeconomist.downloader.dialog.InputDialog;
 import com.theeconomist.downloader.dialog.UnZipDialog;
 import com.theeconomist.downloader.utils.FileUtil;
+import com.theeconomist.downloader.utils.MP3Filter;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import butterknife.BindView;
 
@@ -37,7 +40,14 @@ public class MainActivity extends BaseActivity {
     private LinearLayout bottomPlayStatusLayout;
     private Context mContext;
 
-    public final int START_SCANNING_FILE=0x1;
+    // 文件总数
+    private int totalNum;
+
+    private final static int START_SCANNING_FILE=0x1;
+    private final static int UPDATE_ADD_FILE_PROGRESS=0x2;
+    private final static int DISMISS_ADD_FILE_DIALOG=0x3;
+    private AddDialog addDialog;
+    ArrayList<Mp3FileBean> mFiles=new ArrayList<>();
 
     private Handler handler=new Handler(){
 
@@ -46,6 +56,12 @@ public class MainActivity extends BaseActivity {
             switch(msg.what){
                 case START_SCANNING_FILE:
                     startScanningFile();
+                    break;
+                case UPDATE_ADD_FILE_PROGRESS:
+                    addDialog.setProgress(msg.arg1*100/totalNum);
+                    break;
+                case DISMISS_ADD_FILE_DIALOG:
+                    addDialog.dismiss();
                     break;
             }
         }
@@ -133,7 +149,40 @@ public class MainActivity extends BaseActivity {
     }
 
     private void startScanningFile(){
-        AddDialog addDialog=new AddDialog(mContext, R.style.StyleDialog);
+        addDialog=new AddDialog(mContext, R.style.StyleDialog);
         addDialog.show();
+
+        new Thread(){
+            @Override
+            public void run(){
+
+                File file=new File(FileUtil.path);
+
+                if(!file.exists()){
+                    return;
+                }
+                // 获取MP3文件
+                File[] filteredFiles=file.listFiles(new MP3Filter());
+
+                // 文件总数
+                totalNum=filteredFiles.length;
+
+                for(int i=0;i<totalNum;i++){
+                    File mp3File=filteredFiles[i];
+                    mFiles.add(new Mp3FileBean(mp3File.getAbsolutePath()));
+                    Message msg=new Message();
+                    msg.what=UPDATE_ADD_FILE_PROGRESS;
+                    msg.arg1=i;
+                    handler.sendMessage(msg);
+                    try {
+                        Thread.sleep(200);
+                    }catch(InterruptedException e){
+                        e.printStackTrace();
+                    }
+                }
+
+                handler.sendEmptyMessageDelayed(DISMISS_ADD_FILE_DIALOG,500);
+            }
+        }.start();
     }
 }

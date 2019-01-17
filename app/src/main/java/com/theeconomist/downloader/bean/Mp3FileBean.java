@@ -10,7 +10,9 @@ public class Mp3FileBean {
 
     public long duration;
 
-    public long modifiedTime;
+    public String name;
+
+    public String title;
 
     public long fileSize;
 }

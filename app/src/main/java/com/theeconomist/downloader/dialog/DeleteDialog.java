@@ -75,6 +75,6 @@ public class DeleteDialog extends BaseDialog {
 
                 mHandler.sendEmptyMessage(DISMISS_DIALOG);
             }
-        }.run();
+        }.start();
     }
 }
