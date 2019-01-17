@@ -12,7 +12,7 @@
         android:paddingBottom="20dp"
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
-        android:background="@drawable/white_right_drawable_r4"
+        android:background="@drawable/dialog_background"
         >
 
         <LinearLayout

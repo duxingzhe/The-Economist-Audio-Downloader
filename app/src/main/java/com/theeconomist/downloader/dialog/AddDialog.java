@@ -24,6 +24,8 @@ public class AddDialog extends BaseDialog {
     public ProgressBar fileOperationProgress;
 
     private TextView cancelTextView;
+    private TextView dialogTitleTextView;
+    private TextView progressInfoTextView;
 
     public AddDialog(Context context){
         super(context);
@@ -39,6 +41,8 @@ public class AddDialog extends BaseDialog {
         setContentView(R.layout.file_operation_dialog);
 
         cancelTextView=(TextView)findViewById(R.id.cancel);
+        dialogTitleTextView=(TextView)findViewById(R.id.dialog_title);
+        progressInfoTextView=(TextView)findViewById(R.id.progress_info);
         cancelTextView.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
@@ -46,10 +50,16 @@ public class AddDialog extends BaseDialog {
             }
         });
 
+        dialogTitleTextView.setText("添加文件中");
+
     }
 
     public void setProgress(int progress){
         fileOperationProgress.setProgress(progress);
+    }
+
+    public void setText(String string){
+        progressInfoTextView.setText(string);
     }
 
 }

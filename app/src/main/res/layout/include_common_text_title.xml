@@ -42,7 +42,7 @@
                 android:textSize="20dp"
                 android:singleLine="true"
                 android:textColor="@color/color_white"
-                android:text="title"
+                android:text="The Economist"
                 android:layout_toRightOf="@+id/iv_back"
                 android:layout_toLeftOf="@+id/iv_right"/>
 

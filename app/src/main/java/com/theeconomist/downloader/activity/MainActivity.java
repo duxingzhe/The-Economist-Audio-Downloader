@@ -58,9 +58,11 @@ public class MainActivity extends BaseActivity {
                     startScanningFile();
                     break;
                 case UPDATE_ADD_FILE_PROGRESS:
-                    addDialog.setProgress(msg.arg1*100/totalNum);
+                    addDialog.setText("已添加" + (msg.arg1 + 1) + "个文件，共" + totalNum + "个");
+                    addDialog.setProgress((msg.arg1+1)*100/totalNum);
                     break;
                 case DISMISS_ADD_FILE_DIALOG:
+                    addDialog.setText("添加完成");
                     addDialog.dismiss();
                     break;
             }
@@ -181,7 +183,7 @@ public class MainActivity extends BaseActivity {
                     }
                 }
 
-                handler.sendEmptyMessageDelayed(DISMISS_ADD_FILE_DIALOG,500);
+                handler.sendEmptyMessageDelayed(DISMISS_ADD_FILE_DIALOG,1000);
             }
         }.start();
     }
