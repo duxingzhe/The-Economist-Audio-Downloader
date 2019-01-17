@@ -13,6 +13,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
+import com.theeconomist.downloader.FileAdapter;
 import com.theeconomist.downloader.R;
 import com.theeconomist.downloader.bean.Mp3FileBean;
 import com.theeconomist.downloader.dialog.AddDialog;
@@ -36,6 +37,7 @@ public class MainActivity extends BaseActivity {
     @BindView(R.id.unzip)
     public Button unzipButton;
     private RecyclerView recyclerView;
+    private FileAdapter mAdapter;
 
     private LinearLayout bottomPlayStatusLayout;
     private Context mContext;
@@ -64,6 +66,7 @@ public class MainActivity extends BaseActivity {
                 case DISMISS_ADD_FILE_DIALOG:
                     addDialog.setText("添加完成");
                     addDialog.dismiss();
+                    notifyDataChanged();
                     break;
             }
         }
@@ -76,6 +79,7 @@ public class MainActivity extends BaseActivity {
 
         mContext=this;
 
+        mAdapter=new FileAdapter(mContext, mFiles);
         downloadButton=(Button)findViewById(R.id.download);
         recyclerView=(RecyclerView)findViewById(R.id.recyclerview);
         bottomPlayStatusLayout=(LinearLayout)findViewById(R.id.ly_status);
@@ -148,6 +152,8 @@ public class MainActivity extends BaseActivity {
                 startActivity(MainActivity.this, PlayerActivity.class);
             }
         });
+
+        recyclerView.setAdapter(mAdapter);
     }
 
     private void startScanningFile(){
@@ -186,5 +192,9 @@ public class MainActivity extends BaseActivity {
                 handler.sendEmptyMessageDelayed(DISMISS_ADD_FILE_DIALOG,1000);
             }
         }.start();
+    }
+
+    private void notifyDataChanged(){
+        mAdapter.notifyDataSetChanged();
     }
 }
