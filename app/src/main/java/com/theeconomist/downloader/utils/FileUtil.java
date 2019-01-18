@@ -80,6 +80,11 @@ public class FileUtil {
                     bundle.putLong("File Size",entry.getSize());
                     msg.setData(bundle);
                     handler.sendMessageDelayed(msg,500);
+                    try {
+                        Thread.sleep(200);
+                    }catch(InterruptedException e){
+                        e.printStackTrace();
+                    }
                 }
             }
         } catch (Exception e) {
@@ -133,7 +138,7 @@ public class FileUtil {
         return bitmap;
     }
 
-    public static void scanMusic(Context context, Mp3FileBean mp3File) {
+    public static void getMusicInfo(Context context, Mp3FileBean mp3File) {
         // 查询媒体数据库
         Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 null, MediaStore.Audio.Media.DATA + "=?",new String[]{mp3File.path},
@@ -155,7 +160,7 @@ public class FileUtil {
         }
     }
 
-    public static void deleteMusic(Context context, String musicPath){
+    public static void deleteMusicFile(Context context, String musicPath){
 // 查询媒体数据库
         Cursor cursor = context.getContentResolver().query(MediaStore.Files.getContentUri("external"),
                 null, MediaStore.Files.FileColumns.DATA + "=?",new String[]{musicPath},

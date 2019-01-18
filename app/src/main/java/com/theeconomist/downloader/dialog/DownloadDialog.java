@@ -24,27 +24,8 @@ public class DownloadDialog extends BaseDialog {
 
     private TextView mExitTextView;
     private TextView mDownloadTextView;
-
-    private OnDownloadListener mListener;
-
-    private Handler mHandler=new Handler(){
-        @Override
-        public void handleMessage(Message msg){
-            switch(msg.what){
-                case UPDATE_DOWNLOAD_PROGRESS:
-                    long downloadedSize=msg.getData().getLong("downloadedSize");
-                    long totalSize=msg.getData().getLong("totalSize");
-                    fileOperationProgressBar.setProgress((int)(downloadedSize/totalSize));
-                    break;
-                case DISMISS_DIALOG:
-                    dismiss();
-                    break;
-            }
-        }
-    };
-
-    private final static int UPDATE_DOWNLOAD_PROGRESS=0x1;
-    private final static int DISMISS_DIALOG=0x2;
+    private TextView dialogTitleTextView;
+    private TextView progressInfoTextView;
 
     public DownloadDialog(Context context){
         super(context);
@@ -54,61 +35,32 @@ public class DownloadDialog extends BaseDialog {
         super(context, style);
     }
 
-    public DownloadDialog(Context context, int style, OnDownloadListener listener){
-        super(context, style);
-        mListener=listener;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.file_operation_dialog);
-        downloadFiles();
 
         mDownloadTextView=(TextView)findViewById(R.id.cancel);
         mExitTextView=(TextView)findViewById(R.id.ok);
 
-        mExitTextView.setOnClickListener(new View.OnClickListener(){
+        mDownloadTextView.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
                 dismiss();
             }
         });
+
+        dialogTitleTextView=(TextView)findViewById(R.id.dialog_title);
+        progressInfoTextView=(TextView)findViewById(R.id.progress_info);
+
+        dialogTitleTextView.setText("下载文件中");
     }
 
-    private void downloadFiles(){
-        if(!TextUtils.isEmpty(FileUtil.url) && !TextUtils.isEmpty(FileUtil.fileName)) {
-            DownloadUtil.getInstance().download(FileUtil.url, FileUtil.path, FileUtil.fileName, new DownloadUtil.OnDownloadListener() {
-
-                @Override
-                public void onDownloading(int progress, long totalSize, long downloadedSize) {
-                    Message msg = new Message();
-                    msg.what = UPDATE_DOWNLOAD_PROGRESS;
-                    Bundle bundle = new Bundle();
-                    bundle.putLong("totalSize", totalSize);
-                    bundle.putLong("downloadedSize", downloadedSize);
-                    msg.setData(bundle);
-                    mHandler.sendMessage(msg);
-                }
-
-                @Override
-                public void onDownloadSuccess(File file) {
-                    mListener.onUnZip(file);
-                    mHandler.sendEmptyMessage(DISMISS_DIALOG);
-                }
-
-                @Override
-                public void onDownloadFailed(Exception e) {
-                    mHandler.sendEmptyMessage(DISMISS_DIALOG);
-                }
-            });
-        }else{
-            dismiss();
-        }
+    public void setProgress(int progress){
+        fileOperationProgressBar.setProgress(progress);
     }
-
-    public interface OnDownloadListener{
-
-        void onUnZip(File file);
+    public void setText(String string){
+        progressInfoTextView.setText(string);
     }
 }
