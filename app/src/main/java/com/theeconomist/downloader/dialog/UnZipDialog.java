@@ -4,7 +4,9 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.theeconomist.downloader.R;
 import com.theeconomist.downloader.utils.FileUtil;
@@ -15,30 +17,9 @@ public class UnZipDialog extends BaseDialog {
 
     @BindView(R.id.file_operation_progress)
     public ProgressBar fileOperationProgressBar;
-
-    private OnUnZipListener mListener;
-
-    private long totalSize;
-    private long unZippedSize;
-
-    private Handler mHandler=new Handler(){
-        @Override
-        public void handleMessage(Message msg){
-            switch(msg.what){
-                case UPDATE_UNZIP_PROGRESS:
-                    unZippedSize+=msg.getData().getLong("File Size");
-                    fileOperationProgressBar.setProgress((int)(unZippedSize/totalSize));
-                    break;
-                case DISMISS_DIALOG:
-                    mListener.onUnZipSuccess();
-                    dismiss();
-                    break;
-            }
-        }
-    };
-
-    private final static int UPDATE_UNZIP_PROGRESS=0x1;
-    private final static int DISMISS_DIALOG=0x2;
+    private TextView cancelTextView;
+    private TextView dialogTitleTextView;
+    private TextView progressInfoTextView;
 
     public UnZipDialog(Context context){
         super(context);
@@ -48,32 +29,29 @@ public class UnZipDialog extends BaseDialog {
         super(context, style);
     }
 
-    public UnZipDialog(Context context, int style, OnUnZipListener listener){
-        super(context, style);
-        mListener=listener;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.file_operation_dialog);
-        unZipFile();
+
+        cancelTextView=(TextView)findViewById(R.id.cancel);
+        dialogTitleTextView=(TextView)findViewById(R.id.dialog_title);
+        progressInfoTextView=(TextView)findViewById(R.id.progress_info);
+        cancelTextView.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                dismiss();
+            }
+        });
+
+        dialogTitleTextView.setText("解压文件中");
     }
 
-    private void unZipFile(){
-        if(FileUtil.file!=null&&FileUtil.file.exists()) {
-            totalSize = FileUtil.getZipTrueSize(FileUtil.file.getAbsolutePath());
-            new Thread(){
-                @Override
-                public void run(){
-                    FileUtil.unZip(FileUtil.file, FileUtil.path, mHandler);
-                }
-            }.run();
-        }
+    public void setProgress(int progress){
+        fileOperationProgressBar.setProgress(progress);
     }
 
-    public interface OnUnZipListener{
-
-        void onUnZipSuccess();
+    public void setProgressInfoText(String str){
+        progressInfoTextView.setText(str);
     }
 }

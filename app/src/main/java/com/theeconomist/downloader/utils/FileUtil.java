@@ -12,6 +12,7 @@ import android.os.Message;
 import android.provider.MediaStore;
 import android.util.Log;
 
+import com.theeconomist.downloader.activity.MainActivity;
 import com.theeconomist.downloader.bean.Mp3FileBean;
 
 import java.io.File;
@@ -74,11 +75,11 @@ public class FileUtil {
                     fos.close();
                     is.close();
                     Message msg=new Message();
-                    msg.what=0x1;
+                    msg.what= MainActivity.UPDATE_UNZIP_PROGRESS;
                     Bundle bundle=new Bundle();
                     bundle.putLong("File Size",entry.getSize());
                     msg.setData(bundle);
-                    handler.sendMessage(msg);
+                    handler.sendMessageDelayed(msg,500);
                 }
             }
         } catch (Exception e) {
@@ -92,7 +93,7 @@ public class FileUtil {
                 }
             }
         }
-        handler.sendEmptyMessage(0x2);
+        handler.sendEmptyMessageDelayed(MainActivity.DISMISS_UNZIP_DIALOG,1000);
     }
 
     public static long getZipTrueSize(String filePath) {

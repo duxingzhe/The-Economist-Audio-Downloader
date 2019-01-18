@@ -44,11 +44,20 @@ public class MainActivity extends BaseActivity {
 
     // 文件总数
     private int totalNum;
+    // 压缩包总大小
+    private long totalSize;
+    // 已解压大小
+    private long unZippedSize;
 
     private final static int START_SCANNING_FILE=0x1;
     private final static int UPDATE_ADD_FILE_PROGRESS=0x2;
     private final static int DISMISS_ADD_FILE_DIALOG=0x3;
+    public final static int UPDATE_UNZIP_PROGRESS=0x4;
+    public final static int DISMISS_UNZIP_DIALOG=0x5;
+
     private AddDialog addDialog;
+    private UnZipDialog unZipDialog;
+
     ArrayList<Mp3FileBean> mFiles=new ArrayList<>();
 
     private Handler handler=new Handler(){
@@ -67,6 +76,15 @@ public class MainActivity extends BaseActivity {
                     addDialog.setText("添加完成");
                     addDialog.dismiss();
                     notifyDataChanged();
+                    break;
+                case UPDATE_UNZIP_PROGRESS:
+                    unZippedSize+=msg.getData().getLong("File Size");
+                    unZipDialog.setProgressInfoText("已解压"+FileUtil.getFileSize(unZippedSize)+"，共"+
+                            FileUtil.getFileSize(totalSize));
+                    unZipDialog.setProgress((int)(unZippedSize*100/totalSize));
+                    break;
+                case DISMISS_UNZIP_DIALOG:
+                    unZipDialog.dismiss();
                     break;
             }
         }
@@ -123,14 +141,17 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onClick(View view){
                 if(FileUtil.file!=null&&FileUtil.file.exists()) {
-                    UnZipDialog unZipDialog = new UnZipDialog(mContext, R.style.StyleDialog, new UnZipDialog.OnUnZipListener() {
-                        @Override
-                        public void onUnZipSuccess() {
-                            handler.sendEmptyMessage(START_SCANNING_FILE);
-                        }
-                    });
-
+                    unZipDialog = new UnZipDialog(mContext, R.style.StyleDialog);
                     unZipDialog.show();
+                    if(FileUtil.file!=null&&FileUtil.file.exists()) {
+                        totalSize = FileUtil.getZipTrueSize(FileUtil.file.getAbsolutePath());
+                        new Thread(){
+                            @Override
+                            public void run(){
+                                FileUtil.unZip(FileUtil.file, FileUtil.path,handler);
+                            }
+                        }.start();
+                    }
                 }
             }
         });
