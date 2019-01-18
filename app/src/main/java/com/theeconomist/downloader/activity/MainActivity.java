@@ -110,6 +110,8 @@ public class MainActivity extends BaseActivity {
                 case DISMISS_DELETE_DIALOG:
                     deleteDialog.dismiss();
                     break;
+                default:
+                    break;
             }
         }
     };
@@ -240,7 +242,7 @@ public class MainActivity extends BaseActivity {
                             mp3File.delete();
                             FileUtil.deleteMusicFile(mContext, mp3File.getPath());
                             Message msg=new Message();
-                            msg.what=
+                            msg.what=UPDATE_DELETE_PROGRESS;
                             msg.arg1=i;
                             handler.sendMessageDelayed(msg,500);
                             try {
@@ -312,5 +314,11 @@ public class MainActivity extends BaseActivity {
 
     private void notifyDataChanged(){
         mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        handler.removeCallbacks(null);
     }
 }
