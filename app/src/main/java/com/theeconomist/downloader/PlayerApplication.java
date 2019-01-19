@@ -17,26 +17,11 @@ public class PlayerApplication extends Application {
         globalHandler=new Handler();
         context=this;
     }
-    @Override
-    public void onTerminate() {
 
-        super.onTerminate();
-    }
     @Override
     public void onLowMemory() {
         System.gc();
         super.onLowMemory();
-    }
-    @Override
-    public void onTrimMemory(int level) {
-
-        super.onTrimMemory(level);
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-
-        super.onConfigurationChanged(newConfig);
     }
 
     public Handler getGlobalHandler(){

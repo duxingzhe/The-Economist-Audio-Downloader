@@ -130,7 +130,7 @@ public class FileUtil {
         return size;
     }
 
-    public static Bitmap loadMp3Cover(String path) {
+    public static Bitmap loadMP3Cover(String path) {
         MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
         mediaMetadataRetriever.setDataSource(path);
         byte[] cover = mediaMetadataRetriever.getEmbeddedPicture();
@@ -154,6 +154,8 @@ public class FileUtil {
                 mp3File.fileSize = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE));
                 // 歌曲文件显示名字
                 mp3File.name = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME));
+
+                mp3File.coverImg=FileUtil.loadMP3Cover(mp3File.path);
                 cursor.moveToNext();
             }
             cursor.close();

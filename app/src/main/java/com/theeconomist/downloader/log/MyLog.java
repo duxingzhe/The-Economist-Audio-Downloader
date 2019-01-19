@@ -149,9 +149,6 @@ public class MyLog {
             case A:
                 BaseLog.printDefault(type, tag, headString + msg);
                 break;
-            case JSON:
-                JsonLog.printJson(tag, msg, headString);
-                break;
         }
     }
 

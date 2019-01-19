@@ -1,5 +1,7 @@
 package com.theeconomist.downloader.bean;
 
+import android.graphics.Bitmap;
+
 public class Mp3FileBean {
 
     public Mp3FileBean(String path){
@@ -15,4 +17,6 @@ public class Mp3FileBean {
     public String title;
 
     public long fileSize;
+
+    public Bitmap coverImg;
 }
