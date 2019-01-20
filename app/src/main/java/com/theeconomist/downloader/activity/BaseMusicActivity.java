@@ -95,7 +95,7 @@ public abstract class BaseMusicActivity extends BaseActivity{
     protected void onResume() {
         super.onResume();
         if(ivMiniBg != null) {
-            Glide.with(this).load(getPlayBean().getImg()).apply(RequestOptions.placeholderOf(R.mipmap.icon_mini_default_bg)).into(ivMiniBg);
+            Glide.with(this).load(getPlayBean().getImgByte()).apply(RequestOptions.placeholderOf(R.mipmap.icon_mini_default_bg)).into(ivMiniBg);
         }
         if(tvMiniName != null) {
             if(!tvMiniName.getText().toString().trim().equals(getPlayBean().getName())) {
@@ -103,8 +103,8 @@ public abstract class BaseMusicActivity extends BaseActivity{
             }
         }
         if(tvMiniSubName != null) {
-            if(!tvMiniSubName.getText().toString().trim().equals(getPlayBean().getSubname())) {
-                tvMiniSubName.setText(getPlayBean().getSubname());
+            if(!tvMiniSubName.getText().toString().trim().equals(getPlayBean().getName())) {
+                tvMiniSubName.setText(getPlayBean().getName());
             }
         }
         onMusicStatus(musicStatus);
@@ -130,7 +130,7 @@ public abstract class BaseMusicActivity extends BaseActivity{
     @Optional
     @OnClick(R.id.rl_mini_bar)
     public void onClickLive(View view) {
-        if(playBean != null && !TextUtils.isEmpty(playBean.getChannelId())) {
+        if(playBean != null ) {
             startActivity(this, PlayerActivity.class);
         }
     }

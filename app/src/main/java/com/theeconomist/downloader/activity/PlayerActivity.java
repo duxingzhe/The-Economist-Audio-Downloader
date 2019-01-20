@@ -85,7 +85,7 @@ public class PlayerActivity extends BaseMusicActivity {
         } else if(getPlayBean().getTiming() == 1) {
             tvTip.setText("（直播）");
         }
-        tvSubTitle.setText(getPlayBean().getSubname());
+        tvSubTitle.setText(getPlayBean().getName());
 
         lin = new LinearInterpolator();
         initPointAnimat();
@@ -93,7 +93,7 @@ public class PlayerActivity extends BaseMusicActivity {
         Intent intent = new Intent(this, MusicService.class);
         intent.putExtra("url", getPlayBean().getUrl());
         startService(intent);
-        Glide.with(this).load(getPlayBean().getImg()).apply(RequestOptions.placeholderOf(R.mipmap.icon_cd_default_bg)).into(ivCenter);
+        Glide.with(this).load(getPlayBean().getImgByte()).apply(RequestOptions.placeholderOf(R.mipmap.icon_cd_default_bg)).into(ivCenter);
         Glide.with(this).load(R.mipmap.icon_gray_bg)
                 .apply(bitmapTransform(new BlurTransformation(25, 3)).placeholder(R.mipmap.icon_gray_bg))
                 .into(ivBg);
@@ -241,7 +241,7 @@ public class PlayerActivity extends BaseMusicActivity {
         } else if(getPlayBean().getTiming() == 1) {
             tvTip.setText("（直播）");
         }
-        tvSubTitle.setText(getPlayBean().getSubname());
+        tvSubTitle.setText(getPlayBean().getName());
         initTime();
         updateTime(getTimeBean());
     }

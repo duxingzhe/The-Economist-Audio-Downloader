@@ -7,10 +7,9 @@ package com.theeconomist.downloader.bean;
 public class PlayBean extends BaseBean{
 
     private String name;
-    private String subname;
     private String url;
     private String img;
-    private String channelId;
+    private byte[] imgByte;
     private int index;
     private int timing;
 
@@ -30,28 +29,12 @@ public class PlayBean extends BaseBean{
         this.index = index;
     }
 
-    public String getChannelId() {
-        return channelId;
-    }
-
-    public void setChannelId(String channelId) {
-        this.channelId = channelId;
-    }
-
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getSubname() {
-        return subname;
-    }
-
-    public void setSubname(String subname) {
-        this.subname = subname;
     }
 
     public String getUrl() {
@@ -66,7 +49,15 @@ public class PlayBean extends BaseBean{
         return img;
     }
 
+    public byte[] getImgByte() {
+        return imgByte;
+    }
+
     public void setImg(String img) {
         this.img = img;
+    }
+
+    public void setImg(byte[] imgByte) {
+        this.imgByte = imgByte;
     }
 }

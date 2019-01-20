@@ -28,7 +28,7 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseMusicActivity {
 
     @BindView(R.id.input)
     public Button inputButton;
@@ -50,6 +50,7 @@ public class MainActivity extends BaseActivity {
     // 已解压大小
     private long unZippedSize;
 
+    // Handler Message标识
     private final static int START_SCANNING_FILE=0x1;
     private final static int UPDATE_ADD_FILE_PROGRESS=0x2;
     private final static int DISMISS_ADD_FILE_DIALOG=0x3;
@@ -271,6 +272,17 @@ public class MainActivity extends BaseActivity {
         });
 
         recyclerView.setAdapter(mAdapter);
+
+        mAdapter.setOnItemClickListener(new FileAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(Mp3FileBean mp3FileBean, int position) {
+                getPlayBean().setName(mp3FileBean.name);
+                getPlayBean().setImg(mp3FileBean.coverImg);
+                getPlayBean().setUrl(mp3FileBean.path);
+                getPlayBean().setTiming(1);
+                startActivity(MainActivity.this, PlayerActivity.class);
+            }
+        });
     }
 
     private void startScanningFile(){
