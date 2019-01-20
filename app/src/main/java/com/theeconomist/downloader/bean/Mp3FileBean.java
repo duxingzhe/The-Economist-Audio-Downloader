@@ -14,9 +14,7 @@ public class Mp3FileBean {
 
     public String name;
 
-    public String title;
-
     public long fileSize;
 
-    public Bitmap coverImg;
+    public byte[] coverImg;
 }

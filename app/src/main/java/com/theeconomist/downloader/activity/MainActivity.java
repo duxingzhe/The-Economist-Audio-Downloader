@@ -109,6 +109,7 @@ public class MainActivity extends BaseActivity {
                     break;
                 case DISMISS_DELETE_DIALOG:
                     deleteDialog.dismiss();
+                    startScanningFile();
                     break;
                 default:
                     break;
@@ -290,6 +291,10 @@ public class MainActivity extends BaseActivity {
 
                 // 文件总数
                 totalNum=filteredFiles.length;
+
+                if(mFiles.size()>0){
+                    mFiles.clear();
+                }
 
                 for(int i=0;i<totalNum;i++){
                     File mp3SingleFile=filteredFiles[i];

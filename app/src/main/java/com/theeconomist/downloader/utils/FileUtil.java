@@ -130,12 +130,21 @@ public class FileUtil {
         return size;
     }
 
-    public static Bitmap loadMP3Cover(String path) {
+    public static String getLongTime(long mss) {
+        String dateTimes = null;
+        long hours = (mss % ( 60 * 60 * 24)) / (60 * 60);
+        long minutes = (mss % ( 60 * 60)) /60;
+        long seconds = mss % 60;
+
+        dateTimes=String.format("%02d:", hours)+ String.format("%02d:", minutes) + String.format("%02d", seconds);
+        return dateTimes;
+    }
+
+    public static byte[] loadMP3Cover(String path) {
         MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
         mediaMetadataRetriever.setDataSource(path);
         byte[] cover = mediaMetadataRetriever.getEmbeddedPicture();
-        Bitmap bitmap = BitmapFactory.decodeByteArray(cover, 0, cover.length);
-        return bitmap;
+        return cover;
     }
 
     public static void getMusicInfo(Context context, Mp3FileBean mp3File) {
@@ -146,8 +155,6 @@ public class FileUtil {
         // 遍历媒体数据库
         if (cursor.moveToFirst()) {
             while (!cursor.isAfterLast()) {
-                // 歌曲标题
-                mp3File.title = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE));
                 // 歌曲的总播放时长：MediaStore.Audio.Media.DURATION
                 mp3File.duration = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION));
                 // 歌曲文件的大小 ：MediaStore.Audio.Media.SIZE
@@ -163,7 +170,7 @@ public class FileUtil {
     }
 
     public static void deleteMusicFile(Context context, String musicPath){
-// 查询媒体数据库
+        // 查询媒体数据库
         Cursor cursor = context.getContentResolver().query(MediaStore.Files.getContentUri("external"),
                 null, MediaStore.Files.FileColumns.DATA + "=?",new String[]{musicPath},
                 MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
