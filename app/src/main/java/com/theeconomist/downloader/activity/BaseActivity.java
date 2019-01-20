@@ -134,9 +134,11 @@ public class BaseActivity extends Activity {
 
 
     public void initSystembar(View lySystemBar) {
-
         if (lySystemBar != null) {
-            lySystemBar.setVisibility(View.GONE);
+            lySystemBar.setVisibility(View.VISIBLE);
+            LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) lySystemBar.getLayoutParams();
+            lp.height = CommonUtil.getStatusHeight(this);
+            lySystemBar.requestLayout();
         }
     }
 
@@ -223,14 +225,13 @@ public class BaseActivity extends Activity {
         overridePendingTransition(R.anim.in_from_left, R.anim.out_to_right);
     }
 
-    public void showDadaLoad() {
+    public void showDataLoad() {
         if(lyDataLoad != null) {
             lyDataLoad.setVisibility(View.VISIBLE);
         }
     }
 
-    public void hideDataLoad()
-    {
+    public void hideDataLoad() {
         if(lyDataLoad != null)
         {
             lyDataLoad.setVisibility(View.GONE);

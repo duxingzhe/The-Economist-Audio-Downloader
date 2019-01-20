@@ -20,8 +20,7 @@ import java.lang.reflect.Field;
 
 public class CommonUtil {
 
-    public static int getStatusHeight(Activity activity)
-    {
+    public static int getStatusHeight(Activity activity) {
         int statusBarHeight = 0;
         try {
             Class<?> c = Class.forName("com.android.internal.R$dimen");
