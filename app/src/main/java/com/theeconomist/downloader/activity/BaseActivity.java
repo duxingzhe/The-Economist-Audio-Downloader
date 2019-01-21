@@ -122,10 +122,13 @@ public class BaseActivity extends Activity {
     }
 
     public void onClickBack(){
+        finish();
         overridePendingTransition(R.anim.in_from_left, R.anim.out_to_right);
     }
 
-    public void onClickTxtMenu(){}
+    public void onClickTxtMenu(){
+
+    }
 
 
 
@@ -144,8 +147,7 @@ public class BaseActivity extends Activity {
      * @param title
      */
     public void setTitle(String title) {
-        if(mtvTitle != null)
-        {
+        if(mtvTitle != null) {
             mtvTitle.setText(title);
         }
     }

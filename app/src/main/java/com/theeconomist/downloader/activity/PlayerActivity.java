@@ -152,10 +152,10 @@ public class PlayerActivity extends BaseMusicActivity {
                 EventBus.getDefault().post(eventSeekBean);
             }
         });
-        playRadio();
+        playMusic();
     }
 
-    private void playRadio() {
+    private void playMusic() {
         if(!TextUtils.isEmpty(getPlayBean().getUrl())) {
             if (!getPlayBean().getUrl().equals(playUrl)) {
                 setCdRodio(0f);
@@ -180,7 +180,7 @@ public class PlayerActivity extends BaseMusicActivity {
         switch (status) {
             case PLAY_STATUS_ERROR:
                 if(ivPoint.getRotation() == 0f) {
-                    startPointAnimat(0f, -40f);
+                    startPointAnimate(0f, -40f);
                 }
                 ivStatus.setImageResource(R.drawable.play_selector);
                 break;
@@ -189,7 +189,7 @@ public class PlayerActivity extends BaseMusicActivity {
                 ivStatus.setVisibility(View.GONE);
                 if(ivPoint.getRotation() == -40f) {
                     rlCd.setRotation(getCdRodio());
-                    startPointAnimat(-40f, 0f);
+                    startPointAnimate(-40f, 0f);
                 }
                 ivStatus.setImageResource(R.drawable.pause_selector);
                 break;
@@ -200,13 +200,13 @@ public class PlayerActivity extends BaseMusicActivity {
             case PLAY_STATUS_PLAYING:
                 if(ivPoint.getRotation() == -40f) {
                     rlCd.setRotation(getCdRodio());
-                    startPointAnimat(-40f, 0f);
+                    startPointAnimate(-40f, 0f);
                 }
                 ivStatus.setImageResource(R.drawable.pause_selector);
                 break;
             case PLAY_STATUS_PAUSE:
                 if(ivPoint.getRotation() == 0f) {
-                    startPointAnimat(0f, -40f);
+                    startPointAnimate(0f, -40f);
                 }
                 ivStatus.setImageResource(R.drawable.play_selector);
                 break;
@@ -214,7 +214,7 @@ public class PlayerActivity extends BaseMusicActivity {
                 break;
             case PLAY_STATUS_COMPLETE:
                 if(ivPoint.getRotation() == 0f) {
-                    startPointAnimat(0f, -40f);
+                    startPointAnimate(0f, -40f);
                 }
                 ivStatus.setImageResource(R.drawable.play_selector);
                 break;
@@ -271,11 +271,11 @@ public class PlayerActivity extends BaseMusicActivity {
             pauseMusic(false);
             ivStatus.setImageResource(R.drawable.pause_selector);
             if(ivPoint.getRotation() == -40f) {
-                startPointAnimat(-40f, 0f);
+                startPointAnimate(-40f, 0f);
             }
         } else if(musicStatus == PLAY_STATUS_ERROR || musicStatus == PLAY_STATUS_COMPLETE) {
             playUrl = "";
-            playRadio();
+            playMusic();
         }
     }
 
@@ -314,7 +314,7 @@ public class PlayerActivity extends BaseMusicActivity {
             public void onAnimationStart(Animator animation) {
                 MyLog.d("onAnimationStart");
                 if(!isPlaying()) {
-                    pauseCDanimat();
+                    pauseCDAnimate();
                 }
             }
 
@@ -344,7 +344,7 @@ public class PlayerActivity extends BaseMusicActivity {
      * @param from
      * @param end
      */
-    private void startPointAnimat(float from, float end) {
+    private void startPointAnimate(float from, float end) {
         if(pointAnimator != null) {
             if(from < end) {
                 if(!isPlaying()) {
@@ -392,7 +392,7 @@ public class PlayerActivity extends BaseMusicActivity {
     /**
      * 暂停CD动画
      */
-    private void pauseCDanimat() {
+    private void pauseCDAnimate() {
         if(cdAnimator != null && cdAnimator.isRunning()) {
             cdAnimator.cancel();
         }
@@ -438,25 +438,25 @@ public class PlayerActivity extends BaseMusicActivity {
                 if(mp3File.index == getPlayBean().getIndex()){
                     if(next) {
                         if(i == size - 1) {
-                            showToast("已经是最新节目了");
+                            showToast("已经全部播放完了");
                         } else if(i < size - 1) {
                             mp3File = FileUtil.fileList.get(i+1);
                             getPlayBean().setName(mp3File.name);
                             getPlayBean().setUrl(mp3File.path);
                             getPlayBean().setIndex(mp3File.index);
-                            playRadio();
+                            playMusic();
                             onPlayHistoryChange();
                         }
                         break;
                     } else {
                         if(i == 0) {
-                            showToast("已经没有节目了");
+                            showToast("已经到头了");
                         } else if(i > 0) {
                             mp3File = FileUtil.fileList.get(i-1);
                             getPlayBean().setName(mp3File.name);
                             getPlayBean().setUrl(mp3File.path);
                             getPlayBean().setIndex(mp3File.index);
-                            playRadio();
+                            playMusic();
                             onPlayHistoryChange();
                         }
                         break;
@@ -464,7 +464,25 @@ public class PlayerActivity extends BaseMusicActivity {
                 }
             }
         } else {
-            showToast("没有历史节目");
+            showToast("没有文件可以播放");
+        }
+    }
+    
+    @Override
+    public void replayMusic(){
+        if(!getPlayBean().getUrl().equals(playUrl)) {
+            setCdRodio(0f);
+            playNext(true);
+            if(eventNextBean == null) {
+                eventNextBean = new EventBusBean(EventType.MUSIC_NEXT, getPlayBean().getUrl());
+            } else {
+                eventNextBean.setType(EventType.MUSIC_NEXT);
+                eventNextBean.setObject(getPlayBean().getUrl());
+            }
+            EventBus.getDefault().post(eventNextBean);
+            playUrl = getPlayBean().getUrl();
+            getTimeBean().setTotalSecs(0);
+            getTimeBean().setCurrSecs(0);
         }
     }
 }

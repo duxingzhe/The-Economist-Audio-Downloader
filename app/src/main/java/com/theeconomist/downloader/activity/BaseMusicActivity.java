@@ -86,7 +86,7 @@ public abstract class BaseMusicActivity extends BaseActivity{
     protected void onResume() {
         super.onResume();
         if(ivMiniBg != null) {
-            Glide.with(this).load(getPlayBean().getImgByte()).apply(RequestOptions.placeholderOf(R.mipmap.icon_mini_default_bg)).into(ivMiniBg);
+            Glide.with(this).load(getPlayBean().getImgByte()).apply(RequestOptions.placeholderOf(R.mipmap.ic_launcher)).into(ivMiniBg);
         }
         if(tvMiniName != null) {
             if(!tvMiniName.getText().toString().trim().equals(getPlayBean().getName())) {
@@ -94,22 +94,9 @@ public abstract class BaseMusicActivity extends BaseActivity{
             }
         }
         if(tvMiniSubName != null) {
-            if(!tvMiniSubName.getText().toString().trim().equals(getPlayBean().getName())) {
-                tvMiniSubName.setText(getPlayBean().getName());
-            }
+            tvMiniSubName.setText("The Economist");
         }
         onMusicStatus(musicStatus);
-        if(rlMiniBar != null) {
-            if(playBean != null && !TextUtils.isEmpty(playBean.getUrl())) {
-                if(rlMiniBar.getVisibility() != View.VISIBLE) {
-                    rlMiniBar.setVisibility(View.VISIBLE);
-                }
-            }
-            else
-            {
-                rlMiniBar.setVisibility(View.GONE);
-            }
-        }
     }
 
     @Optional
@@ -128,7 +115,7 @@ public abstract class BaseMusicActivity extends BaseActivity{
 
     @Optional
     @OnClick(R.id.iv_mini_playstatus)
-    public void onClickPlaystatus(View view) {
+    public void onClickPlayStatus(View view) {
         if(musicStatus == PLAY_STATUS_PLAYING) {
             pauseMusic(true);
             if(ivMiniPlayStatus != null) {
@@ -142,7 +129,7 @@ public abstract class BaseMusicActivity extends BaseActivity{
             }
         } else if(musicStatus == PLAY_STATUS_ERROR || musicStatus == PLAY_STATUS_COMPLETE) {
             playUrl = "";
-            replayRadio();
+            replayMusic();
         }
     }
 
@@ -296,26 +283,12 @@ public abstract class BaseMusicActivity extends BaseActivity{
                     ivMiniPlayStatus.setImageResource(R.drawable.svg_play);
                 }
                 break;
-                default:
+            default:
                     break;
         }
     }
 
-    private void replayRadio() {
-        if(!getPlayBean().getUrl().equals(playUrl)) {
-            setCdRodio(0f);
-            if(eventNextBean == null) {
-                eventNextBean = new EventBusBean(EventType.MUSIC_NEXT, getPlayBean().getUrl());
-            } else {
-                eventNextBean.setType(EventType.MUSIC_NEXT);
-                eventNextBean.setObject(getPlayBean().getUrl());
-            }
-            EventBus.getDefault().post(eventNextBean);
-            playUrl = getPlayBean().getUrl();
-            getTimeBean().setTotalSecs(0);
-            getTimeBean().setCurrSecs(0);
-        }
-    }
+    public abstract void replayMusic();
 
     public void onRelease() {
         eventPauseResumeBean = null;

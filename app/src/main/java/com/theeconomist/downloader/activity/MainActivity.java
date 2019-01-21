@@ -128,7 +128,7 @@ public class MainActivity extends BaseMusicActivity {
         mAdapter=new FileAdapter(mContext, mFiles);
         downloadButton=(Button)findViewById(R.id.download);
         recyclerView=(RecyclerView)findViewById(R.id.recyclerview);
-        bottomPlayStatusLayout=(LinearLayout)findViewById(R.id.ly_status);
+        bottomPlayStatusLayout=(LinearLayout)findViewById(R.id.ly_mini_player);
         scanButton=(Button)findViewById(R.id.scan);
         deleteButton=(Button)findViewById(R.id.delete);
 
@@ -271,14 +271,13 @@ public class MainActivity extends BaseMusicActivity {
             }
         });
 
-        recyclerView.setAdapter(mAdapter);
-
         mAdapter.setOnItemClickListener(new FileAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(Mp3FileBean mp3FileBean, int position) {
                 getPlayBean().setName(mp3FileBean.name);
                 getPlayBean().setImg(mp3FileBean.coverImg);
                 getPlayBean().setUrl(mp3FileBean.path);
+                getPlayBean().setIndex(mp3FileBean.index);
                 startActivity(MainActivity.this, PlayerActivity.class);
             }
         });
@@ -289,6 +288,10 @@ public class MainActivity extends BaseMusicActivity {
     private void startScanningFile(){
         addDialog=new AddDialog(mContext, R.style.StyleDialog);
         addDialog.show();
+
+        if(mFiles.size()>0){
+            mFiles.clear();
+        }
 
         new Thread(){
             @Override
@@ -304,10 +307,6 @@ public class MainActivity extends BaseMusicActivity {
 
                 // 文件总数
                 totalNum=filteredFiles.length;
-
-                if(mFiles.size()>0){
-                    mFiles.clear();
-                }
 
                 for(int i=0;i<totalNum;i++){
                     File mp3SingleFile=filteredFiles[i];
@@ -333,6 +332,7 @@ public class MainActivity extends BaseMusicActivity {
 
     private void notifyDataChanged(){
         FileUtil.fileList=mFiles;
+        recyclerView.setAdapter(mAdapter);
         mAdapter.notifyDataSetChanged();
     }
 
@@ -340,5 +340,10 @@ public class MainActivity extends BaseMusicActivity {
     public void onDestroy(){
         super.onDestroy();
         handler.removeCallbacks(null);
+    }
+
+    @Override
+    public void replayMusic(){
+
     }
 }

@@ -76,12 +76,9 @@ public class MusicService extends Service {
         wlMusic.setOnInfoListener(new OnInfoListener() {
             @Override
             public void onInfo(TimeBean timeBean) {
-                if(timeEventBean == null)
-                {
+                if(timeEventBean == null) {
                     timeEventBean = new EventBusBean(EventType.MUSIC_TIME_INFO, timeBean);
-                }
-                else
-                {
+                } else {
                     timeEventBean.setObject(timeBean);
                     timeEventBean.setType(EventType.MUSIC_TIME_INFO);
                 }
@@ -92,12 +89,9 @@ public class MusicService extends Service {
         wlMusic.setOnErrorListener(new OnErrorListener() {
             @Override
             public void onError(int code, String msg) {
-                if(errorEventBean == null)
-                {
+                if(errorEventBean == null) {
                     errorEventBean = new EventBusBean(EventType.MUSIC_ERROR, msg);
-                }
-                else
-                {
+                } else {
                     errorEventBean.setType(EventType.MUSIC_ERROR);
                     errorEventBean.setObject(msg);
                 }
@@ -109,12 +103,9 @@ public class MusicService extends Service {
         wlMusic.setOnLoadListener(new OnLoadListener() {
             @Override
             public void onLoad(boolean load) {
-                if(loadEventBean == null)
-                {
+                if(loadEventBean == null) {
                     loadEventBean = new EventBusBean(EventType.MUSIC_LOAD, load);
-                }
-                else
-                {
+                } else {
                     loadEventBean.setType(EventType.MUSIC_LOAD);
                     loadEventBean.setObject(load);
                 }
