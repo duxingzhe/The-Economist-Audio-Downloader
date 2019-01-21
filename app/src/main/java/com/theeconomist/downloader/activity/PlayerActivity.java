@@ -19,10 +19,12 @@ import com.bumptech.glide.request.RequestOptions;
 import com.theeconomist.downloader.MusicService;
 import com.theeconomist.downloader.R;
 import com.theeconomist.downloader.bean.EventBusBean;
+import com.theeconomist.downloader.bean.Mp3FileBean;
 import com.theeconomist.downloader.bean.SeekBean;
 import com.theeconomist.downloader.log.MyLog;
 import com.theeconomist.downloader.utils.CommonUtil;
 import com.theeconomist.downloader.utils.EventType;
+import com.theeconomist.downloader.utils.FileUtil;
 import com.ywl5320.bean.TimeBean;
 import com.ywl5320.util.WlTimeUtil;
 
@@ -78,18 +80,13 @@ public class PlayerActivity extends BaseMusicActivity {
         setTitleTrans(R.color.color_trans);
         setBackView();
         setTitleLine(R.color.color_trans);
-        setRightView(R.drawable.svg_menu_white);
         setTitle(getPlayBean().getName());
-        if(getPlayBean().getTiming() == 0) {
-            tvTip.setText("（回放）");
-        } else if(getPlayBean().getTiming() == 1) {
-            tvTip.setText("（直播）");
-        }
+        tvTip.setText("The Economist");
         tvSubTitle.setText(getPlayBean().getName());
 
         lin = new LinearInterpolator();
-        initPointAnimat();
-        initCDAnimat();
+        initPointAnimate();
+        initCDAnimate();
         Intent intent = new Intent(this, MusicService.class);
         intent.putExtra("url", getPlayBean().getUrl());
         startService(intent);
@@ -236,11 +233,8 @@ public class PlayerActivity extends BaseMusicActivity {
     @Override
     public void onPlayHistoryChange() {
         super.onPlayHistoryChange();
-        if(getPlayBean().getTiming() == 0) {
-            tvTip.setText("（回放）");
-        } else if(getPlayBean().getTiming() == 1) {
-            tvTip.setText("（直播）");
-        }
+        tvTip.setText("The Economist");
+        setTitle(getPlayBean().getName());
         tvSubTitle.setText(getPlayBean().getName());
         initTime();
         updateTime(getTimeBean());
@@ -286,14 +280,12 @@ public class PlayerActivity extends BaseMusicActivity {
     }
 
     @OnClick(R.id.iv_pre)
-    public void onClickPre(View view)
-    {
+    public void onClickPre(View view) {
         playNext(false);
     }
 
     @OnClick(R.id.iv_next)
-    public void onClickNext(View view)
-    {
+    public void onClickNext(View view) {
         playNext(true);
     }
 
@@ -301,7 +293,7 @@ public class PlayerActivity extends BaseMusicActivity {
     /**
      * 初始化指针动画
      */
-    private void initPointAnimat() {
+    private void initPointAnimate() {
         ivPoint.setPivotX(CommonUtil.dip2px(PlayerActivity.this, 17));
         ivPoint.setPivotY(CommonUtil.dip2px(PlayerActivity.this, 15));
         pointAnimator = ValueAnimator.ofFloat(0, 0);
@@ -321,8 +313,7 @@ public class PlayerActivity extends BaseMusicActivity {
             @Override
             public void onAnimationStart(Animator animation) {
                 MyLog.d("onAnimationStart");
-                if(!isPlaying())
-                {
+                if(!isPlaying()) {
                     pauseCDanimat();
                 }
             }
@@ -330,9 +321,8 @@ public class PlayerActivity extends BaseMusicActivity {
             @Override
             public void onAnimationEnd(Animator animation) {
                 MyLog.d("onAnimationEnd");
-                if(isPlaying())
-                {
-                    resumeCDanimat();
+                if(isPlaying()) {
+                    resumeCDAnimate();
                 }
             }
 
@@ -373,7 +363,7 @@ public class PlayerActivity extends BaseMusicActivity {
     /**
      * 初始化CD动画
      */
-    private void initCDAnimat() {
+    private void initCDAnimate() {
         cdAnimator = ValueAnimator.ofFloat(rlCd.getRotation(), 360f + rlCd.getRotation());
         cdAnimator.setTarget(rlCd);
         cdAnimator.setRepeatCount(ValueAnimator.INFINITE);
@@ -392,7 +382,7 @@ public class PlayerActivity extends BaseMusicActivity {
     /**
      * 开始cd动画
      */
-    private void resumeCDanimat() {
+    private void resumeCDAnimate() {
         if(cdAnimator != null && !cdAnimator.isRunning()) {
             cdAnimator.setFloatValues(rlCd.getRotation(), 360f + rlCd.getRotation());
             cdAnimator.start();
@@ -440,6 +430,41 @@ public class PlayerActivity extends BaseMusicActivity {
     }
 
     private void playNext(boolean next) {
-
+        if(FileUtil.fileList != null && FileUtil.fileList.size() > 0) {
+            int size = FileUtil.fileList.size();
+            for(int i = 0; i < size; i++) {
+                Mp3FileBean mp3File = FileUtil.fileList.get(i);
+                //当前播放的节目
+                if(mp3File.index == getPlayBean().getIndex()){
+                    if(next) {
+                        if(i == size - 1) {
+                            showToast("已经是最新节目了");
+                        } else if(i < size - 1) {
+                            mp3File = FileUtil.fileList.get(i+1);
+                            getPlayBean().setName(mp3File.name);
+                            getPlayBean().setUrl(mp3File.path);
+                            getPlayBean().setIndex(mp3File.index);
+                            playRadio();
+                            onPlayHistoryChange();
+                        }
+                        break;
+                    } else {
+                        if(i == 0) {
+                            showToast("已经没有节目了");
+                        } else if(i > 0) {
+                            mp3File = FileUtil.fileList.get(i-1);
+                            getPlayBean().setName(mp3File.name);
+                            getPlayBean().setUrl(mp3File.path);
+                            getPlayBean().setIndex(mp3File.index);
+                            playRadio();
+                            onPlayHistoryChange();
+                        }
+                        break;
+                    }
+                }
+            }
+        } else {
+            showToast("没有历史节目");
+        }
     }
 }

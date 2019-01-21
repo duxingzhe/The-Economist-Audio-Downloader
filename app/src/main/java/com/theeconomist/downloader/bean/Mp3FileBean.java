@@ -17,4 +17,6 @@ public class Mp3FileBean {
     public long fileSize;
 
     public byte[] coverImg;
+
+    public int index;
 }

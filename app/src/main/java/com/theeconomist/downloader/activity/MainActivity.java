@@ -279,10 +279,11 @@ public class MainActivity extends BaseMusicActivity {
                 getPlayBean().setName(mp3FileBean.name);
                 getPlayBean().setImg(mp3FileBean.coverImg);
                 getPlayBean().setUrl(mp3FileBean.path);
-                getPlayBean().setTiming(1);
                 startActivity(MainActivity.this, PlayerActivity.class);
             }
         });
+
+        startScanningFile();
     }
 
     private void startScanningFile(){
@@ -312,6 +313,7 @@ public class MainActivity extends BaseMusicActivity {
                     File mp3SingleFile=filteredFiles[i];
                     Mp3FileBean mp3File=new Mp3FileBean(mp3SingleFile.getAbsolutePath());
                     FileUtil.getMusicInfo(mContext,mp3File);
+                    mp3File.index=i;
                     mFiles.add(mp3File);
                     Message msg=new Message();
                     msg.what=UPDATE_ADD_FILE_PROGRESS;
@@ -330,6 +332,7 @@ public class MainActivity extends BaseMusicActivity {
     }
 
     private void notifyDataChanged(){
+        FileUtil.fileList=mFiles;
         mAdapter.notifyDataSetChanged();
     }
 

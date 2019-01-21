@@ -53,10 +53,6 @@ public class BaseActivity extends Activity {
     @BindView(R.id.tv_right)
     TextView tvRight;
 
-    @Nullable
-    @BindView(R.id.ly_data_load)
-    LinearLayout lyDataLoad;
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -147,8 +143,7 @@ public class BaseActivity extends Activity {
      * 设置标题
      * @param title
      */
-    public void setTitle(String title)
-    {
+    public void setTitle(String title) {
         if(mtvTitle != null)
         {
             mtvTitle.setText(title);
@@ -171,23 +166,6 @@ public class BaseActivity extends Activity {
         if(mivBack != null) {
             mivBack.setVisibility(View.VISIBLE);
             mivBack.setImageResource(resId);
-        }
-    }
-
-    /**
-     * 显示返回图标
-     */
-    public void setRightView(int resId) {
-        if(mivRight != null) {
-            mivRight.setVisibility(View.VISIBLE);
-            mivRight.setImageResource(resId);
-        }
-    }
-
-    public void setRightTxtMenu(String menu) {
-        if(tvRight != null) {
-            tvRight.setVisibility(View.VISIBLE);
-            tvRight.setText(menu);
         }
     }
 
@@ -223,19 +201,6 @@ public class BaseActivity extends Activity {
     public void onBackPressed() {
         this.finish();
         overridePendingTransition(R.anim.in_from_left, R.anim.out_to_right);
-    }
-
-    public void showDataLoad() {
-        if(lyDataLoad != null) {
-            lyDataLoad.setVisibility(View.VISIBLE);
-        }
-    }
-
-    public void hideDataLoad() {
-        if(lyDataLoad != null)
-        {
-            lyDataLoad.setVisibility(View.GONE);
-        }
     }
 
 }

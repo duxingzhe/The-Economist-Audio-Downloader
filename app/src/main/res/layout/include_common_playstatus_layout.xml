@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="50dp"
     android:background="@drawable/item_background">
+
     <LinearLayout
         android:id="@+id/ly_status"
         android:layout_width="wrap_content"
@@ -12,15 +13,7 @@
         android:orientation="horizontal"
         android:layout_alignParentRight="true"
         android:gravity="center_vertical">
-        <ProgressBar
-            android:id="@+id/pb_mini_load"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:indeterminateDrawable="@drawable/play_mini_load_drawable"
-            android:indeterminateOnly="true"
-            android:layout_centerInParent="true"
-            android:indeterminateBehavior="repeat"
-            android:padding="8dp"/>
+
         <ImageView
             android:id="@+id/iv_mini_playstatus"
             android:layout_width="40dp"
@@ -28,14 +21,6 @@
             android:layout_toLeftOf="@+id/iv_mini_menu"
             android:src="@drawable/svg_play"
             android:padding="8dp"
-            android:layout_centerVertical="true"/>
-        <ImageView
-            android:id="@+id/iv_mini_menu"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_alignParentRight="true"
-            android:src="@drawable/svg_menu"
-            android:padding="5dp"
             android:layout_centerVertical="true"/>
     </LinearLayout>
 
@@ -61,7 +46,6 @@
             android:id="@+id/tv_mini_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="水手"
             android:textColor="#000000"
             android:textSize="12dp"
             android:singleLine="true"
@@ -70,7 +54,6 @@
             android:id="@+id/tv_mini_subname"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="水手"
             android:textColor="#333333"
             android:textSize="10dp"
             android:layout_marginTop="2dp"

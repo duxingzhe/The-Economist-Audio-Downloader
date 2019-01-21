@@ -1,12 +1,10 @@
 package com.theeconomist.downloader.activity;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -22,9 +20,6 @@ import com.ywl5320.bean.TimeBean;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -55,10 +50,6 @@ public abstract class BaseMusicActivity extends BaseActivity{
     @Nullable
     @BindView(R.id.iv_mini_playstatus)
     ImageView ivMiniPlayStatus;
-
-    @Nullable
-    @BindView(R.id.pb_mini_load)
-    ProgressBar pbMiniLoad;
 
     @Nullable
     @BindView(R.id.rl_mini_bar)
@@ -161,7 +152,9 @@ public abstract class BaseMusicActivity extends BaseActivity{
             //时间信息
             MyLog.d("播放中...");
             if(!isPlaying) {
-                ivMiniPlayStatus.setImageResource(R.mipmap.icon_menu_pause);
+                if(ivMiniPlayStatus != null) {
+                    ivMiniPlayStatus.setImageResource(R.mipmap.icon_menu_pause);
+                }
             }
             isPlaying = true;
             timeBean = (TimeBean) messBean.getObject();
@@ -272,44 +265,29 @@ public abstract class BaseMusicActivity extends BaseActivity{
                 }
                 break;
             case PLAY_STATUS_LOADING:
-                if(pbMiniLoad != null && ivMiniPlayStatus != null)
-                {
-                    pbMiniLoad.setVisibility(View.VISIBLE);
+                if(ivMiniPlayStatus != null) {
                     ivMiniPlayStatus.setVisibility(View.GONE);
                 }
                 break;
             case PLAY_STATUS_UNLOADING:
-                if(pbMiniLoad != null && ivMiniPlayStatus != null)
-                {
-                    pbMiniLoad.setVisibility(View.GONE);
+                if(ivMiniPlayStatus != null) {
                     ivMiniPlayStatus.setVisibility(View.VISIBLE);
                 }
                 break;
             case PLAY_STATUS_PLAYING:
-                if(ivMiniPlayStatus != null)
-                {
+                if(ivMiniPlayStatus != null) {
                     ivMiniPlayStatus.setImageResource(R.mipmap.icon_menu_pause);
-                    if(pbMiniLoad != null)
-                    {
-                        pbMiniLoad.setVisibility(View.GONE);
-                        ivMiniPlayStatus.setVisibility(View.VISIBLE);
-                    }
+                    ivMiniPlayStatus.setVisibility(View.VISIBLE);
                 }
                 break;
             case PLAY_STATUS_PAUSE:
-                if(ivMiniPlayStatus != null)
-                {
+                if(ivMiniPlayStatus != null) {
                     ivMiniPlayStatus.setImageResource(R.drawable.svg_play);
-                    if(pbMiniLoad != null)
-                    {
-                        pbMiniLoad.setVisibility(View.GONE);
-                        ivMiniPlayStatus.setVisibility(View.VISIBLE);
-                    }
+                    ivMiniPlayStatus.setVisibility(View.VISIBLE);
                 }
                 break;
             case PLAY_STATUS_RESUME:
-                if(ivMiniPlayStatus != null)
-                {
+                if(ivMiniPlayStatus != null) {
                     ivMiniPlayStatus.setImageResource(R.drawable.svg_play);
                 }
                 break;

@@ -75,13 +75,4 @@
             layout="@layout/include_common_playstatus_layout"/>
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/ly_data_load"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/title"
-        android:orientation="vertical"
-        android:visibility="gone">
-        <include layout="@layout/loading_layout"/>
-    </LinearLayout>
 </RelativeLayout>

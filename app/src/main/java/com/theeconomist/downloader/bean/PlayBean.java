@@ -8,18 +8,8 @@ public class PlayBean extends BaseBean{
 
     private String name;
     private String url;
-    private String img;
     private byte[] imgByte;
     private int index;
-    private int timing;
-
-    public int getTiming() {
-        return timing;
-    }
-
-    public void setTiming(int timing) {
-        this.timing = timing;
-    }
 
     public int getIndex() {
         return index;
@@ -45,16 +35,8 @@ public class PlayBean extends BaseBean{
         this.url = url;
     }
 
-    public String getImg() {
-        return img;
-    }
-
     public byte[] getImgByte() {
         return imgByte;
-    }
-
-    public void setImg(String img) {
-        this.img = img;
     }
 
     public void setImg(byte[] imgByte) {

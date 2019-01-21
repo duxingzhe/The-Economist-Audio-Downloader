@@ -20,6 +20,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -34,6 +35,8 @@ public class FileUtil {
 
     // 需要解压的文件
     public static File file;
+
+    public static ArrayList<Mp3FileBean> fileList;
 
     private static int BUFFER_SIZE=4096;
 
