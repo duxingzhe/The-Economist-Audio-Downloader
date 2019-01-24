@@ -46,7 +46,7 @@ public class DownloadUtil {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 InputStream is = null;
-                byte[] buf = new byte[2048];
+                byte[] buf = new byte[2048*1024];
                 int len = 0;
                 FileOutputStream fos = null;
                 // 储存下载文件的目录
@@ -60,13 +60,18 @@ public class DownloadUtil {
                     long total = response.body().contentLength();
                     fos = new FileOutputStream(file);
                     long sum = 0;
+                    long newSum=0;
                     while ((len = is.read(buf)) != -1) {
                         fos.write(buf, 0, len);
-                        sum += len;
-                        int progress = (int) (sum * 1.0f / total * 100);
-                        // 下载中更新进度条
-                        listener.onDownloading(progress, total ,sum);
+                        newSum += len;
+                        // 每一兆更新一次
+                        if(newSum-sum>1024*1024) {
+                            // 下载中更新进度条
+                            listener.onDownloading(total, newSum);
+                            sum=newSum;
+                        }
                     }
+                    listener.onDownloading(total, newSum);
                     fos.flush();
                     // 下载完成
                     listener.onDownloadSuccess(file);
@@ -107,9 +112,9 @@ public class DownloadUtil {
         void onDownloadSuccess(File file);
 
         /**
-         * @param progress 下载进度
+         * @param
          */
-        void onDownloading(int progress,long totalSize, long downloadedSize);
+        void onDownloading(long totalSize, long downloadedSize);
 
         /**
          * @param e 下载异常信息

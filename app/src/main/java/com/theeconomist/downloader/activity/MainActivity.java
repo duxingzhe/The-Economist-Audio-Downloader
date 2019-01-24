@@ -1,9 +1,13 @@
 package com.theeconomist.downloader.activity;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.content.FileProvider;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -60,6 +64,8 @@ public class MainActivity extends BaseMusicActivity {
     private final static int DISMISS_DOWNLOAD_DIALOG=0x7;
     private final static int UPDATE_DELETE_PROGRESS=0x8;
     private final static int DISMISS_DELETE_DIALOG=0x9;
+
+    private static final String ACTION_MEDIA_SCANNER_SCAN_DIR = "android.intent.action.MEDIA_SCANNER_SCAN_DIR";
 
     private AddDialog addDialog;
     private UnZipDialog unZipDialog;
@@ -161,7 +167,7 @@ public class MainActivity extends BaseMusicActivity {
                         DownloadUtil.getInstance().download(FileUtil.url, FileUtil.path, FileUtil.fileName, new DownloadUtil.OnDownloadListener() {
 
                             @Override
-                            public void onDownloading(int progress, long totalSize, long downloadedSize) {
+                            public void onDownloading(long totalSize, long downloadedSize) {
                                 Message msg = new Message();
                                 msg.what = UPDATE_DOWNLOAD_PROGRESS;
                                 Bundle bundle = new Bundle();
@@ -278,6 +284,8 @@ public class MainActivity extends BaseMusicActivity {
                 getPlayBean().setImg(mp3FileBean.coverImg);
                 getPlayBean().setUrl(mp3FileBean.path);
                 getPlayBean().setIndex(mp3FileBean.index);
+                getPlayBean().setDuration((int)mp3FileBean.duration);
+                getPlayBean().setAblumName(mp3FileBean.albumName);
                 startActivity(MainActivity.this, PlayerActivity.class);
             }
         });
@@ -307,6 +315,15 @@ public class MainActivity extends BaseMusicActivity {
 
                 // 文件总数
                 totalNum=filteredFiles.length;
+
+                Intent scanIntent = new Intent(ACTION_MEDIA_SCANNER_SCAN_DIR);
+                if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.N){
+                    Uri mediaFileUri = FileProvider.getUriForFile(mContext, "com.theeconomist.downloader.fileprovider", file);
+                    scanIntent.setData(mediaFileUri);
+                }else {
+                    scanIntent.setData(Uri.fromFile(new File(FileUtil.path)));
+                }
+                mContext.sendBroadcast(scanIntent);
 
                 for(int i=0;i<totalNum;i++){
                     File mp3SingleFile=filteredFiles[i];
@@ -342,8 +359,4 @@ public class MainActivity extends BaseMusicActivity {
         handler.removeCallbacks(null);
     }
 
-    @Override
-    public void replayMusic(){
-
-    }
 }

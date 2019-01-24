@@ -135,11 +135,9 @@ public class FileUtil {
 
     public static String getLongTime(long mss) {
         String dateTimes = null;
-        long hours = (mss % ( 60 * 60 * 24)) / (60 * 60);
         long minutes = (mss % ( 60 * 60)) /60;
         long seconds = mss % 60;
-
-        dateTimes=String.format("%02d:", hours)+ String.format("%02d:", minutes) + String.format("%02d", seconds);
+        dateTimes=String.format("%02d:", minutes) + String.format("%02d", seconds);
         return dateTimes;
     }
 
@@ -159,12 +157,13 @@ public class FileUtil {
         if (cursor.moveToFirst()) {
             while (!cursor.isAfterLast()) {
                 // 歌曲的总播放时长：MediaStore.Audio.Media.DURATION
-                mp3File.duration = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION));
+                mp3File.duration = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION))/1000;
                 // 歌曲文件的大小 ：MediaStore.Audio.Media.SIZE
                 mp3File.fileSize = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE));
                 // 歌曲文件显示名字
                 mp3File.name = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME));
-
+                // 歌曲文件专辑
+                mp3File.albumName=cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM));
                 mp3File.coverImg=FileUtil.loadMP3Cover(mp3File.path);
                 cursor.moveToNext();
             }

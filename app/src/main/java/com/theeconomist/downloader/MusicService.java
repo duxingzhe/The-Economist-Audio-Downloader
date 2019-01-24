@@ -7,25 +7,26 @@ import android.support.annotation.Nullable;
 
 import com.theeconomist.downloader.bean.EventBusBean;
 import com.theeconomist.downloader.bean.SeekBean;
+import com.theeconomist.downloader.bean.TimeBean;
 import com.theeconomist.downloader.log.MyLog;
 import com.theeconomist.downloader.utils.EventType;
-import com.ywl5320.bean.TimeBean;
-import com.ywl5320.libmusic.WlMusic;
-import com.ywl5320.listener.OnCompleteListener;
-import com.ywl5320.listener.OnErrorListener;
-import com.ywl5320.listener.OnInfoListener;
-import com.ywl5320.listener.OnLoadListener;
-import com.ywl5320.listener.OnPauseResumeListener;
-import com.ywl5320.listener.OnPreparedListener;
-import com.ywl5320.listener.OnVolumeDBListener;
+import com.ywl5320.wlmedia.WlMedia;
+import com.ywl5320.wlmedia.enums.WlPlayModel;
+import com.ywl5320.wlmedia.listener.WlOnCompleteListener;
+import com.ywl5320.wlmedia.listener.WlOnErrorListener;
+import com.ywl5320.wlmedia.listener.WlOnLoadListener;
+import com.ywl5320.wlmedia.listener.WlOnPauseListener;
+import com.ywl5320.wlmedia.listener.WlOnPreparedListener;
+import com.ywl5320.wlmedia.listener.WlOnTimeInfoListener;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 public class MusicService extends Service {
-    private WlMusic wlMusic;
+    private WlMedia wlMedia;
     private String url;
+    private double duration;
     private EventBusBean timeEventBean;
     private EventBusBean errorEventBean;
     private EventBusBean loadEventBean;
@@ -39,14 +40,14 @@ public class MusicService extends Service {
     public void onCreate() {
         super.onCreate();
         EventBus.getDefault().register(this);
-        wlMusic = WlMusic.getInstance();
+        wlMedia = new WlMedia();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if(wlMusic != null) {
-            wlMusic.stop();
+        if(wlMedia != null) {
+            wlMedia.stop();
         }
         EventBus.getDefault().unregister(this);
     }
@@ -61,21 +62,24 @@ public class MusicService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         url = intent.getStringExtra("url");
-        wlMusic = WlMusic.getInstance();
-        wlMusic.setSource(url);
-        wlMusic.setPlayCircle(true);
-        wlMusic.setVolume(100);
-        wlMusic.setOnPreparedListener(new OnPreparedListener() {
+        wlMedia.setSource(url);
+        wlMedia.setVolume(100);
+        wlMedia.setPlayModel(WlPlayModel.PLAYMODEL_ONLY_AUDIO);
+        wlMedia.setOnPreparedListener(new WlOnPreparedListener() {
             @Override
             public void onPrepared() {
                 MyLog.e("onPrepared.................");
-                wlMusic.start();
+                wlMedia.start();
+                duration=wlMedia.getDuration();
             }
         });
 
-        wlMusic.setOnInfoListener(new OnInfoListener() {
+        wlMedia.setOnTimeInfoListener(new WlOnTimeInfoListener() {
             @Override
-            public void onInfo(TimeBean timeBean) {
+            public void onTimeInfo(double time) {
+                TimeBean timeBean=new TimeBean();
+                timeBean.setCurrSecs((int)time);
+                timeBean.setTotalSecs((int)duration);
                 if(timeEventBean == null) {
                     timeEventBean = new EventBusBean(EventType.MUSIC_TIME_INFO, timeBean);
                 } else {
@@ -86,7 +90,7 @@ public class MusicService extends Service {
             }
         });
 
-        wlMusic.setOnErrorListener(new OnErrorListener() {
+        wlMedia.setOnErrorListener(new WlOnErrorListener() {
             @Override
             public void onError(int code, String msg) {
                 if(errorEventBean == null) {
@@ -100,7 +104,7 @@ public class MusicService extends Service {
             }
         });
 
-        wlMusic.setOnLoadListener(new OnLoadListener() {
+        wlMedia.setOnLoadListener(new WlOnLoadListener() {
             @Override
             public void onLoad(boolean load) {
                 if(loadEventBean == null) {
@@ -113,7 +117,7 @@ public class MusicService extends Service {
             }
         });
 
-        wlMusic.setOnCompleteListener(new OnCompleteListener() {
+        wlMedia.setOnCompleteListener(new WlOnCompleteListener() {
             @Override
             public void onComplete() {
                 if(completeEventBean == null) {
@@ -127,7 +131,7 @@ public class MusicService extends Service {
             }
         });
 
-        wlMusic.setOnPauseResumeListener(new OnPauseResumeListener() {
+        wlMedia.setOnPauseListener(new WlOnPauseListener() {
             @Override
             public void onPause(boolean pause) {
                 if(pauseResumeEventBean == null) {
@@ -140,14 +144,7 @@ public class MusicService extends Service {
             }
         });
 
-        wlMusic.setOnVolumeDBListener(new OnVolumeDBListener() {
-            @Override
-            public void onVolumeDB(int db) {
-//                MyLog.d(db);
-            }
-        });
-
-        wlMusic.prePared();
+        wlMedia.prepared();
 
         return super.onStartCommand(intent, flags, startId);
     }
@@ -157,22 +154,23 @@ public class MusicService extends Service {
         if(messBean.getType() == EventType.MUSIC_PAUSE_RESUME) {
             boolean pause = (boolean) messBean.getObject();
             if(pause) {
-                wlMusic.pause();
+                wlMedia.pause();
             } else {
-                wlMusic.resume();
+                wlMedia.resume();
             }
         } else if(messBean.getType() == EventType.MUSIC_NEXT) {
-            if(wlMusic != null) {
+            if(wlMedia != null) {
                 String u = (String) messBean.getObject();
                 if(!url.equals(u)) {
                     url = u;
-                    wlMusic.playNext(url);
+                    wlMedia.setSource(url);
+                    wlMedia.next();
                 }
             }
         } else if(messBean.getType() == EventType.MUSIC_SEEK_TIME) {
-            if(wlMusic != null) {
+            if(wlMedia != null) {
                 SeekBean seekBean = (SeekBean) messBean.getObject();
-                wlMusic.seek(seekBean.getPosition(), seekBean.isSeekingfinished(), seekBean.isShowTime());
+                wlMedia.seek(seekBean.getPosition());
             }
         }
     }

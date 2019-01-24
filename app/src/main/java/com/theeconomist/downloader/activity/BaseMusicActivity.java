@@ -13,9 +13,9 @@ import com.bumptech.glide.request.RequestOptions;
 import com.theeconomist.downloader.R;
 import com.theeconomist.downloader.bean.EventBusBean;
 import com.theeconomist.downloader.bean.PlayBean;
+import com.theeconomist.downloader.bean.TimeBean;
 import com.theeconomist.downloader.log.MyLog;
 import com.theeconomist.downloader.utils.EventType;
-import com.ywl5320.bean.TimeBean;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -56,7 +56,7 @@ public abstract class BaseMusicActivity extends BaseActivity{
     RelativeLayout rlMiniBar;
 
     private static EventBusBean eventPauseResumeBean;//暂停、播放状态
-    private static float cdRodio = 0f;
+    private static float cdRadio = 0f;
     private static PlayBean playBean;
     private static TimeBean timeBean;
     private static boolean isPlaying = false;
@@ -94,7 +94,11 @@ public abstract class BaseMusicActivity extends BaseActivity{
             }
         }
         if(tvMiniSubName != null) {
-            tvMiniSubName.setText("The Economist");
+            if(TextUtils.isEmpty(getPlayBean().getAlbumName())) {
+                tvMiniSubName.setText("The Economist");
+            }else{
+                tvMiniSubName.setText("The Economist - "+getPlayBean().getAlbumName());
+            }
         }
         onMusicStatus(musicStatus);
     }
@@ -121,8 +125,7 @@ public abstract class BaseMusicActivity extends BaseActivity{
             if(ivMiniPlayStatus != null) {
                 ivMiniPlayStatus.setImageResource(R.drawable.svg_play);
             }
-        }
-        else if(musicStatus == PLAY_STATUS_PAUSE) {
+        } else if(musicStatus == PLAY_STATUS_PAUSE) {
             pauseMusic(false);
             if(ivMiniPlayStatus != null) {
                 ivMiniPlayStatus.setImageResource(R.mipmap.icon_menu_pause);
@@ -213,12 +216,12 @@ public abstract class BaseMusicActivity extends BaseActivity{
         return isPlaying;
     }
 
-    public void setCdRodio(float rodio) {
-        cdRodio = rodio;
+    public void setCdRadio(float radio) {
+        cdRadio = radio;
     }
 
-    public float getCdRodio() {
-        return cdRodio;
+    public float getCdRadio() {
+        return cdRadio;
     }
 
 
@@ -288,11 +291,13 @@ public abstract class BaseMusicActivity extends BaseActivity{
         }
     }
 
-    public abstract void replayMusic();
+    public void replayMusic(){
+
+    }
 
     public void onRelease() {
         eventPauseResumeBean = null;
-        cdRodio = 0f;
+        cdRadio = 0f;
         playBean = null;
         timeBean = null;
         isPlaying = false;

@@ -19,4 +19,6 @@ public class Mp3FileBean {
     public byte[] coverImg;
 
     public int index;
+
+    public String albumName;
 }

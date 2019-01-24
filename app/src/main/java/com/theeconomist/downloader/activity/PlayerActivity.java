@@ -21,12 +21,12 @@ import com.theeconomist.downloader.R;
 import com.theeconomist.downloader.bean.EventBusBean;
 import com.theeconomist.downloader.bean.Mp3FileBean;
 import com.theeconomist.downloader.bean.SeekBean;
+import com.theeconomist.downloader.bean.TimeBean;
 import com.theeconomist.downloader.log.MyLog;
 import com.theeconomist.downloader.utils.CommonUtil;
 import com.theeconomist.downloader.utils.EventType;
 import com.theeconomist.downloader.utils.FileUtil;
-import com.ywl5320.bean.TimeBean;
-import com.ywl5320.util.WlTimeUtil;
+import com.ywl5320.wlmedia.util.WlTimeUtil;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -81,7 +81,11 @@ public class PlayerActivity extends BaseMusicActivity {
         setBackView();
         setTitleLine(R.color.color_trans);
         setTitle(getPlayBean().getName());
-        tvTip.setText("The Economist");
+        if(TextUtils.isEmpty(getPlayBean().getAlbumName())) {
+            tvTip.setText("The Economist");
+        }else{
+            tvTip.setText("The Economist - " + getPlayBean().getAlbumName());
+        }
         tvSubTitle.setText(getPlayBean().getName());
 
         lin = new LinearInterpolator();
@@ -158,7 +162,7 @@ public class PlayerActivity extends BaseMusicActivity {
     private void playMusic() {
         if(!TextUtils.isEmpty(getPlayBean().getUrl())) {
             if (!getPlayBean().getUrl().equals(playUrl)) {
-                setCdRodio(0f);
+                setCdRadio(0f);
                 if (eventNextBean == null) {
                     eventNextBean = new EventBusBean(EventType.MUSIC_NEXT, getPlayBean().getUrl());
                 } else {
@@ -167,7 +171,7 @@ public class PlayerActivity extends BaseMusicActivity {
                 }
                 EventBus.getDefault().post(eventNextBean);
                 playUrl = getPlayBean().getUrl();
-                getTimeBean().setTotalSecs(0);
+                getTimeBean().setTotalSecs(getPlayBean().getDuration());
                 getTimeBean().setCurrSecs(0);
             }
         }
@@ -188,7 +192,7 @@ public class PlayerActivity extends BaseMusicActivity {
                 pbLoad.setVisibility(View.VISIBLE);
                 ivStatus.setVisibility(View.GONE);
                 if(ivPoint.getRotation() == -40f) {
-                    rlCd.setRotation(getCdRodio());
+                    rlCd.setRotation(getCdRadio());
                     startPointAnimate(-40f, 0f);
                 }
                 ivStatus.setImageResource(R.drawable.pause_selector);
@@ -199,7 +203,7 @@ public class PlayerActivity extends BaseMusicActivity {
                 break;
             case PLAY_STATUS_PLAYING:
                 if(ivPoint.getRotation() == -40f) {
-                    rlCd.setRotation(getCdRodio());
+                    rlCd.setRotation(getCdRadio());
                     startPointAnimate(-40f, 0f);
                 }
                 ivStatus.setImageResource(R.drawable.pause_selector);
@@ -233,7 +237,11 @@ public class PlayerActivity extends BaseMusicActivity {
     @Override
     public void onPlayHistoryChange() {
         super.onPlayHistoryChange();
-        tvTip.setText("The Economist");
+        if(TextUtils.isEmpty(getPlayBean().getAlbumName())) {
+            tvTip.setText("The Economist");
+        }else{
+            tvTip.setText("The Economist - " + getPlayBean().getAlbumName());
+        }
         setTitle(getPlayBean().getName());
         tvSubTitle.setText(getPlayBean().getName());
         initTime();
@@ -249,7 +257,7 @@ public class PlayerActivity extends BaseMusicActivity {
     protected void onResume() {
         super.onResume();
         updateTime(getTimeBean());
-        rlCd.setRotation(getCdRodio());
+        rlCd.setRotation(getCdRadio());
         ivPoint.setRotation(-40f);
     }
 
@@ -373,7 +381,7 @@ public class PlayerActivity extends BaseMusicActivity {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 float current = (Float) animation.getAnimatedValue();
-                setCdRodio(current);
+                setCdRadio(current);
                 rlCd.setRotation(current);
             }
         });
@@ -444,6 +452,7 @@ public class PlayerActivity extends BaseMusicActivity {
                             getPlayBean().setName(mp3File.name);
                             getPlayBean().setUrl(mp3File.path);
                             getPlayBean().setIndex(mp3File.index);
+                            getPlayBean().setDuration((int)mp3File.duration);
                             playMusic();
                             onPlayHistoryChange();
                         }
@@ -456,6 +465,7 @@ public class PlayerActivity extends BaseMusicActivity {
                             getPlayBean().setName(mp3File.name);
                             getPlayBean().setUrl(mp3File.path);
                             getPlayBean().setIndex(mp3File.index);
+                            getPlayBean().setDuration((int)mp3File.duration);
                             playMusic();
                             onPlayHistoryChange();
                         }
@@ -471,7 +481,7 @@ public class PlayerActivity extends BaseMusicActivity {
     @Override
     public void replayMusic(){
         if(!getPlayBean().getUrl().equals(playUrl)) {
-            setCdRodio(0f);
+            setCdRadio(0f);
             playNext(true);
             if(eventNextBean == null) {
                 eventNextBean = new EventBusBean(EventType.MUSIC_NEXT, getPlayBean().getUrl());
@@ -481,8 +491,9 @@ public class PlayerActivity extends BaseMusicActivity {
             }
             EventBus.getDefault().post(eventNextBean);
             playUrl = getPlayBean().getUrl();
-            getTimeBean().setTotalSecs(0);
+            getTimeBean().setTotalSecs(getPlayBean().getDuration());
             getTimeBean().setCurrSecs(0);
         }
+        onPlayHistoryChange();
     }
 }
