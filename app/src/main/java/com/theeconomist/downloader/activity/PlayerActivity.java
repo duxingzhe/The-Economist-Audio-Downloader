@@ -481,20 +481,6 @@ public class PlayerActivity extends BaseMusicActivity {
     }
 
     public void playNextMusic(){
-        if(getPlayBean().getUrl().equals(playUrl)) {
-            setCdRadio(0f);
-            playNext(true);
-            if(eventNextBean == null) {
-                eventNextBean = new EventBusBean(EventType.MUSIC_NEXT, getPlayBean().getUrl());
-            } else {
-                eventNextBean.setType(EventType.MUSIC_NEXT);
-                eventNextBean.setObject(getPlayBean().getUrl());
-            }
-            EventBus.getDefault().post(eventNextBean);
-            playUrl = getPlayBean().getUrl();
-            getTimeBean().setTotalSecs(getPlayBean().getDuration());
-            getTimeBean().setCurrSecs(0);
-        }
-        onPlayHistoryChange();
+        playNext(true);
     }
 }
