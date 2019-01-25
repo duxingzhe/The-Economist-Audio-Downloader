@@ -70,6 +70,7 @@
                 android:textSize="15sp"/>
             <TextView
                 android:id="@+id/ok"
+                android:visibility="gone"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"

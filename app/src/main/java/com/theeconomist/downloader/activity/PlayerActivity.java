@@ -217,10 +217,12 @@ public class PlayerActivity extends BaseMusicActivity {
             case PLAY_STATUS_RESUME:
                 break;
             case PLAY_STATUS_COMPLETE:
-                if(ivPoint.getRotation() == 0f) {
-                    startPointAnimate(0f, -40f);
+                if(ivPoint.getRotation() == -40f) {
+                    rlCd.setRotation(getCdRadio());
+                    startPointAnimate(-40f, 0f);
                 }
-                ivStatus.setImageResource(R.drawable.play_selector);
+                ivStatus.setImageResource(R.drawable.pause_selector);
+                playNextMusic();
                 break;
             default:
                 break;
@@ -477,10 +479,9 @@ public class PlayerActivity extends BaseMusicActivity {
             showToast("没有文件可以播放");
         }
     }
-    
-    @Override
-    public void replayMusic(){
-        if(!getPlayBean().getUrl().equals(playUrl)) {
+
+    public void playNextMusic(){
+        if(getPlayBean().getUrl().equals(playUrl)) {
             setCdRadio(0f);
             playNext(true);
             if(eventNextBean == null) {

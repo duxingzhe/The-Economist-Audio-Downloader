@@ -61,9 +61,8 @@ public abstract class BaseMusicActivity extends BaseActivity{
     private static TimeBean timeBean;
     private static boolean isPlaying = false;
 
-    private EventBusBean eventNextBean;
-    public static String playUrl = "";//当前播放url
-    public static String liveUrl = "";//直播url
+    //当前播放url
+    public static String playUrl = "";
 
     public static int musicStatus = -1;
 
@@ -132,7 +131,6 @@ public abstract class BaseMusicActivity extends BaseActivity{
             }
         } else if(musicStatus == PLAY_STATUS_ERROR || musicStatus == PLAY_STATUS_COMPLETE) {
             playUrl = "";
-            replayMusic();
         }
     }
 
@@ -291,19 +289,13 @@ public abstract class BaseMusicActivity extends BaseActivity{
         }
     }
 
-    public void replayMusic(){
-
-    }
-
     public void onRelease() {
         eventPauseResumeBean = null;
         cdRadio = 0f;
         playBean = null;
         timeBean = null;
         isPlaying = false;
-        eventNextBean = null;
         playUrl = "";
-        liveUrl = "";
         musicStatus = -1;
     }
 
