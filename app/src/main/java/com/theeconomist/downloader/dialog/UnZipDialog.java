@@ -21,6 +21,12 @@ public class UnZipDialog extends BaseDialog {
     private TextView dialogTitleTextView;
     private TextView progressInfoTextView;
 
+    private OnCancelButtonClickListener mCancelButtonListener;
+
+    public void setOnCancelButtonClickListener(OnCancelButtonClickListener mListener){
+        mCancelButtonListener=mListener;
+    }
+
     public UnZipDialog(Context context){
         super(context);
     }
@@ -34,12 +40,14 @@ public class UnZipDialog extends BaseDialog {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.file_operation_dialog);
 
+        setCancelable(false);
         cancelTextView=(TextView)findViewById(R.id.cancel);
         dialogTitleTextView=(TextView)findViewById(R.id.dialog_title);
         progressInfoTextView=(TextView)findViewById(R.id.progress_info);
         cancelTextView.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
+                mCancelButtonListener.onCancelButtonClick(view);
                 dismiss();
             }
         });
@@ -53,5 +61,10 @@ public class UnZipDialog extends BaseDialog {
 
     public void setProgressInfoText(String str){
         progressInfoTextView.setText(str);
+    }
+
+    public interface OnCancelButtonClickListener{
+
+        void onCancelButtonClick(View view);
     }
 }

@@ -60,18 +60,19 @@ public class DownloadUtil {
                     long total = response.body().contentLength();
                     fos = new FileOutputStream(file);
                     long sum = 0;
-                    long newSum=0;
+                    long a=System.currentTimeMillis(),b;
                     while ((len = is.read(buf)) != -1) {
                         fos.write(buf, 0, len);
-                        newSum += len;
-                        // 每一兆更新一次
-                        if(newSum-sum>1024*1024) {
+                        sum+=len;
+                        b=System.currentTimeMillis();
+                        // 每一秒更新一次
+                        if(b-a>1000){
                             // 下载中更新进度条
-                            listener.onDownloading(total, newSum);
-                            sum=newSum;
+                            listener.onDownloading(total, sum);
+                            a=b;
                         }
                     }
-                    listener.onDownloading(total, newSum);
+                    listener.onDownloading(total, sum);
                     fos.flush();
                     // 下载完成
                     listener.onDownloadSuccess(file);

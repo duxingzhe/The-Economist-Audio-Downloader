@@ -27,6 +27,8 @@ public class AddDialog extends BaseDialog {
     private TextView dialogTitleTextView;
     private TextView progressInfoTextView;
 
+    private OnCancelButtonClickListener mCancelButtonListener;
+
     public AddDialog(Context context){
         super(context);
     }
@@ -46,6 +48,7 @@ public class AddDialog extends BaseDialog {
         cancelTextView.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
+                mCancelButtonListener.onCancelButtonClick(view);
                 dismiss();
             }
         });
@@ -62,4 +65,12 @@ public class AddDialog extends BaseDialog {
         progressInfoTextView.setText(string);
     }
 
+    public void setOnCancelButtonClickListener(OnCancelButtonClickListener mListener){
+        mCancelButtonListener=mListener;
+    }
+
+    public interface OnCancelButtonClickListener{
+
+        void onCancelButtonClick(View view);
+    }
 }

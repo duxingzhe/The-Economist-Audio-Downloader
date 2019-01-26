@@ -27,6 +27,9 @@ public class DownloadDialog extends BaseDialog {
     private TextView dialogTitleTextView;
     private TextView progressInfoTextView;
 
+    private OnCancelButtonClickListener mCancelButtonListener;
+    private OnDownloadButtonClickListener mDownloadButtonClickListener;
+
     public DownloadDialog(Context context){
         super(context);
     }
@@ -35,14 +38,32 @@ public class DownloadDialog extends BaseDialog {
         super(context, style);
     }
 
+    public void setOnDownloadButtonClickListener(OnDownloadButtonClickListener mListener){
+        mDownloadButtonClickListener=mListener;
+    }
+
+    public void setOnCancelButtonClickListener(OnCancelButtonClickListener mListener){
+        mCancelButtonListener=mListener;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.file_operation_dialog);
 
-        mDownloadTextView=(TextView)findViewById(R.id.cancel);
-        mExitTextView=(TextView)findViewById(R.id.ok);
+        mExitTextView=(TextView)findViewById(R.id.cancel);
+        mDownloadTextView=(TextView)findViewById(R.id.ok);
+
+        setCancelable(false);
+        mExitTextView.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                mCancelButtonListener.onCancelButtonClick(view);
+            }
+        });
+
+        dialogTitleTextView=(TextView)findViewById(R.id.dialog_title);
+        progressInfoTextView=(TextView)findViewById(R.id.progress_info);
 
         mDownloadTextView.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -51,16 +72,24 @@ public class DownloadDialog extends BaseDialog {
             }
         });
 
-        dialogTitleTextView=(TextView)findViewById(R.id.dialog_title);
-        progressInfoTextView=(TextView)findViewById(R.id.progress_info);
-
         dialogTitleTextView.setText("下载文件中");
     }
 
     public void setProgress(int progress){
         fileOperationProgressBar.setProgress(progress);
     }
+
     public void setText(String string){
         progressInfoTextView.setText(string);
+    }
+
+    public interface OnCancelButtonClickListener{
+
+        void onCancelButtonClick(View view);
+    }
+
+    public interface OnDownloadButtonClickListener{
+
+        void onDownloadButtonClick(View view);
     }
 }

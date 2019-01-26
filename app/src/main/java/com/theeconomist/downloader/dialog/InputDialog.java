@@ -39,6 +39,7 @@ public class InputDialog extends BaseDialog {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.input_dialog_layout);
 
+        setCancelable(false);
         issueEditText=(EditText)findViewById(R.id.issue);
         yearEditText=(EditText)findViewById(R.id.year);
         monthEditText=(EditText)findViewById(R.id.month);

@@ -36,11 +36,7 @@ public class MainActivity extends BaseMusicActivity {
 
     @BindView(R.id.input)
     public Button inputButton;
-    private Button downloadButton;
-    private Button scanButton;
     private Button deleteButton;
-    @BindView(R.id.unzip)
-    public Button unzipButton;
     private RecyclerView recyclerView;
     private FileAdapter mAdapter;
 
@@ -64,6 +60,8 @@ public class MainActivity extends BaseMusicActivity {
     private final static int DISMISS_DOWNLOAD_DIALOG=0x7;
     private final static int UPDATE_DELETE_PROGRESS=0x8;
     private final static int DISMISS_DELETE_DIALOG=0x9;
+    private final static int START_DOWNLOADING_FILE=0x10;
+    private final static int START_UNZIPPING_FILE=0x11;
 
     private static final String ACTION_MEDIA_SCANNER_SCAN_DIR = "android.intent.action.MEDIA_SCANNER_SCAN_DIR";
 
@@ -71,6 +69,9 @@ public class MainActivity extends BaseMusicActivity {
     private UnZipDialog unZipDialog;
     private DownloadDialog downloadDialog;
     private DeleteDialog deleteDialog;
+
+    // 三个线程，用于解压、删除和扫描文件
+    private Thread unZipThread, deleteThread, scanFileThread;
 
     ArrayList<Mp3FileBean> mFiles=new ArrayList<>();
 
@@ -99,6 +100,7 @@ public class MainActivity extends BaseMusicActivity {
                     break;
                 case DISMISS_UNZIP_DIALOG:
                     unZipDialog.dismiss();
+                    handler.sendEmptyMessageDelayed(START_SCANNING_FILE,500);
                     break;
                 case UPDATE_DOWNLOAD_PROGRESS:
                     long downloadedSize=msg.getData().getLong("downloadedSize");
@@ -109,6 +111,7 @@ public class MainActivity extends BaseMusicActivity {
                     break;
                 case DISMISS_DOWNLOAD_DIALOG:
                     downloadDialog.dismiss();
+                    handler.sendEmptyMessageDelayed(START_UNZIPPING_FILE,500);
                     break;
                 case UPDATE_DELETE_PROGRESS:
                     deleteDialog.setText("已删除" + (msg.arg1 + 1) + "个文件，共" + totalNum + "个");
@@ -116,7 +119,13 @@ public class MainActivity extends BaseMusicActivity {
                     break;
                 case DISMISS_DELETE_DIALOG:
                     deleteDialog.dismiss();
-                    startScanningFile();
+                    handler.sendEmptyMessageDelayed(START_SCANNING_FILE,500);
+                    break;
+                case START_DOWNLOADING_FILE:
+                    downloadFile();
+                    break;
+                case START_UNZIPPING_FILE:
+                    unzipFile();
                     break;
                 default:
                     break;
@@ -132,10 +141,8 @@ public class MainActivity extends BaseMusicActivity {
         mContext=this;
 
         mAdapter=new FileAdapter(mContext, mFiles);
-        downloadButton=(Button)findViewById(R.id.download);
         recyclerView=(RecyclerView)findViewById(R.id.recyclerview);
         bottomPlayStatusLayout=(LinearLayout)findViewById(R.id.ly_mini_player);
-        scanButton=(Button)findViewById(R.id.scan);
         deleteButton=(Button)findViewById(R.id.delete);
 
         inputButton.setOnClickListener(new View.OnClickListener(){
@@ -146,6 +153,7 @@ public class MainActivity extends BaseMusicActivity {
                     public void downloadFile(String downloadUrl, String fileName) {
                         FileUtil.url=downloadUrl;
                         FileUtil.fileName=fileName;
+                        handler.sendEmptyMessageDelayed(START_DOWNLOADING_FILE,500);
                     }
                 });
 
@@ -153,116 +161,10 @@ public class MainActivity extends BaseMusicActivity {
             }
         });
 
-        downloadButton.setOnClickListener(new View.OnClickListener(){
-
-            @Override
-            public void onClick(View view){
-
-                if(!TextUtils.isEmpty(FileUtil.url)) {
-                    downloadDialog = new DownloadDialog(mContext, R.style.StyleDialog);
-
-                    downloadDialog.show();
-
-                    if(!TextUtils.isEmpty(FileUtil.url) && !TextUtils.isEmpty(FileUtil.fileName)) {
-                        DownloadUtil.getInstance().download(FileUtil.url, FileUtil.path, FileUtil.fileName, new DownloadUtil.OnDownloadListener() {
-
-                            @Override
-                            public void onDownloading(long totalSize, long downloadedSize) {
-                                Message msg = new Message();
-                                msg.what = UPDATE_DOWNLOAD_PROGRESS;
-                                Bundle bundle = new Bundle();
-                                bundle.putLong("totalSize", totalSize);
-                                bundle.putLong("downloadedSize", downloadedSize);
-                                msg.setData(bundle);
-                                handler.sendMessageDelayed(msg,500);
-                                try {
-                                    Thread.sleep(200);
-                                }catch(InterruptedException e){
-                                    e.printStackTrace();
-                                }
-                            }
-
-                            @Override
-                            public void onDownloadSuccess(File file) {
-                                FileUtil.file = file;
-                                handler.sendEmptyMessageDelayed(DISMISS_DOWNLOAD_DIALOG,1000);
-                            }
-
-                            @Override
-                            public void onDownloadFailed(Exception e) {
-                                handler.sendEmptyMessageDelayed(DISMISS_DOWNLOAD_DIALOG,1000);
-                            }
-                        });
-                    }else{
-                        downloadDialog.dismiss();
-                    }
-                }
-            }
-        });
-
-        unzipButton.setOnClickListener(new View.OnClickListener(){
-
-            @Override
-            public void onClick(View view){
-                if(FileUtil.file!=null&&FileUtil.file.exists()) {
-                    unZipDialog = new UnZipDialog(mContext, R.style.StyleDialog);
-                    unZipDialog.show();
-                    if(FileUtil.file!=null&&FileUtil.file.exists()) {
-                        totalSize = FileUtil.getZipTrueSize(FileUtil.file.getAbsolutePath());
-                        new Thread(){
-                            @Override
-                            public void run(){
-                                FileUtil.unZip(FileUtil.file, FileUtil.path,handler);
-                            }
-                        }.start();
-                    }
-                }
-            }
-        });
-
-        scanButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                startScanningFile();
-            }
-        });
-
         deleteButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
-
-                deleteDialog=new DeleteDialog(mContext, R.style.StyleDialog);
-                deleteDialog.show();
-                new Thread(){
-                    @Override
-                    public void run(){
-                        File file=new File(FileUtil.path);
-
-                        if(!file.exists()){
-                            return;
-                        }
-                        // 获取MP3文件
-                        File[] filteredFiles=file.listFiles();
-                        // 总文件数量
-                        totalNum=filteredFiles.length;
-                        for(int i=0;i<totalNum;i++){
-                            File mp3File=filteredFiles[i];
-                            mp3File.delete();
-                            FileUtil.deleteMusicFile(mContext, mp3File.getPath());
-                            Message msg=new Message();
-                            msg.what=UPDATE_DELETE_PROGRESS;
-                            msg.arg1=i;
-                            handler.sendMessageDelayed(msg,500);
-                            try {
-                                Thread.sleep(200);
-                            }catch(InterruptedException e){
-                                e.printStackTrace();
-                            }
-                        }
-
-                        handler.sendEmptyMessageDelayed(DISMISS_DELETE_DIALOG, 1000);
-                    }
-                }.start();
+                deleteFile();
             }
         });
 
@@ -301,7 +203,16 @@ public class MainActivity extends BaseMusicActivity {
             mFiles.clear();
         }
 
-        new Thread(){
+        addDialog.setOnCancelButtonClickListener(new AddDialog.OnCancelButtonClickListener() {
+            @Override
+            public void onCancelButtonClick(View view) {
+                if(scanFileThread.isAlive()){
+                    scanFileThread.interrupt();
+                }
+            }
+        });
+
+        scanFileThread=new Thread(){
             @Override
             public void run(){
 
@@ -344,7 +255,9 @@ public class MainActivity extends BaseMusicActivity {
 
                 handler.sendEmptyMessageDelayed(DISMISS_ADD_FILE_DIALOG,1000);
             }
-        }.start();
+        };
+
+        scanFileThread.start();
     }
 
     private void notifyDataChanged(){
@@ -357,6 +270,131 @@ public class MainActivity extends BaseMusicActivity {
     public void onDestroy(){
         super.onDestroy();
         handler.removeCallbacks(null);
+    }
+
+    private void deleteFile(){
+        deleteDialog=new DeleteDialog(mContext, R.style.StyleDialog);
+        deleteDialog.show();
+
+        deleteDialog.setOnCancelButtonClickListener(new DeleteDialog.OnCancelButtonClickListener(){
+
+            @Override
+            public void onCancelButtonClick(View view){
+                if(deleteThread.isAlive()){
+                    deleteThread.interrupt();
+                }
+            }
+        });
+
+        deleteThread=new Thread(){
+            @Override
+            public void run(){
+                File file=new File(FileUtil.path);
+
+                if(!file.exists()){
+                    return;
+                }
+                // 获取MP3文件
+                File[] filteredFiles=file.listFiles();
+                // 总文件数量
+                totalNum=filteredFiles.length;
+                for(int i=0;i<totalNum;i++){
+                    File mp3File=filteredFiles[i];
+                    mp3File.delete();
+                    FileUtil.deleteMusicFile(mContext, mp3File.getPath());
+                    Message msg=new Message();
+                    msg.what=UPDATE_DELETE_PROGRESS;
+                    msg.arg1=i;
+                    handler.sendMessageDelayed(msg,500);
+                    try {
+                        Thread.sleep(200);
+                    }catch(InterruptedException e){
+                        e.printStackTrace();
+                    }
+                }
+
+                handler.sendEmptyMessageDelayed(DISMISS_DELETE_DIALOG, 1000);
+            }
+        };
+
+        deleteThread.start();
+    }
+
+    private void downloadFile(){
+        if(!TextUtils.isEmpty(FileUtil.url)) {
+            downloadDialog = new DownloadDialog(mContext, R.style.StyleDialog);
+
+            downloadDialog.show();
+
+            downloadDialog.setOnCancelButtonClickListener(new DownloadDialog.OnCancelButtonClickListener() {
+                @Override
+                public void onCancelButtonClick(View view) {
+                    DownloadUtil.getInstance().cancel();
+                }
+            });
+
+            if(!TextUtils.isEmpty(FileUtil.url) && !TextUtils.isEmpty(FileUtil.fileName)) {
+                DownloadUtil.getInstance().download(FileUtil.url, FileUtil.path, FileUtil.fileName, new DownloadUtil.OnDownloadListener() {
+
+                    @Override
+                    public void onDownloading(long totalSize, long downloadedSize) {
+                        Message msg = new Message();
+                        msg.what = UPDATE_DOWNLOAD_PROGRESS;
+                        Bundle bundle = new Bundle();
+                        bundle.putLong("totalSize", totalSize);
+                        bundle.putLong("downloadedSize", downloadedSize);
+                        msg.setData(bundle);
+                        handler.sendMessageDelayed(msg,500);
+                        try {
+                            Thread.sleep(200);
+                        }catch(InterruptedException e){
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onDownloadSuccess(File file) {
+                        FileUtil.file = file;
+                        handler.sendEmptyMessageDelayed(DISMISS_DOWNLOAD_DIALOG,1000);
+                    }
+
+                    @Override
+                    public void onDownloadFailed(Exception e) {
+                        handler.sendEmptyMessageDelayed(DISMISS_DOWNLOAD_DIALOG,1000);
+                    }
+                });
+            }else{
+                downloadDialog.dismiss();
+            }
+        }
+    }
+
+    private void unzipFile(){
+        if(FileUtil.file!=null&&FileUtil.file.exists()) {
+
+            unZipDialog = new UnZipDialog(mContext, R.style.StyleDialog);
+            unZipDialog.show();
+
+            unZipDialog.setOnCancelButtonClickListener(new UnZipDialog.OnCancelButtonClickListener() {
+                @Override
+                public void onCancelButtonClick(View view) {
+                    if(unZipThread.isAlive()){
+                        unZipThread.interrupt();
+                    }
+                }
+            });
+
+            if(FileUtil.file!=null&&FileUtil.file.exists()) {
+                totalSize = FileUtil.getZipTrueSize(FileUtil.file.getAbsolutePath());
+                unZipThread=new Thread(){
+                    @Override
+                    public void run(){
+                        FileUtil.unZip(FileUtil.file, FileUtil.path,handler);
+                    }
+                };
+                unZipThread.start();
+            }
+        }
     }
 
 }
