@@ -55,7 +55,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_alignParentBottom="true"
-        android:paddingBottom="10dp"
+        android:layout_marginBottom="5dp"
         >
         <include
             layout="@layout/common_play_status_layout"/>
