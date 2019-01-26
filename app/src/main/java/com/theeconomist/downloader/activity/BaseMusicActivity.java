@@ -81,7 +81,7 @@ public abstract class BaseMusicActivity extends BaseActivity{
     protected void onResume() {
         super.onResume();
         if(ivMiniBg != null) {
-            Glide.with(this).load(getPlayBean().getImgByte()).apply(RequestOptions.placeholderOf(R.mipmap.ic_launcher)).into(ivMiniBg);
+            Glide.with(this).load(getPlayBean().getImgByte()).apply(RequestOptions.errorOf(R.mipmap.file_mp3_icon)).into(ivMiniBg);
         }
         if(tvMiniName != null) {
             if(!tvMiniName.getText().toString().trim().equals(getPlayBean().getName())) {

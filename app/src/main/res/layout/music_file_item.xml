@@ -17,7 +17,6 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_gravity="center"
-            android:background="@mipmap/file_mp3_icon"
             />
     </LinearLayout>
 
@@ -58,7 +57,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:paddingRight="20dp"
+        android:paddingRight="10dp"
         android:gravity="center|right"
         >
 

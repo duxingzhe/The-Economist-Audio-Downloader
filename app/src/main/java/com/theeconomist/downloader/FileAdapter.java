@@ -49,7 +49,7 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
     @Override
     public void onBindViewHolder(FileViewHolder viewHolder, final int position){
         Mp3FileBean mp3File=mDataList.get(position);
-        Glide.with(mContext).load(mp3File.coverImg).apply(RequestOptions.placeholderOf(R.mipmap.file_mp3_icon)).into(viewHolder.mp3FileCoverImg);
+        Glide.with(mContext).load(mp3File.coverImg).apply(RequestOptions.errorOf(R.mipmap.file_mp3_icon)).into(viewHolder.mp3FileCoverImg);
         viewHolder.mp3FileTitle.setText(mp3File.name);
         viewHolder.mp3FileDuration.setText(FileUtil.getLongTime(mp3File.duration));
         viewHolder.mp3FileSize.setText(FileUtil.getFileSize(mp3File.fileSize));
