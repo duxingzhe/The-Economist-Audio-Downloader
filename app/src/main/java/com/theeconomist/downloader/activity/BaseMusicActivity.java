@@ -128,6 +128,10 @@ public abstract class BaseMusicActivity extends BaseActivity{
     public void eventMsg(final EventBusBean messBean) {
         if(messBean.getType() == EventType.MUSIC_TIME_INFO){
             //时间信息
+            if(musicStatus==PLAY_STATUS_PAUSE){
+                pauseMusic(true);
+                return;
+            }
             MyLog.d("播放中...");
             if(!isPlaying) {
                 if(ivMiniPlayStatus != null) {
