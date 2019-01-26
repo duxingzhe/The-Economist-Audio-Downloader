@@ -32,10 +32,6 @@ import butterknife.Optional;
 public abstract class BaseMusicActivity extends BaseActivity{
 
     @Nullable
-    @BindView(R.id.iv_mini_menu)
-    ImageView ivMiniMenu;
-
-    @Nullable
     @BindView(R.id.iv_mini_bg)
     ImageView ivMiniBg;
     
@@ -100,12 +96,6 @@ public abstract class BaseMusicActivity extends BaseActivity{
             }
         }
         onMusicStatus(musicStatus);
-    }
-
-    @Optional
-    @OnClick(R.id.iv_mini_menu)
-    public void onClickHistory(View view) {
-
     }
 
     @Optional

@@ -10,6 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:orientation="horizontal"
+        android:paddingRight="20dp"
         android:layout_alignParentRight="true"
         android:gravity="center_vertical">
 
@@ -17,8 +18,8 @@
             android:id="@+id/iv_mini_playstatus"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_toLeftOf="@+id/iv_mini_menu"
             android:src="@drawable/svg_play"
+
             android:padding="8dp"
             android:layout_centerVertical="true"/>
     </LinearLayout>
@@ -33,7 +34,8 @@
         android:layout_marginEnd="5dp"
         android:layout_marginBottom="5dp"
         android:background="@drawable/gray_border"
-        android:padding="1dp" />
+        android:paddingLeft="10dp" />
+
     <LinearLayout
         android:layout_toRightOf="@+id/iv_mini_bg"
         android:layout_width="match_parent"

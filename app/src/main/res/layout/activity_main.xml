@@ -5,25 +5,36 @@
     android:layout_height="match_parent"
     >
 
-    <include android:id="@+id/title" layout="@layout/include_common_text_title"/>
+    <include
+        android:id="@+id/title"
+        layout="@layout/common_text_title"/>
 
     <LinearLayout
         android:id="@+id/downloadPanel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/title"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:paddingLeft="20dp"
         >
 
         <Button
             android:id="@+id/input"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@drawable/button_background"
+            android:textColor="@color/color_ec4c48"
             android:text="输入"
             />
+
         <Button
             android:id="@+id/delete"
-            android:layout_width="80dp"
+            android:layout_marginLeft="20dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@drawable/button_background"
+            android:textColor="@color/color_ec4c48"
             android:text="删除"
             />
     </LinearLayout>
@@ -33,16 +44,21 @@
         android:layout_below="@+id/downloadPanel"
         android:layout_above="@+id/ly_mini_player"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:paddingTop="10dp"
+        android:paddingLeft="20dp"
+        />
 
     <LinearLayout
         android:id="@+id/ly_mini_player"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_alignParentBottom="true">
+        android:layout_alignParentBottom="true"
+        android:paddingBottom="10dp"
+        >
         <include
-            layout="@layout/include_common_playstatus_layout"/>
+            layout="@layout/common_play_status_layout"/>
     </LinearLayout>
 
 </RelativeLayout>
