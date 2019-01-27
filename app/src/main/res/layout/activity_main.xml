@@ -23,7 +23,7 @@
             android:id="@+id/input"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/button_background"
+            android:background="@drawable/red_button_background"
             android:textColor="@color/color_ec4c48"
             android:text="输入"
             />
@@ -33,8 +33,8 @@
             android:layout_marginLeft="20dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/button_background"
-            android:textColor="@color/color_ec4c48"
+            android:background="@drawable/gray_button_background"
+            android:textColor="@color/color_ededed"
             android:text="删除"
             />
     </LinearLayout>

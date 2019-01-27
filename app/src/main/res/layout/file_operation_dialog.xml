@@ -45,7 +45,7 @@
             android:paddingTop="3dp"
             android:paddingBottom="3dp"
             style="?android:attr/progressBarStyleHorizontal"
-            android:progressDrawable="@drawable/add_file_progress_drawable"
+            android:progressDrawable="@drawable/progress_drawable"
             android:layout_width="match_parent"
             android:layout_height="10dp" />
 
