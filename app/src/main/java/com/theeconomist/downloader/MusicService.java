@@ -78,7 +78,7 @@ public class MusicService extends Service {
             @Override
             public void onTimeInfo(double time) {
                 TimeBean timeBean=new TimeBean();
-                timeBean.setCurrSecs((int)Math.ceil(time));
+                timeBean.setCurrSecs((int)Math.floor(time));
                 timeBean.setTotalSecs((int)duration);
                 if(timeEventBean == null) {
                     timeEventBean = new EventBusBean(EventType.MUSIC_TIME_INFO, timeBean);

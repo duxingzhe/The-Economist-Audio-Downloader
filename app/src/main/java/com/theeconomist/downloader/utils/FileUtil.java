@@ -141,14 +141,14 @@ public class FileUtil {
         return dateTimes;
     }
 
-    public static byte[] loadMP3Cover(String path) {
+    private static byte[] loadMP3Cover(String path) {
         MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
         mediaMetadataRetriever.setDataSource(path);
         byte[] cover = mediaMetadataRetriever.getEmbeddedPicture();
         return cover;
     }
 
-    public static void getMusicInfo(Context context, Mp3FileBean mp3File) {
+    public static boolean getMusicInfo(Context context, Mp3FileBean mp3File) {
         // 查询媒体数据库
         Cursor cursor = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 null, MediaStore.Audio.Media.DATA + "=?",new String[]{mp3File.path},
@@ -161,14 +161,28 @@ public class FileUtil {
                 // 歌曲文件的大小 ：MediaStore.Audio.Media.SIZE
                 mp3File.fileSize = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE));
                 // 歌曲文件显示名字
-                mp3File.name = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME));
+                mp3File.name = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE));
                 // 歌曲文件专辑
                 mp3File.albumName=cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM));
-                mp3File.coverImg=FileUtil.loadMP3Cover(mp3File.path);
+                mp3File.coverImg=loadMP3Cover(mp3File.path);
                 cursor.moveToNext();
             }
             cursor.close();
+            return true;
+        }else{
+            return false;
         }
+    }
+
+    public static void loadMP3Info(Mp3FileBean mp3File) {
+        MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
+        mediaMetadataRetriever.setDataSource(mp3File.path);
+        File file=new File(mp3File.path);
+        mp3File.duration=Long.valueOf(mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION))/1000;
+        mp3File.albumName=mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM);
+        mp3File.name=mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+        mp3File.coverImg = mediaMetadataRetriever.getEmbeddedPicture();
+        mp3File.fileSize=file.length();
     }
 
     public static void deleteMusicFile(Context context, String musicPath){
