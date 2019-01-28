@@ -232,7 +232,7 @@ public class MainActivity extends BaseMusicActivity {
                     Uri mediaFileUri = FileProvider.getUriForFile(mContext, "com.theeconomist.downloader.fileprovider", file);
                     scanIntent.setData(mediaFileUri);
                 }else {
-                    scanIntent.setData(Uri.fromFile(new File(FileUtil.path)));
+                    scanIntent.setData(Uri.fromFile(file));
                 }
                 mContext.sendBroadcast(scanIntent);
 
