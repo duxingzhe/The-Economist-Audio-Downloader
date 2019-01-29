@@ -37,6 +37,16 @@
             android:textColor="@color/color_222222"
             android:text="删除"
             />
+
+        <Button
+            android:id="@+id/exit"
+            android:layout_marginLeft="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/gray_button_background"
+            android:textColor="@color/color_222222"
+            android:text="退出"
+            />
     </LinearLayout>
 
     <android.support.v7.widget.RecyclerView

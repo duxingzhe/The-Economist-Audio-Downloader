@@ -15,8 +15,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.theeconomist.downloader.FileAdapter;
 import com.theeconomist.downloader.R;
+import com.theeconomist.downloader.bean.EventBusBean;
 import com.theeconomist.downloader.bean.Mp3FileBean;
 import com.theeconomist.downloader.dialog.AddDialog;
 import com.theeconomist.downloader.dialog.DeleteDialog;
@@ -24,8 +27,11 @@ import com.theeconomist.downloader.dialog.DownloadDialog;
 import com.theeconomist.downloader.dialog.InputDialog;
 import com.theeconomist.downloader.dialog.UnZipDialog;
 import com.theeconomist.downloader.utils.DownloadUtil;
+import com.theeconomist.downloader.utils.EventType;
 import com.theeconomist.downloader.utils.FileUtil;
 import com.theeconomist.downloader.utils.MP3Filter;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -37,11 +43,14 @@ public class MainActivity extends BaseMusicActivity {
     @BindView(R.id.input)
     public Button inputButton;
     private Button deleteButton;
+    private Button exitButton;
     private RecyclerView recyclerView;
     private FileAdapter mAdapter;
 
     private LinearLayout bottomPlayStatusLayout;
     private Context mContext;
+
+    private EventBusBean eventNextBean;
 
     // 文件总数
     private int totalNum;
@@ -144,6 +153,7 @@ public class MainActivity extends BaseMusicActivity {
         recyclerView=(RecyclerView)findViewById(R.id.recyclerview);
         bottomPlayStatusLayout=(LinearLayout)findViewById(R.id.ly_mini_player);
         deleteButton=(Button)findViewById(R.id.delete);
+        exitButton=(Button)findViewById(R.id.exit);
 
         inputButton.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -189,6 +199,13 @@ public class MainActivity extends BaseMusicActivity {
                 getPlayBean().setDuration((int)mp3FileBean.duration);
                 getPlayBean().setAblumName(mp3FileBean.albumName);
                 startActivity(MainActivity.this, PlayerActivity.class);
+            }
+        });
+
+        exitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
             }
         });
 
@@ -273,6 +290,20 @@ public class MainActivity extends BaseMusicActivity {
     public void onDestroy(){
         super.onDestroy();
         handler.removeCallbacks(null);
+    }
+
+    @Override
+    public void onMusicStatus(int status) {
+        super.onMusicStatus(status);
+        switch (status) {
+            case PLAY_STATUS_RESUME:
+                break;
+            case PLAY_STATUS_COMPLETE:
+                playNextMusic();
+                break;
+            default:
+                break;
+        }
     }
 
     private void deleteFile(){
@@ -396,6 +427,49 @@ public class MainActivity extends BaseMusicActivity {
                     }
                 };
                 unZipThread.start();
+            }
+        }
+    }
+
+    @Override
+    public void playNextMusic(){
+        playNext(true);
+    }
+
+    @Override
+    public void playMusic(){
+        if(!TextUtils.isEmpty(getPlayBean().getUrl())) {
+            if (!getPlayBean().getUrl().equals(playUrl)) {
+                setCdRadio(0f);
+                if (eventNextBean == null) {
+                    eventNextBean = new EventBusBean(EventType.MUSIC_NEXT, getPlayBean().getUrl());
+                } else {
+                    eventNextBean.setType(EventType.MUSIC_NEXT);
+                    eventNextBean.setObject(getPlayBean().getUrl());
+                }
+                EventBus.getDefault().post(eventNextBean);
+                playUrl = getPlayBean().getUrl();
+                getTimeBean().setTotalSecs(getPlayBean().getDuration());
+                getTimeBean().setCurrSecs(0);
+            }
+        }
+        initMiniBar();
+    }
+
+    private void initMiniBar() {
+        if(ivMiniBg != null) {
+            Glide.with(this).load(getPlayBean().getImgByte()).apply(RequestOptions.errorOf(R.mipmap.file_mp3_icon)).into(ivMiniBg);
+        }
+        if(tvMiniName != null) {
+            if(!tvMiniName.getText().toString().trim().equals(getPlayBean().getName())) {
+                tvMiniName.setText(getPlayBean().getName());
+            }
+        }
+        if(tvMiniSubName != null) {
+            if(TextUtils.isEmpty(getPlayBean().getAlbumName())) {
+                tvMiniSubName.setText("The Economist");
+            }else{
+                tvMiniSubName.setText("The Economist - "+getPlayBean().getAlbumName());
             }
         }
     }

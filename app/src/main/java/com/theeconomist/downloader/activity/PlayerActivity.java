@@ -159,7 +159,8 @@ public class PlayerActivity extends BaseMusicActivity {
         playMusic();
     }
 
-    private void playMusic() {
+    @Override
+    public void playMusic() {
         if(!TextUtils.isEmpty(getPlayBean().getUrl())) {
             if (!getPlayBean().getUrl().equals(playUrl)) {
                 setCdRadio(0f);
@@ -439,48 +440,4 @@ public class PlayerActivity extends BaseMusicActivity {
         }
     }
 
-    private void playNext(boolean next) {
-        if(FileUtil.fileList != null && FileUtil.fileList.size() > 0) {
-            int size = FileUtil.fileList.size();
-            for(int i = 0; i < size; i++) {
-                Mp3FileBean mp3File = FileUtil.fileList.get(i);
-                //当前播放的节目
-                if(mp3File.index == getPlayBean().getIndex()){
-                    if(next) {
-                        if(i == size - 1) {
-                            showToast("已经全部播放完了");
-                        } else if(i < size - 1) {
-                            mp3File = FileUtil.fileList.get(i+1);
-                            getPlayBean().setName(mp3File.name);
-                            getPlayBean().setUrl(mp3File.path);
-                            getPlayBean().setIndex(mp3File.index);
-                            getPlayBean().setDuration((int)mp3File.duration);
-                            playMusic();
-                            onPlayHistoryChange();
-                        }
-                        break;
-                    } else {
-                        if(i == 0) {
-                            showToast("已经到头了");
-                        } else if(i > 0) {
-                            mp3File = FileUtil.fileList.get(i-1);
-                            getPlayBean().setName(mp3File.name);
-                            getPlayBean().setUrl(mp3File.path);
-                            getPlayBean().setIndex(mp3File.index);
-                            getPlayBean().setDuration((int)mp3File.duration);
-                            playMusic();
-                            onPlayHistoryChange();
-                        }
-                        break;
-                    }
-                }
-            }
-        } else {
-            showToast("没有文件可以播放");
-        }
-    }
-
-    public void playNextMusic(){
-        playNext(true);
-    }
 }
