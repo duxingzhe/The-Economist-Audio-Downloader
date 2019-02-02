@@ -53,7 +53,8 @@ public abstract class BaseMusicActivity extends BaseActivity{
     @BindView(R.id.rl_mini_bar)
     RelativeLayout rlMiniBar;
 
-    private static EventBusBean eventPauseResumeBean;//暂停、播放状态
+    //暂停、播放状态
+    private static EventBusBean eventPauseResumeBean;
     private static float cdRadio = 0f;
     private static PlayBean playBean;
     private static TimeBean timeBean;
@@ -281,7 +282,7 @@ public abstract class BaseMusicActivity extends BaseActivity{
                 }
                 break;
             default:
-                    break;
+                break;
         }
     }
 

@@ -172,6 +172,11 @@ public class MusicService extends Service {
                 SeekBean seekBean = (SeekBean) messBean.getObject();
                 wlMedia.seek(seekBean.getPosition());
             }
+        } else if(messBean.getType()== EventType.MUSIC_STOP){
+            if(wlMedia != null) {
+                wlMedia.stop();
+                wlMedia=null;
+            }
         }
     }
 }

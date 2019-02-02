@@ -12,4 +12,6 @@ public class EventType {
 
     public static final int MUSIC_PAUSE_RESUME_RESULT = 0X1007;
     public static final int MUSIC_SEEK_TIME = 0X1008;
+
+    public static final int MUSIC_STOP = 0X1009;
 }

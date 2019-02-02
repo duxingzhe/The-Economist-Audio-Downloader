@@ -51,6 +51,7 @@ public class MainActivity extends BaseMusicActivity {
     private Context mContext;
 
     private EventBusBean eventNextBean;
+    private EventBusBean eventStopBean;
 
     // 文件总数
     private int totalNum;
@@ -205,6 +206,14 @@ public class MainActivity extends BaseMusicActivity {
         exitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (eventStopBean == null) {
+                    eventStopBean = new EventBusBean(EventType.MUSIC_STOP,-1);
+                } else {
+                    eventStopBean.setType(EventType.MUSIC_STOP);
+                    eventStopBean.setObject(getPlayBean().getUrl());
+                }
+                EventBus.getDefault().post(eventStopBean);
+                onRelease();
                 finish();
             }
         });
@@ -299,7 +308,9 @@ public class MainActivity extends BaseMusicActivity {
             case PLAY_STATUS_RESUME:
                 break;
             case PLAY_STATUS_COMPLETE:
-                playNextMusic();
+                if(isPlaying()) {
+                    playNextMusic();
+                }
                 break;
             default:
                 break;
