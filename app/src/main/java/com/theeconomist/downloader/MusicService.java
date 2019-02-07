@@ -24,6 +24,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 public class MusicService extends Service {
+
     private WlMedia wlMedia;
     private String url;
     private double duration;

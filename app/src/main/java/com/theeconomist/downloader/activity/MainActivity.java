@@ -206,6 +206,7 @@ public class MainActivity extends BaseMusicActivity {
         exitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                setIsExiting(true);
                 if (eventStopBean == null) {
                     eventStopBean = new EventBusBean(EventType.MUSIC_STOP,-1);
                 } else {
@@ -308,7 +309,7 @@ public class MainActivity extends BaseMusicActivity {
             case PLAY_STATUS_RESUME:
                 break;
             case PLAY_STATUS_COMPLETE:
-                if(isPlaying()) {
+                if(isPlaying()||!isExiting()) {
                     playNextMusic();
                 }
                 break;

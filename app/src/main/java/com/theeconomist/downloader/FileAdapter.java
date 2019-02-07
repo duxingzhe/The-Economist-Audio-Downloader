@@ -62,8 +62,7 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
             });
         }
 
-        if(onItemLongClickListener != null)
-        {
+        if(onItemLongClickListener != null) {
             ((FileViewHolder)viewHolder).itemLayout.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {

@@ -59,6 +59,7 @@ public abstract class BaseMusicActivity extends BaseActivity{
     private static PlayBean playBean;
     private static TimeBean timeBean;
     private static boolean isPlaying = false;
+    private boolean isExiting=false;
 
     //当前播放url
     public static String playUrl = "";
@@ -211,6 +212,10 @@ public abstract class BaseMusicActivity extends BaseActivity{
         return isPlaying;
     }
 
+    public boolean isExiting(){
+        return isExiting;
+    }
+
     public void setCdRadio(float radio) {
         cdRadio = radio;
     }
@@ -343,6 +348,10 @@ public abstract class BaseMusicActivity extends BaseActivity{
 
     public void playMusic(){
 
+    }
+
+    public void setIsExiting(boolean isExiting){
+        this.isExiting=isExiting;
     }
 
 }
