@@ -21,4 +21,5 @@ public class Mp3FileBean {
     public int index;
 
     public String albumName;
+
 }
