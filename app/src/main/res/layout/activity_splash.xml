@@ -17,27 +17,17 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="CATTI, TOFEL/GRE, IELTS, Unified Postgraduate Examination in China"
+        android:text="CATTI, TOFEL/GRE, IELTS, Unified Postgraduate Examination in China, etc"
         android:layout_marginBottom="50dp"
         android:gravity="center"
         android:textColor="@color/color_white"
         android:textSize="16sp"/>
 
-    <ProgressBar
-        android:id="@+id/pb_load"
-        android:layout_centerInParent="true"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:indeterminateOnly="true"
-        android:indeterminateDrawable="@drawable/data_load_drawable"
-        android:layout_marginBottom="10dp"
-        android:visibility="invisible"/>
-
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="v1.0"
-        android:layout_marginBottom="30dp"
+        android:text="@string/version"
+        android:layout_marginBottom="80dp"
         android:textColor="@color/color_white"
-        android:textSize="14dp"/>
+        android:textSize="14sp"/>
 </LinearLayout>

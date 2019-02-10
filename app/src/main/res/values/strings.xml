@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">The Economist Audio Downloader</string>
+    <string name="version">v1.2.1</string>
 </resources>
