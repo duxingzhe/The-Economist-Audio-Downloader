@@ -35,6 +35,7 @@ public class MusicService extends Service {
     private EventBusBean pauseResumeEventBean;
 
     public MusicService() {
+
     }
 
     @Override
@@ -79,7 +80,13 @@ public class MusicService extends Service {
             @Override
             public void onTimeInfo(double time) {
                 TimeBean timeBean=new TimeBean();
-                timeBean.setCurrSecs((int)Math.floor(time));
+
+                if(Math.floor(time)>duration){
+                    timeBean.setCurrSecs((int)duration);
+                }else{
+                    timeBean.setCurrSecs((int)Math.floor(time));
+                }
+
                 timeBean.setTotalSecs((int)duration);
                 if(timeEventBean == null) {
                     timeEventBean = new EventBusBean(EventType.MUSIC_TIME_INFO, timeBean);
