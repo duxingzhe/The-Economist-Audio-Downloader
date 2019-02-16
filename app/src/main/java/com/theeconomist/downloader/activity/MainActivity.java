@@ -150,6 +150,14 @@ public class MainActivity extends BaseMusicActivity {
 
         mContext=this;
 
+        Glide.get(mContext).clearMemory();
+        new Thread(){
+            @Override
+            public void run(){
+                Glide.get(mContext).clearDiskCache();
+            }
+        }.start();
+
         mAdapter=new FileAdapter(mContext, mFiles);
         recyclerView=(RecyclerView)findViewById(R.id.recyclerview);
         bottomPlayStatusLayout=(LinearLayout)findViewById(R.id.ly_mini_player);
