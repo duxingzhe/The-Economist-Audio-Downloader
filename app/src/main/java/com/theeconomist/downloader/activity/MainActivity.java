@@ -21,6 +21,7 @@ import com.theeconomist.downloader.FileAdapter;
 import com.theeconomist.downloader.R;
 import com.theeconomist.downloader.bean.EventBusBean;
 import com.theeconomist.downloader.bean.Mp3FileBean;
+import com.theeconomist.downloader.bean.TimeBean;
 import com.theeconomist.downloader.dialog.AddDialog;
 import com.theeconomist.downloader.dialog.DeleteDialog;
 import com.theeconomist.downloader.dialog.DownloadDialog;
@@ -228,6 +229,26 @@ public class MainActivity extends BaseMusicActivity {
         });
 
         startScanningFile();
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        if(ivMiniBg != null) {
+            Glide.with(this).load(getPlayBean().getImgByte()).apply(RequestOptions.errorOf(R.mipmap.file_mp3_icon)).into(ivMiniBg);
+        }
+        if(tvMiniName != null) {
+            if(!tvMiniName.getText().toString().trim().equals(getPlayBean().getName())) {
+                tvMiniName.setText(getPlayBean().getName());
+            }
+        }
+        if(tvMiniSubName != null) {
+            if(TextUtils.isEmpty(getPlayBean().getAlbumName())) {
+                tvMiniSubName.setText("The Economist");
+            }else{
+                tvMiniSubName.setText("The Economist - "+getPlayBean().getAlbumName());
+            }
+        }
     }
 
     private void startScanningFile(){
@@ -477,21 +498,25 @@ public class MainActivity extends BaseMusicActivity {
     }
 
     private void initMiniBar() {
-        if(ivMiniBg != null) {
-            Glide.with(this).load(getPlayBean().getImgByte()).apply(RequestOptions.errorOf(R.mipmap.file_mp3_icon)).into(ivMiniBg);
-        }
-        if(tvMiniName != null) {
-            if(!tvMiniName.getText().toString().trim().equals(getPlayBean().getName())) {
+        Glide.with(this).load(getPlayBean().getImgByte()).apply(RequestOptions.errorOf(R.mipmap.file_mp3_icon)).into(ivMiniBg);
+        if(!tvMiniName.getText().toString().trim().equals(getPlayBean().getName())) {
                 tvMiniName.setText(getPlayBean().getName());
-            }
         }
-        if(tvMiniSubName != null) {
-            if(TextUtils.isEmpty(getPlayBean().getAlbumName())) {
-                tvMiniSubName.setText("The Economist");
-            }else{
-                tvMiniSubName.setText("The Economist - "+getPlayBean().getAlbumName());
-            }
+        if(TextUtils.isEmpty(getPlayBean().getAlbumName())) {
+            tvMiniSubName.setText("The Economist");
+        }else{
+            tvMiniSubName.setText("The Economist - "+getPlayBean().getAlbumName());
         }
+    }
+
+    @Override
+    public void timeInfo(TimeBean timeBean) {
+        super.timeInfo(timeBean);
+        updateTime(timeBean);
+    }
+
+    private void updateTime(TimeBean timeBean) {
+        ivMiniPlayStatus.setProgress(getProgress());
     }
 
 }

@@ -70,16 +70,14 @@ public class CommonUtil {
         return false;
     }
 
-    public static int getScreenWidth(Activity context)
-    {
+    public static int getScreenWidth(Activity context) {
         DisplayMetrics dm = new DisplayMetrics();
         context.getWindowManager().getDefaultDisplay().getMetrics(dm);
         int mScreenWidth = dm.widthPixels;// 获取屏幕分辨率宽度
         return  mScreenWidth;
     }
 
-    public static int getScreenHeight(Activity context)
-    {
+    public static int getScreenHeight(Activity context) {
         DisplayMetrics dm = new DisplayMetrics();
         context.getWindowManager().getDefaultDisplay().getMetrics(dm);
         int mScreenHeight = dm.heightPixels;

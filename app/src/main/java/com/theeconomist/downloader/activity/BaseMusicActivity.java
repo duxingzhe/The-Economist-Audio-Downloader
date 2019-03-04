@@ -18,6 +18,7 @@ import com.theeconomist.downloader.bean.TimeBean;
 import com.theeconomist.downloader.log.MyLog;
 import com.theeconomist.downloader.utils.EventType;
 import com.theeconomist.downloader.utils.FileUtil;
+import com.theeconomist.downloader.view.PlayPauseView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -47,7 +48,7 @@ public abstract class BaseMusicActivity extends BaseActivity{
 
     @Nullable
     @BindView(R.id.iv_mini_playstatus)
-    ImageView ivMiniPlayStatus;
+    PlayPauseView ivMiniPlayStatus;
 
     @Nullable
     @BindView(R.id.rl_mini_bar)
@@ -74,7 +75,6 @@ public abstract class BaseMusicActivity extends BaseActivity{
     public static final int PLAY_STATUS_RESUME = 5;
     public static final int PLAY_STATUS_COMPLETE = 6;
 
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,21 +84,6 @@ public abstract class BaseMusicActivity extends BaseActivity{
     @Override
     protected void onResume() {
         super.onResume();
-        if(ivMiniBg != null) {
-            Glide.with(this).load(getPlayBean().getImgByte()).apply(RequestOptions.errorOf(R.mipmap.file_mp3_icon)).into(ivMiniBg);
-        }
-        if(tvMiniName != null) {
-            if(!tvMiniName.getText().toString().trim().equals(getPlayBean().getName())) {
-                tvMiniName.setText(getPlayBean().getName());
-            }
-        }
-        if(tvMiniSubName != null) {
-            if(TextUtils.isEmpty(getPlayBean().getAlbumName())) {
-                tvMiniSubName.setText("The Economist");
-            }else{
-                tvMiniSubName.setText("The Economist - "+getPlayBean().getAlbumName());
-            }
-        }
         onMusicStatus(musicStatus);
     }
 
@@ -116,12 +101,12 @@ public abstract class BaseMusicActivity extends BaseActivity{
         if(musicStatus == PLAY_STATUS_PLAYING) {
             pauseMusic(true);
             if(ivMiniPlayStatus != null) {
-                ivMiniPlayStatus.setImageResource(R.drawable.svg_play);
+                ivMiniPlayStatus.pause();
             }
         } else if(musicStatus == PLAY_STATUS_PAUSE) {
             pauseMusic(false);
             if(ivMiniPlayStatus != null) {
-                ivMiniPlayStatus.setImageResource(R.mipmap.icon_menu_pause);
+                ivMiniPlayStatus.play();
             }
         } else if(musicStatus == PLAY_STATUS_ERROR || musicStatus == PLAY_STATUS_COMPLETE) {
             playUrl = "";
@@ -139,7 +124,7 @@ public abstract class BaseMusicActivity extends BaseActivity{
             MyLog.d("播放中...");
             if(!isPlaying) {
                 if(ivMiniPlayStatus != null) {
-                    ivMiniPlayStatus.setImageResource(R.mipmap.icon_menu_pause);
+                    ivMiniPlayStatus.pause();
                 }
             }
             isPlaying = true;
@@ -251,7 +236,7 @@ public abstract class BaseMusicActivity extends BaseActivity{
         switch (status) {
             case PLAY_STATUS_ERROR:
                 if(ivMiniPlayStatus != null) {
-                    ivMiniPlayStatus.setImageResource(R.drawable.svg_play);
+                    ivMiniPlayStatus.pause();
                 }
                 break;
             case PLAY_STATUS_LOADING:
@@ -266,24 +251,24 @@ public abstract class BaseMusicActivity extends BaseActivity{
                 break;
             case PLAY_STATUS_PLAYING:
                 if(ivMiniPlayStatus != null) {
-                    ivMiniPlayStatus.setImageResource(R.mipmap.icon_menu_pause);
+                    ivMiniPlayStatus.play();
                     ivMiniPlayStatus.setVisibility(View.VISIBLE);
                 }
                 break;
             case PLAY_STATUS_PAUSE:
                 if(ivMiniPlayStatus != null) {
-                    ivMiniPlayStatus.setImageResource(R.drawable.svg_play);
+                    ivMiniPlayStatus.pause();
                     ivMiniPlayStatus.setVisibility(View.VISIBLE);
                 }
                 break;
             case PLAY_STATUS_RESUME:
                 if(ivMiniPlayStatus != null) {
-                    ivMiniPlayStatus.setImageResource(R.drawable.svg_play);
+                    ivMiniPlayStatus.pause();
                 }
                 break;
             case PLAY_STATUS_COMPLETE:
                 if(ivMiniPlayStatus != null) {
-                    ivMiniPlayStatus.setImageResource(R.drawable.svg_play);
+                    ivMiniPlayStatus.pause();
                 }
                 break;
             default:
