@@ -32,6 +32,7 @@ public class PlayPauseView extends View{
     private Path mLeftPath;
     //暂停时右侧竖条Path
     private Path mRightPath;
+    private Path mTrianglePath;
     //两个暂停竖条中间的空隙,默认为两侧竖条的宽度
     private float mGapWidth;
     //动画Progress
@@ -44,8 +45,12 @@ public class PlayPauseView extends View{
     private float mRectWidth;
     //圆内矩形高度
     private float mRectHeight;
+    private float mTriangleLength;
     //矩形左侧上侧坐标
     private float mRectLT;
+    // 三角形左上角坐标
+    private float mTriangleTop;
+    private float mTriangleLeft;
     //圆的半径
     private float mRadius;
     private int mBgColor = Color.WHITE;
@@ -77,6 +82,7 @@ public class PlayPauseView extends View{
         mPaint.setAntiAlias(true);
         mLeftPath = new Path();
         mRightPath = new Path();
+        mTrianglePath=new Path();
         mRect = new Rect();
         TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.PlayPauseView);
         mBgColor = ta.getColor(R.styleable.PlayPauseView_bg_color, Color.WHITE);
@@ -116,16 +122,16 @@ public class PlayPauseView extends View{
         viewHalfLength = viewHeight < viewWidth ? viewHeight / 2 : viewWidth / 2;
 
         int paintCircle = viewHalfLength / 15;
-        rectCircle.left = viewCenterX - (viewHalfLength - paintCircle / 2);
-        rectCircle.top = viewCenterY - (viewHalfLength - paintCircle / 2);
-        rectCircle.right = viewCenterX + (viewHalfLength - paintCircle / 2);
-        rectCircle.bottom = viewCenterY + (viewHalfLength - paintCircle / 2);
+        rectCircle.left = viewCenterX - (viewHalfLength - paintCircle / 2f);
+        rectCircle.top = viewCenterY - (viewHalfLength - paintCircle / 2f);
+        rectCircle.right = viewCenterX + (viewHalfLength - paintCircle / 2f);
+        rectCircle.bottom = viewCenterY + (viewHalfLength - paintCircle / 2f);
 
         int paintProgressWidth = viewHalfLength / 8;
-        rectProgress.left = viewCenterX - (viewHalfLength - paintProgressWidth / 2);
-        rectProgress.top = viewCenterY - (viewHalfLength - paintProgressWidth / 2);
-        rectProgress.right = viewCenterX + (viewHalfLength - paintProgressWidth / 2);
-        rectProgress.bottom = viewCenterY + (viewHalfLength - paintProgressWidth / 2);
+        rectProgress.left = viewCenterX - (viewHalfLength - paintProgressWidth / 2f);
+        rectProgress.top = viewCenterY - (viewHalfLength - paintProgressWidth / 2f);
+        rectProgress.right = viewCenterX + (viewHalfLength - paintProgressWidth / 2f);
+        rectProgress.bottom = viewCenterY + (viewHalfLength - paintProgressWidth / 2f);
     }
 
     @Override
@@ -137,10 +143,15 @@ public class PlayPauseView extends View{
 
     private void initValue() {
 
-        mRadius = mWidth / 2;
+        mRadius = mWidth / 2f;
         mPadding =  mRadius / 3f;
-        float space = (float) (mRadius / Math.sqrt(2) - mPadding); //矩形宽高的一半
+
+        //矩形宽高的一半
+        float space = (float) (mRadius / Math.sqrt(2) - mPadding);
         mRectLT = mRadius - space;
+        mTriangleLeft=mRadius - space;
+        mTriangleTop=mRadius - 1.8f * (float) Math.sin(Math.sqrt(3)/2) * space;
+
         float rectRB = mRadius + space;
         mRect.top = (int) mRectLT;
         mRect.bottom = (int) rectRB;
@@ -149,6 +160,7 @@ public class PlayPauseView extends View{
 
         mRectWidth = 2 * space;
         mRectHeight = 2 * space;
+        mTriangleLength=3*space;
         mGapWidth = mRectWidth / 3;
         mAnimationProgress = isPlaying ? 0 : 1;
         mAnimDuration = 200;
@@ -158,89 +170,69 @@ public class PlayPauseView extends View{
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        mLeftPath.rewind();
-        mRightPath.rewind();
+        if(isPlaying()) {
+            mLeftPath.rewind();
+            mRightPath.rewind();
 
-        mPaint.setColor(mBgColor);
-        canvas.drawCircle(mWidth / 2, mHeight / 2, mRadius, mPaint);
-        //暂停时左右两边矩形距离
-        float distance = mGapWidth * (1 - mAnimationProgress);
-        //一个矩形的宽度
-        float barWidth = mRectWidth / 2 - distance / 2;
-        //左边矩形左上角
-        float leftLeftTop = barWidth * mAnimationProgress;
-        //右边矩形左上角
-        float rightLeftTop = barWidth + distance;
-        //右边矩形右上角
-        float rightRightTop = 2 * barWidth + distance;
-        //右边矩形右下角
-        float rightRightBottom = rightRightTop - barWidth * mAnimationProgress;
+            //暂停时左右两边矩形距离
+            float distance = mGapWidth;
+            //一个矩形的宽度
+            float barWidth = mRectWidth / 2 - distance / 2;
+            //右边矩形左上角
+            float rightLeftTop = barWidth + distance;
 
-        mPaint.setColor(mBtnColor);
-        mPaint.setStyle(Paint.Style.FILL);
+            mPaint.setColor(mBtnColor);
+            mPaint.setStyle(Paint.Style.FILL);
 
-        mLeftPath.moveTo(leftLeftTop + mRectLT, mRectLT);
-        mLeftPath.lineTo(mRectLT, mRectHeight + mRectLT);
-        mLeftPath.lineTo(barWidth + mRectLT, mRectHeight + mRectLT);
-        mLeftPath.lineTo(barWidth + mRectLT, mRectLT);
-        mLeftPath.close();
+            mLeftPath.moveTo(mRectLT, mRectLT);
+            mLeftPath.lineTo(mRectLT, mRectHeight + mRectLT);
+            mLeftPath.lineTo(barWidth + mRectLT, mRectHeight + mRectLT);
+            mLeftPath.lineTo(barWidth + mRectLT, mRectLT);
+            mLeftPath.close();
 
-        mRightPath.moveTo(rightLeftTop + mRectLT, mRectLT);
-        mRightPath.lineTo(rightLeftTop + mRectLT, mRectHeight + mRectLT);
-        mRightPath.lineTo(rightLeftTop + mRectLT + barWidth, mRectHeight + mRectLT);
-        mRightPath.lineTo(rightRightBottom + mRectLT, mRectLT);
-        mRightPath.close();
-        canvas.save();
+            mRightPath.moveTo(rightLeftTop + mRectLT , mRectLT);
+            mRightPath.lineTo(rightLeftTop + mRectLT, mRectHeight + mRectLT);
+            mRightPath.lineTo(rightLeftTop + mRectLT + barWidth, mRectHeight + mRectLT);
+            mRightPath.lineTo(rightLeftTop + mRectLT + barWidth, mRectLT);
 
-        canvas.translate(mRectHeight / 8f * mAnimationProgress, 0);
-        float progress = isPlaying ? (1 - mAnimationProgress) : mAnimationProgress;
-        int corner = 90;
-        float rotation = isPlaying ? corner * (1 + progress) : corner * progress;
-        canvas.rotate(rotation, mWidth / 2f, mHeight / 2f);
-        canvas.drawPath(mLeftPath, mPaint);
-        canvas.drawPath(mRightPath, mPaint);
+            mRightPath.close();
+            canvas.save();
 
-        mPaint.setStrokeWidth(viewHalfLength/15);
+            canvas.drawPath(mLeftPath, mPaint);
+            canvas.drawPath(mRightPath, mPaint);
+        }else{
+            //三角形
+            mPaint.setColor(mBtnColor);
+            mPaint.setStyle(Paint.Style.FILL);
+
+            mTrianglePath.moveTo(mTriangleLeft, mTriangleTop);
+            mTrianglePath.lineTo(mTriangleLeft, mTriangleLength + mTriangleTop);
+            mTrianglePath.lineTo(mTriangleLeft+mTriangleLength*(float)Math.sin(Math.sqrt(3)/2),
+                    mTriangleTop + mTriangleLength/2);
+            mTrianglePath.close();
+            canvas.save();
+
+            canvas.drawPath(mTrianglePath, mPaint);
+        }
+
+        mPaint.setStrokeWidth(viewHalfLength/15f);
         mPaint.setStyle(Paint.Style.STROKE);
         canvas.drawArc(rectCircle, 0, 360, false, mPaint);
-        mPaint.setStrokeWidth(viewHalfLength / 8);
+        mPaint.setStrokeWidth(viewHalfLength / 8f);
         mPaint.setStyle(Paint.Style.STROKE);
         canvas.drawArc(rectProgress, -90, mPlayingProgress * 3.6f, false, mPaint);
         canvas.restore();
 
     }
 
-    public ValueAnimator getPlayPauseAnim() {
-        ValueAnimator valueAnimator = ValueAnimator.ofFloat(isPlaying ? 1 : 0, isPlaying ? 0 : 1);
-        valueAnimator.setDuration(mAnimDuration);
-        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                mAnimationProgress = (float) animation.getAnimatedValue();
-                invalidate();
-            }
-        });
-        return valueAnimator;
-    }
-
     public void play() {
-        if(isFirstChange) {
-            isFirstChange=false;
-            if (getPlayPauseAnim() != null) {
-                getPlayPauseAnim().cancel();
-            }
-            setPlaying(true);
-            getPlayPauseAnim().start();
-        }
+        setPlaying(true);
+        invalidate();
     }
 
     public void pause() {
-        if (getPlayPauseAnim() != null) {
-            getPlayPauseAnim().cancel();
-        }
         setPlaying(false);
-        getPlayPauseAnim().start();
-        isFirstChange=true;
+        invalidate();
     }
 
     public int dp2px(Context context, float dpVal) {
