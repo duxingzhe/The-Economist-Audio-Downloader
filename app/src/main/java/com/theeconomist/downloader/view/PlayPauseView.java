@@ -1,6 +1,5 @@
 package com.theeconomist.downloader.view;
 
-import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -35,9 +34,8 @@ public class PlayPauseView extends View{
     private Path mTrianglePath;
     //两个暂停竖条中间的空隙,默认为两侧竖条的宽度
     private float mGapWidth;
-    //动画Progress
-    private float mAnimationProgress;
-    /** 进度 */
+
+    // 进度
     private int mPlayingProgress;
     private Rect mRect;
     private boolean isPlaying;
@@ -46,22 +44,19 @@ public class PlayPauseView extends View{
     //圆内矩形高度
     private float mRectHeight;
     private float mTriangleLength;
-    //矩形左侧上侧坐标
+    // 矩形左侧上侧坐标
     private float mRectLT;
     // 三角形左上角坐标
     private float mTriangleTop;
     private float mTriangleLeft;
-    //圆的半径
+    // 圆的半径
     private float mRadius;
     private int mBgColor = Color.WHITE;
     private int mBtnColor = Color.BLACK;
-    /** 包围进度圆弧的矩形 */
+    // 包围进度圆弧的矩形
     private RectF rectCircle=new RectF();
     private RectF rectProgress = new RectF();
     private float mPadding;
-    //动画时间
-    private int mAnimDuration = 200;
-    private boolean isFirstChange=true;
 
     public PlayPauseView(Context context) {
         super(context);
@@ -89,7 +84,6 @@ public class PlayPauseView extends View{
         mBtnColor = ta.getColor(R.styleable.PlayPauseView_btn_color, getResources().getColor(R.color.color_ec4c48));
         mGapWidth = ta.getDimensionPixelSize(R.styleable.PlayPauseView_gap_width, dp2px(context, 0));
         mPadding = ta.getDimensionPixelSize(R.styleable.PlayPauseView_space_padding, dp2px(context, 0));
-        mAnimDuration = ta.getInt(R.styleable.PlayPauseView_anim_duration, 200);
         ta.recycle();
 
         setLayerType(View.LAYER_TYPE_SOFTWARE, null);
@@ -149,8 +143,8 @@ public class PlayPauseView extends View{
         //矩形宽高的一半
         float space = (float) (mRadius / Math.sqrt(2) - mPadding);
         mRectLT = mRadius - space;
-        mTriangleLeft=mRadius - space;
-        mTriangleTop=mRadius - 1.8f * (float) Math.sin(Math.sqrt(3)/2) * space;
+        mTriangleLeft=mRadius - 0.7f * space;
+        mTriangleTop=mRadius - 1.5f * (float) Math.sin(Math.sqrt(3)/2) * space;
 
         float rectRB = mRadius + space;
         mRect.top = (int) mRectLT;
@@ -160,10 +154,9 @@ public class PlayPauseView extends View{
 
         mRectWidth = 2 * space;
         mRectHeight = 2 * space;
-        mTriangleLength=3*space;
+        mTriangleLength= 2.5f * space;
         mGapWidth = mRectWidth / 3;
-        mAnimationProgress = isPlaying ? 0 : 1;
-        mAnimDuration = 200;
+
     }
 
     @Override
