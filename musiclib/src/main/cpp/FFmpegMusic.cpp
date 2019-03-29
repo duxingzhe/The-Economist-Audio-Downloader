@@ -76,3 +76,36 @@ int createFFmpeg(int *rate, int *channel)
     *channel=codecContext->channels;
     return 0;
 }
+
+int getPcm(void **pcm, size_t *pcm_size)
+{
+    int frameCount=0;
+    int got_frame;
+
+    while(av_read_frame(formatContext, packet)>=0)
+    {
+        avcodec_decode_audio4(codecContext, frame, &got_frame, packet);
+        if(got_frame)
+        {
+            LOGE("解码");
+
+            swr_convert(swrContext, &out_buffer, 44100*2, (const uint8_t **)frame->data, frame->nb_samples);
+            int size=av_samples_get_buffer_size(NULL, out_channer_nb, frame->nb_samples, AV_SAMPLE_FMT_S16, 1);
+
+            *pcm=out_buffer;
+            *pcm_size=size;
+            break;
+        }
+    }
+    return 0;
+}
+
+void realseFFmpeg()
+{
+    av_free_packet(packet);
+    av_free(out_buffer);
+    av_frame_free(&frame);
+    swr_free(&swrContext);
+    avcodec_close(codecContext);
+    avformat_close_input(&formatContext);
+}
