@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.4.1)
 
-set(distribution_DIR ./libs)
+set(distribution_DIR ../musiclib)
 
 add_library( native-lib
-             SHARED
-                src/main/cpp/FFmpegMusic.cpp
-                )
+        SHARED
+        src/main/cpp/native-lib.cpp
+        )
 add_library( avcodec-58
              SHARED
              IMPORTED)
@@ -46,7 +46,9 @@ add_library( swscale-5
 set_target_properties( swscale-5
                        PROPERTIES IMPORTED_LOCATION
                        ${distribution_DIR}/${ANDROID_ABI}/libswscale-5.so)
-include_directories(libs/include)
+include_directories(${distribution_DIR}/libs/include
+        ${distribution_DIR}/src/main/cpp
+        )
 target_link_libraries( native-lib
                        avcodec-58
                        avfilter-7
