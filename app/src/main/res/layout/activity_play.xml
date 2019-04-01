@@ -37,7 +37,6 @@
                 android:layout_height="250dp"
                 android:src="@mipmap/icon_chanpian"
                 android:background="@drawable/circle_gray_border"/>
-
         </RelativeLayout>
         <ImageView
             android:id="@+id/iv_point"

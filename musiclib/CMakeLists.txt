@@ -3,9 +3,9 @@ cmake_minimum_required(VERSION 3.4.1)
 set(distribution_DIR ./libs)
 
 add_library( native-lib
-             SHARED
-                src/main/cpp/FFmpegMusic.cpp
-                )
+            SHARED
+            src/main/cpp/FFmpegMusic.cpp
+        )
 add_library( avcodec-58
              SHARED
              IMPORTED)

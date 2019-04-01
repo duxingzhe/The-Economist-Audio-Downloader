@@ -130,8 +130,6 @@ public class BaseActivity extends Activity {
 
     }
 
-
-
     public void initSystembar(View lySystemBar) {
         if (lySystemBar != null) {
             lySystemBar.setVisibility(View.VISIBLE);
