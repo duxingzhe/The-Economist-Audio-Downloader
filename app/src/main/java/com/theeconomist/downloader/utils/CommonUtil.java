@@ -8,6 +8,7 @@ import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Environment;
 import android.util.DisplayMetrics;
+import android.view.WindowManager;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -70,11 +71,9 @@ public class CommonUtil {
         return false;
     }
 
-    public static int getScreenWidth(Activity context) {
-        DisplayMetrics dm = new DisplayMetrics();
-        context.getWindowManager().getDefaultDisplay().getMetrics(dm);
-        int mScreenWidth = dm.widthPixels;// 获取屏幕分辨率宽度
-        return  mScreenWidth;
+    public static int getScreenWidth(Context context) {
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        return wm.getDefaultDisplay().getWidth();
     }
 
     public static int getScreenHeight(Activity context) {

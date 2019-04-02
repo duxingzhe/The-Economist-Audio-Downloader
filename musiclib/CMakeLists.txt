@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.4.1)
 
 set(distribution_DIR ./libs)
+set(CURRENT_DIR ${CMAKE_SOURCE_DIR})
 
 add_library( native-lib
             SHARED
