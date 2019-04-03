@@ -14,7 +14,7 @@ extern "C"
 }
 
 #include "FFmpegMusic.h"
-#define LOGE(FORMAT,...) __android_log_print(ANDROID_LOG_ERROR,"LC",FORMAT,##__VA_ARGS__);
+#define LOGE(FORMAT, ...) __android_log_print(ANDROID_LOG_ERROR, "LC", FORMAT, ##__VA_ARGS__);
 
 SLObjectItf engineObject=NULL;
 SLEngineItf engineEngine=NULL;

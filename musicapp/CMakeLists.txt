@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.4.1)
 
-set(distribution_DIR ../musiclib/libs)
-set(CURRENT_DIR ${CMAKE_SOURCE_DIR})
+set(distribution_DIR F:\\Project\\Android\\NDK\\musiclib\\libs)
 
 add_library( native-lib
         SHARED

@@ -34,26 +34,6 @@ import butterknife.Optional;
 
 public abstract class BaseMusicActivity extends BaseActivity{
 
-    @Nullable
-    @BindView(R.id.iv_mini_bg)
-    ImageView ivMiniBg;
-    
-    @Nullable
-    @BindView(R.id.tv_mini_name)
-    TextView tvMiniName;
-
-    @Nullable
-    @BindView(R.id.tv_mini_subname)
-    TextView tvMiniSubName;
-
-    @Nullable
-    @BindView(R.id.iv_mini_playstatus)
-    PlayPauseView ivMiniPlayStatus;
-
-    @Nullable
-    @BindView(R.id.rl_mini_bar)
-    RelativeLayout rlMiniBar;
-
     //暂停、播放状态
     private static EventBusBean eventPauseResumeBean;
     private static float cdRadio = 0f;
@@ -95,24 +75,6 @@ public abstract class BaseMusicActivity extends BaseActivity{
         }
     }
 
-    @Optional
-    @OnClick(R.id.iv_mini_playstatus)
-    public void onClickPlayStatus(View view) {
-        if(musicStatus == PLAY_STATUS_PLAYING) {
-            pauseMusic(true);
-            if(ivMiniPlayStatus != null) {
-                ivMiniPlayStatus.pause();
-            }
-        } else if(musicStatus == PLAY_STATUS_PAUSE) {
-            pauseMusic(false);
-            if(ivMiniPlayStatus != null) {
-                ivMiniPlayStatus.play();
-            }
-        } else if(musicStatus == PLAY_STATUS_ERROR || musicStatus == PLAY_STATUS_COMPLETE) {
-            playUrl = "";
-        }
-    }
-
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void eventMsg(final EventBusBean messBean) {
         if(messBean.getType() == EventType.MUSIC_TIME_INFO){
@@ -122,11 +84,6 @@ public abstract class BaseMusicActivity extends BaseActivity{
                 return;
             }
             MyLog.d("播放中...");
-            if(!isPlaying) {
-                if(ivMiniPlayStatus != null) {
-                    ivMiniPlayStatus.pause();
-                }
-            }
             isPlaying = true;
             timeBean = (TimeBean) messBean.getObject();
             timeInfo(timeBean);
@@ -233,47 +190,7 @@ public abstract class BaseMusicActivity extends BaseActivity{
     }
 
     public void onMusicStatus(int status) {
-        switch (status) {
-            case PLAY_STATUS_ERROR:
-                if(ivMiniPlayStatus != null) {
-                    ivMiniPlayStatus.pause();
-                }
-                break;
-            case PLAY_STATUS_LOADING:
-                if(ivMiniPlayStatus != null) {
-                    ivMiniPlayStatus.setVisibility(View.GONE);
-                }
-                break;
-            case PLAY_STATUS_UNLOADING:
-                if(ivMiniPlayStatus != null) {
-                    ivMiniPlayStatus.setVisibility(View.VISIBLE);
-                }
-                break;
-            case PLAY_STATUS_PLAYING:
-                if(ivMiniPlayStatus != null) {
-                    ivMiniPlayStatus.play();
-                    ivMiniPlayStatus.setVisibility(View.VISIBLE);
-                }
-                break;
-            case PLAY_STATUS_PAUSE:
-                if(ivMiniPlayStatus != null) {
-                    ivMiniPlayStatus.pause();
-                    ivMiniPlayStatus.setVisibility(View.VISIBLE);
-                }
-                break;
-            case PLAY_STATUS_RESUME:
-                if(ivMiniPlayStatus != null) {
-                    ivMiniPlayStatus.pause();
-                }
-                break;
-            case PLAY_STATUS_COMPLETE:
-                if(ivMiniPlayStatus != null) {
-                    ivMiniPlayStatus.pause();
-                }
-                break;
-            default:
-                break;
-        }
+
     }
 
     public void onRelease() {

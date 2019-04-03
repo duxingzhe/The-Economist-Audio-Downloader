@@ -7,13 +7,17 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.Nullable;
 import android.support.v4.content.FileProvider;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -31,6 +35,7 @@ import com.theeconomist.downloader.utils.DownloadUtil;
 import com.theeconomist.downloader.utils.EventType;
 import com.theeconomist.downloader.utils.FileUtil;
 import com.theeconomist.downloader.utils.MP3Filter;
+import com.theeconomist.downloader.view.PlayPauseView;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -38,6 +43,8 @@ import java.io.File;
 import java.util.ArrayList;
 
 import butterknife.BindView;
+import butterknife.OnClick;
+import butterknife.Optional;
 
 public class MainActivity extends BaseMusicActivity {
 
@@ -47,6 +54,22 @@ public class MainActivity extends BaseMusicActivity {
     private Button exitButton;
     private RecyclerView recyclerView;
     private FileAdapter mAdapter;
+
+    @BindView(R.id.iv_mini_bg)
+    ImageView ivMiniBg;
+
+    @BindView(R.id.tv_mini_name)
+    TextView tvMiniName;
+
+    @BindView(R.id.tv_mini_subname)
+    TextView tvMiniSubName;
+
+    @BindView(R.id.iv_mini_playstatus)
+    PlayPauseView ivMiniPlayStatus;
+
+    @Nullable
+    @BindView(R.id.rl_mini_bar)
+    RelativeLayout rlMiniBar;
 
     private LinearLayout bottomPlayStatusLayout;
     private Context mContext;
@@ -333,11 +356,43 @@ public class MainActivity extends BaseMusicActivity {
 
     @Override
     public void onMusicStatus(int status) {
-        super.onMusicStatus(status);
         switch (status) {
+            case PLAY_STATUS_ERROR:
+                if(ivMiniPlayStatus != null) {
+                    ivMiniPlayStatus.pause();
+                }
+                break;
+            case PLAY_STATUS_LOADING:
+                if(ivMiniPlayStatus != null) {
+                    ivMiniPlayStatus.setVisibility(View.GONE);
+                }
+                break;
+            case PLAY_STATUS_UNLOADING:
+                if(ivMiniPlayStatus != null) {
+                    ivMiniPlayStatus.setVisibility(View.VISIBLE);
+                }
+                break;
+            case PLAY_STATUS_PLAYING:
+                if(ivMiniPlayStatus != null) {
+                    ivMiniPlayStatus.play();
+                    ivMiniPlayStatus.setVisibility(View.VISIBLE);
+                }
+                break;
+            case PLAY_STATUS_PAUSE:
+                if(ivMiniPlayStatus != null) {
+                    ivMiniPlayStatus.pause();
+                    ivMiniPlayStatus.setVisibility(View.VISIBLE);
+                }
+                break;
             case PLAY_STATUS_RESUME:
+                if(ivMiniPlayStatus != null) {
+                    ivMiniPlayStatus.pause();
+                }
                 break;
             case PLAY_STATUS_COMPLETE:
+                if(ivMiniPlayStatus != null) {
+                    ivMiniPlayStatus.pause();
+                }
                 if(isPlaying()||!isExiting()) {
                     playNextMusic();
                 }
@@ -519,4 +574,20 @@ public class MainActivity extends BaseMusicActivity {
         ivMiniPlayStatus.setProgress(getProgress());
     }
 
+    @OnClick(R.id.iv_mini_playstatus)
+    public void onClickPlayStatus(View view) {
+        if(musicStatus == PLAY_STATUS_PLAYING) {
+            pauseMusic(true);
+            if(ivMiniPlayStatus != null) {
+                ivMiniPlayStatus.pause();
+            }
+        } else if(musicStatus == PLAY_STATUS_PAUSE) {
+            pauseMusic(false);
+            if(ivMiniPlayStatus != null) {
+                ivMiniPlayStatus.play();
+            }
+        } else if(musicStatus == PLAY_STATUS_ERROR || musicStatus == PLAY_STATUS_COMPLETE) {
+            playUrl = "";
+        }
+    }
 }

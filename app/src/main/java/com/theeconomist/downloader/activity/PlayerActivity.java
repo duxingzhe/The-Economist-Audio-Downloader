@@ -41,10 +41,6 @@ import static com.bumptech.glide.request.RequestOptions.bitmapTransform;
 
 public class PlayerActivity extends BaseMusicActivity {
 
-    @BindView(R.id.iv_point)
-    ImageView ivPoint;
-    @BindView(R.id.rl_cd)
-    RelativeLayout rlCd;
     @BindView(R.id.tv_nowtime)
     TextView tvNowTime;
     @BindView(R.id.tv_totaltime)
@@ -53,8 +49,6 @@ public class PlayerActivity extends BaseMusicActivity {
     SeekBar seekBar;
     @BindView(R.id.iv_status)
     ImageView ivStatus;
-    @BindView(R.id.iv_center)
-    ImageView ivCenter;
     @BindView(R.id.iv_bg)
     ImageView ivBg;
     @BindView(R.id.pb_load)
@@ -66,7 +60,6 @@ public class PlayerActivity extends BaseMusicActivity {
 
     private ValueAnimator cdAnimator;
     private ValueAnimator pointAnimator;
-    private LinearInterpolator lin;
     private EventBusBean eventNextBean;
     private EventBusBean eventSeekBean;
     private SeekBean seekBean;
@@ -88,13 +81,10 @@ public class PlayerActivity extends BaseMusicActivity {
         }
         tvSubTitle.setText(getPlayBean().getName());
 
-        lin = new LinearInterpolator();
-        initPointAnimate();
-        initCDAnimate();
         Intent intent = new Intent(this, MusicService.class);
         intent.putExtra("url", getPlayBean().getUrl());
         startService(intent);
-        Glide.with(this).load(getPlayBean().getImgByte()).apply(RequestOptions.placeholderOf(R.mipmap.icon_cd_default_bg)).into(ivCenter);
+
         Glide.with(this).load(R.mipmap.icon_gray_bg)
                 .apply(bitmapTransform(new BlurTransformation(25, 3)).placeholder(R.mipmap.icon_gray_bg))
                 .into(ivBg);
@@ -184,18 +174,13 @@ public class PlayerActivity extends BaseMusicActivity {
         super.onMusicStatus(status);
         switch (status) {
             case PLAY_STATUS_ERROR:
-                if(ivPoint.getRotation() == 0f) {
-                    startPointAnimate(0f, -40f);
-                }
+
                 ivStatus.setImageResource(R.drawable.play_selector);
                 break;
             case PLAY_STATUS_LOADING:
                 pbLoad.setVisibility(View.VISIBLE);
                 ivStatus.setVisibility(View.GONE);
-                if(ivPoint.getRotation() == -40f) {
-                    rlCd.setRotation(getCdRadio());
-                    startPointAnimate(-40f, 0f);
-                }
+
                 ivStatus.setImageResource(R.drawable.pause_selector);
                 break;
             case PLAY_STATUS_UNLOADING:
@@ -203,25 +188,17 @@ public class PlayerActivity extends BaseMusicActivity {
                 ivStatus.setVisibility(View.VISIBLE);
                 break;
             case PLAY_STATUS_PLAYING:
-                if(ivPoint.getRotation() == -40f) {
-                    rlCd.setRotation(getCdRadio());
-                    startPointAnimate(-40f, 0f);
-                }
+
                 ivStatus.setImageResource(R.drawable.pause_selector);
                 break;
             case PLAY_STATUS_PAUSE:
-                if(ivPoint.getRotation() == 0f) {
-                    startPointAnimate(0f, -40f);
-                }
+
                 ivStatus.setImageResource(R.drawable.play_selector);
                 break;
             case PLAY_STATUS_RESUME:
                 break;
             case PLAY_STATUS_COMPLETE:
-                if(ivPoint.getRotation() == -40f) {
-                    rlCd.setRotation(getCdRadio());
-                    startPointAnimate(-40f, 0f);
-                }
+
                 ivStatus.setImageResource(R.drawable.pause_selector);
                 playNextMusic();
                 break;
@@ -260,8 +237,7 @@ public class PlayerActivity extends BaseMusicActivity {
     protected void onResume() {
         super.onResume();
         updateTime(getTimeBean());
-        rlCd.setRotation(getCdRadio());
-        ivPoint.setRotation(-40f);
+
     }
 
     @Override
@@ -281,9 +257,7 @@ public class PlayerActivity extends BaseMusicActivity {
         } else if(musicStatus == PLAY_STATUS_PAUSE) {
             pauseMusic(false);
             ivStatus.setImageResource(R.drawable.pause_selector);
-            if(ivPoint.getRotation() == -40f) {
-                startPointAnimate(-40f, 0f);
-            }
+
         } else if(musicStatus == PLAY_STATUS_ERROR || musicStatus == PLAY_STATUS_COMPLETE) {
             playUrl = "";
             playMusic();
@@ -298,115 +272,6 @@ public class PlayerActivity extends BaseMusicActivity {
     @OnClick(R.id.iv_next)
     public void onClickNext(View view) {
         playNext(true);
-    }
-
-
-    /**
-     * 初始化指针动画
-     */
-    private void initPointAnimate() {
-        ivPoint.setPivotX(CommonUtil.dip2px(PlayerActivity.this, 17));
-        ivPoint.setPivotY(CommonUtil.dip2px(PlayerActivity.this, 15));
-        pointAnimator = ValueAnimator.ofFloat(0, 0);
-        pointAnimator.setTarget(ivPoint);
-        pointAnimator.setRepeatCount(0);
-        pointAnimator.setDuration(300);
-        pointAnimator.setInterpolator(lin);
-        pointAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                float current = (Float) animation.getAnimatedValue();
-                ivPoint.setRotation(current);
-            }
-        });
-
-        pointAnimator.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                MyLog.d("onAnimationStart");
-                if(!isPlaying()) {
-                    pauseCDAnimate();
-                }
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                MyLog.d("onAnimationEnd");
-                if(isPlaying()) {
-                    resumeCDAnimate();
-                }
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-                MyLog.d("onAnimationCancel");
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-                MyLog.d("onAnimationRepeat");
-            }
-        });
-
-    }
-
-    /**
-     * 开始指针动画
-     * @param from
-     * @param end
-     */
-    private void startPointAnimate(float from, float end) {
-        if(pointAnimator != null) {
-            if(from < end) {
-                if(!isPlaying()) {
-                    return;
-                }
-            } else {
-                if(isPlaying()) {
-                    return;
-                }
-            }
-            pointAnimator.setFloatValues(from, end);
-            pointAnimator.start();
-        }
-    }
-
-    /**
-     * 初始化CD动画
-     */
-    private void initCDAnimate() {
-        cdAnimator = ValueAnimator.ofFloat(rlCd.getRotation(), 360f + rlCd.getRotation());
-        cdAnimator.setTarget(rlCd);
-        cdAnimator.setRepeatCount(ValueAnimator.INFINITE);
-        cdAnimator.setDuration(15000);
-        cdAnimator.setInterpolator(lin);
-        cdAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                float current = (Float) animation.getAnimatedValue();
-                setCdRadio(current);
-                rlCd.setRotation(current);
-            }
-        });
-    }
-
-    /**
-     * 开始cd动画
-     */
-    private void resumeCDAnimate() {
-        if(cdAnimator != null && !cdAnimator.isRunning()) {
-            cdAnimator.setFloatValues(rlCd.getRotation(), 360f + rlCd.getRotation());
-            cdAnimator.start();
-        }
-    }
-
-    /**
-     * 暂停CD动画
-     */
-    private void pauseCDAnimate() {
-        if(cdAnimator != null && cdAnimator.isRunning()) {
-            cdAnimator.cancel();
-        }
     }
 
     private void updateTime(TimeBean timeBean) {
