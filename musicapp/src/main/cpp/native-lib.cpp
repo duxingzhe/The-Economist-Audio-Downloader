@@ -17,7 +17,7 @@ extern "C"
 #define LOGE(FORMAT,...) __android_log_print(ANDROID_LOG_ERROR,"LC",FORMAT,##__VA_ARGS__);
 
 SLObjectItf engineObject=NULL;
-SLEngineItf engienEngine=NULL;
+SLEngineItf engineEngine=NULL;
 
 SLObjectItf outputMixObject=NULL;
 SLEnvironmentalReverbItf outputMixEnvironmentalReverb=NULL;
@@ -41,12 +41,36 @@ void getQueueCallback(SLAndroidSimpleBufferQueueItf slBufferQueueItf, void *cont
     }
 }
 
-extern "C"
+void createEngine()
+{
+    slCreateEngine(&engineObject, 0, NULL, 0, NULL, NULL);
+    (*engineObject)->Realize(engineObject, SL_BOOLEAN_FALSE);
+    (*engineObject)->GetInterface(engineObject, SL_IID_ENGINE, &engineEngine);
+}
 
+void createMixVolume()
+{
+    (*engineEngine)->CreateOutputMix(engineEngine, &outputMixObject, 0, 0, 0);
+    (*outputMixObject)->Realize(outputMixObject, SL_BOOLEAN_FALSE);
+    SLresult sLresult=(*outputMixObject)->GetInterface(outputMixObject, SL_IID_ENVIRONMENTALREVERB, &outputMixEnvironmentalReverb);
+
+    if(SL_RESULT_SUCCESS==sLresult)
+    {
+        (*outputMixEnvironmentalReverb)->SetEnvironmentalReverbProperties(outputMixEnvironmentalReverb, &settings);
+    }
+}
+extern "C"
 JNIEXPORT void JNICALL
 Java_com_luxuan_musicapp_MusicPlay_play(JNIEnv *env, jobject instance)
 {
     createEngine();
     createMixVolume();
     createPlayer();
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_luxuan_musicapp_MusicPlay_stop(JNIEnv *env, jobject instance)
+{
+    realseResource();
 }
