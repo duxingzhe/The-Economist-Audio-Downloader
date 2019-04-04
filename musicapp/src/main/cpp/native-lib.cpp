@@ -59,6 +59,76 @@ void createMixVolume()
         (*outputMixEnvironmentalReverb)->SetEnvironmentalReverbProperties(outputMixEnvironmentalReverb, &settings);
     }
 }
+
+void createPlayer()
+{
+    int rate;
+    int channels;
+    createFFmpeg(&rate, &channels);
+    LOGE("RATE %d", rate);
+    LOGE("channels %d", channels);
+
+    /*
+    *
+    typedef struct SLDataLocator_AndroidBufferQueue_ {
+        SLuint32    locatorType;//缓冲区队列类型
+        SLuint32    numBuffers;//buffer位数
+    } */
+
+    SLDataLocator_AndroidBufferQueue android_queue={SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE, 2};
+
+    /**
+    typedef struct SLDataFormat_PCM_ {
+        SLuint32 		formatType;  pcm
+        SLuint32 		numChannels;  通道数
+        SLuint32 		samplesPerSec;  采样率
+        SLuint32 		bitsPerSample;  采样位数
+        SLuint32 		containerSize;  包含位数
+        SLuint32 		channelMask;     立体声
+        SLuint32		endianness;    end标志位
+    } SLDataFormat_PCM;
+     */
+     SLDataFormat_PCM pcm={SL_DATAFORMAT_PCM, channels, rate*1000, SL_PCMSAMPLEFORMAT_FIXED_16,
+                           SL_PCMSAMPLEFORMAT_FIXED_16, SL_SPEAKER_FRONT_LEFT|SL_SPEAKER_FRONT_RIGHT,
+                           SL_BYTEORDER_LITTLEENDIAN};
+    /*
+    * typedef struct SLDataSource_ {
+           void *pLocator;//缓冲区队列
+           void *pFormat;//数据样式,配置信息
+       } SLDataSource;
+    * */
+    SLDataSource dataSource={&android_queue, &pcm};
+
+    SLDataLocator_OutputMix slDataLocator_outputMix={SL_DATALOCATOR_OUTPUTMIX, outputMixObject};
+
+    SLDataSink slDataSink={&slDataLocator_outputMix, NULL};
+
+    const SLInterfaceID ids[3]={SL_IID_BUFFERQUEUE, SL_IID_EFFECTSEND, SL_IID_VOLUME};
+    const SLboolean req[3]={SL_BOOLEAN_FALSE, SL_BOOLEAN_FALSE, SL_BOOLEAN_FALSE};
+
+    /*
+     * SLresult (*CreateAudioPlayer) (
+		SLEngineItf self,
+		SLObjectItf * pPlayer,
+		SLDataSource *pAudioSrc,//数据设置
+		SLDataSink *pAudioSnk,//关联混音器
+		SLuint32 numInterfaces,
+		const SLInterfaceID * pInterfaceIds,
+		const SLboolean * pInterfaceRequired
+	);
+     * */
+    LOGE("执行到此处")
+    (*engineEngine)->CreateAudioPlayer(engineEngine, &audioplayer, &dataSource, &slDataSink, 3, ids, req);
+    (*audioplayer)->Realize(audioplayer, SL_BOOLEAN_FALSE);
+    LOGE("执行到此处2")
+    (*audioplayer)->GetInterface(audioplayer, SL_IID_PLAY, &slPlayItf);
+    (*audioplayer)->GetInterface(audioplayer, SL_IID_BUFFERQUEUE, &slBufferQueueItf);
+    (*slBufferQueueItf)->RegisterCallback(slBufferQueueItf, getQueueCallback, NULL);
+    (*slPlayItf)->SetPlayState(slPlayItf, SL_PLAYSTATE_PLAYING);
+
+    getQueueCallback(slBufferQueueItf, NULL);
+}
+
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_luxuan_musicapp_MusicPlay_play(JNIEnv *env, jobject instance)

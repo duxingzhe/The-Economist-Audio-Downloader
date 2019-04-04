@@ -24,8 +24,10 @@ import com.theeconomist.downloader.bean.SeekBean;
 import com.theeconomist.downloader.bean.TimeBean;
 import com.theeconomist.downloader.log.MyLog;
 import com.theeconomist.downloader.utils.CommonUtil;
+import com.theeconomist.downloader.utils.CoverLoader;
 import com.theeconomist.downloader.utils.EventType;
 import com.theeconomist.downloader.utils.FileUtil;
+import com.theeconomist.downloader.view.AlbumCoverView;
 import com.ywl5320.wlmedia.util.WlTimeUtil;
 
 import org.greenrobot.eventbus.EventBus;
@@ -57,6 +59,7 @@ public class PlayerActivity extends BaseMusicActivity {
     TextView tvSubTitle;
     @BindView(R.id.tv_tip)
     TextView tvTip;
+    private AlbumCoverView mAlbumCoverView;
 
     private ValueAnimator cdAnimator;
     private ValueAnimator pointAnimator;
@@ -70,6 +73,8 @@ public class PlayerActivity extends BaseMusicActivity {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play);
+
+        mAlbumCoverView=(AlbumCoverView) findViewById(R.id.album_cover_view);
         setTitleTrans(R.color.color_trans);
         setBackView();
         setTitleLine(R.color.color_trans);
@@ -84,7 +89,8 @@ public class PlayerActivity extends BaseMusicActivity {
         Intent intent = new Intent(this, MusicService.class);
         intent.putExtra("url", getPlayBean().getUrl());
         startService(intent);
-
+        mAlbumCoverView.setCoverBitmap(CoverLoader.get().loadBitmapFromByteArray(getPlayBean().getImgByte()));
+        mAlbumCoverView.initNeedle(false);
         Glide.with(this).load(R.mipmap.icon_gray_bg)
                 .apply(bitmapTransform(new BlurTransformation(25, 3)).placeholder(R.mipmap.icon_gray_bg))
                 .into(ivBg);
@@ -174,13 +180,13 @@ public class PlayerActivity extends BaseMusicActivity {
         super.onMusicStatus(status);
         switch (status) {
             case PLAY_STATUS_ERROR:
-
+                mAlbumCoverView.pause();
                 ivStatus.setImageResource(R.drawable.play_selector);
                 break;
             case PLAY_STATUS_LOADING:
                 pbLoad.setVisibility(View.VISIBLE);
                 ivStatus.setVisibility(View.GONE);
-
+                mAlbumCoverView.pause();
                 ivStatus.setImageResource(R.drawable.pause_selector);
                 break;
             case PLAY_STATUS_UNLOADING:
@@ -188,17 +194,17 @@ public class PlayerActivity extends BaseMusicActivity {
                 ivStatus.setVisibility(View.VISIBLE);
                 break;
             case PLAY_STATUS_PLAYING:
-
+                mAlbumCoverView.play();
                 ivStatus.setImageResource(R.drawable.pause_selector);
                 break;
             case PLAY_STATUS_PAUSE:
-
+                mAlbumCoverView.pause();
                 ivStatus.setImageResource(R.drawable.play_selector);
                 break;
             case PLAY_STATUS_RESUME:
                 break;
             case PLAY_STATUS_COMPLETE:
-
+                mAlbumCoverView.pause();
                 ivStatus.setImageResource(R.drawable.pause_selector);
                 playNextMusic();
                 break;

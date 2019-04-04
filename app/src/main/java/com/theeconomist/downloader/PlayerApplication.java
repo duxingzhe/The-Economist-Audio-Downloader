@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Handler;
 
+import com.theeconomist.downloader.utils.CoverLoader;
+
 public class PlayerApplication extends Application {
 
     private Handler globalHandler;
@@ -16,6 +18,8 @@ public class PlayerApplication extends Application {
         super.onCreate();
         globalHandler=new Handler();
         context=this;
+
+        CoverLoader.get().init(context);
     }
 
     @Override

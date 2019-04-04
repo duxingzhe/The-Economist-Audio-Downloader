@@ -153,7 +153,7 @@ public class AlbumCoverView extends View implements ValueAnimator.AnimatorUpdate
         invalidate();
     }
 
-    public void start() {
+    public void play() {
         if (isPlaying) {
             return;
         }
