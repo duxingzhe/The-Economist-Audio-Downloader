@@ -129,6 +129,31 @@ void createPlayer()
     getQueueCallback(slBufferQueueItf, NULL);
 }
 
+void realseResource()
+{
+    if(audioplayer!=NULL)
+    {
+        (*audioplayer)->Destroy(audioplayer);
+        audioplayer=NULL;
+        slBufferQueueItf=NULL;
+        slPlayItf=NULL;
+    }
+    if(outputMixObject!=NULL)
+    {
+        (*outputMixObject)->Destroy(outputMixObject);
+        outputMixObject=NULL;
+        outputMixEnvironmentalReverb=NULL;
+    }
+
+    if(engineObject!=NULL)
+    {
+        (*engineObject)->Destroy(engineObject);
+        engineObject=NULL;
+        engineEngine=NULL;
+    }
+    realseFFmpeg();
+}
+
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_luxuan_musicapp_MusicPlay_play(JNIEnv *env, jobject instance)

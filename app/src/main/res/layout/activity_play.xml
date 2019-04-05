@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <ImageView
         android:id="@+id/iv_bg"
         android:layout_width="match_parent"
@@ -46,14 +48,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                android:textSize="16dp"
+                android:textSize="16sp"
                 android:textColor="@color/color_white"/>
             <TextView
                 android:id="@+id/tv_tip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="15dp"
-                android:textSize="12dp"
+                android:textSize="12sp"
                 android:textColor="@color/color_white"/>
         </LinearLayout>
 
@@ -72,7 +74,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="00:00"
-                android:textSize="12dp"
+                android:textSize="12sp"
                 android:textColor="@color/color_white"/>
             <SeekBar
                 android:id="@+id/seek_bar"
@@ -91,7 +93,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="00:00"
-                android:textSize="12dp"
+                android:textSize="12sp"
                 android:textColor="@color/color_white"/>
         </LinearLayout>
 
