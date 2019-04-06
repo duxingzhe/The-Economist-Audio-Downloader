@@ -7,6 +7,18 @@ add_library( native-lib
             SHARED
             src/main/cpp/FFmpegMusic.cpp
         )
+add_library( ssl
+        SHARED
+        IMPORTED)
+set_target_properties( ssl
+        PROPERTIES IMPORTED_LOCATION
+        ${distribution_DIR}/${ANDROID_ABI}/libssl.so)
+add_library( crypto
+        SHARED
+        IMPORTED)
+set_target_properties( crypto
+        PROPERTIES IMPORTED_LOCATION
+        ${distribution_DIR}/${ANDROID_ABI}/libcrypto.so)
 add_library( avcodec-58
              SHARED
              IMPORTED)
@@ -47,7 +59,8 @@ add_library( swscale-5
 set_target_properties( swscale-5
                        PROPERTIES IMPORTED_LOCATION
                        ${distribution_DIR}/${ANDROID_ABI}/libswscale-5.so)
-include_directories(libs/include)
+include_directories(libs/include/ffmpeg
+        lib/include/openssl)
 target_link_libraries( native-lib
                        avcodec-58
                        avfilter-7
