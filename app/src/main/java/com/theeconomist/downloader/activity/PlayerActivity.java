@@ -1,39 +1,28 @@
 package com.theeconomist.downloader.activity;
 
-import android.animation.Animator;
-import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
-import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
 import com.theeconomist.downloader.MusicService;
 import com.theeconomist.downloader.R;
 import com.theeconomist.downloader.bean.EventBusBean;
-import com.theeconomist.downloader.bean.Mp3FileBean;
 import com.theeconomist.downloader.bean.SeekBean;
 import com.theeconomist.downloader.bean.TimeBean;
 import com.theeconomist.downloader.log.MyLog;
-import com.theeconomist.downloader.utils.CommonUtil;
 import com.theeconomist.downloader.utils.CoverLoader;
 import com.theeconomist.downloader.utils.EventType;
-import com.theeconomist.downloader.utils.FileUtil;
 import com.theeconomist.downloader.view.AlbumCoverView;
 import com.ywl5320.wlmedia.util.WlTimeUtil;
 
 import org.greenrobot.eventbus.EventBus;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -61,8 +50,6 @@ public class PlayerActivity extends BaseMusicActivity {
     TextView tvTip;
     private AlbumCoverView mAlbumCoverView;
 
-    private ValueAnimator cdAnimator;
-    private ValueAnimator pointAnimator;
     private EventBusBean eventNextBean;
     private EventBusBean eventSeekBean;
     private SeekBean seekBean;
@@ -243,16 +230,6 @@ public class PlayerActivity extends BaseMusicActivity {
     protected void onResume() {
         super.onResume();
         updateTime(getTimeBean());
-
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        pointAnimator.cancel();
-        cdAnimator.cancel();
-        pointAnimator = null;
-        cdAnimator = null;
     }
 
     @OnClick(R.id.iv_status)

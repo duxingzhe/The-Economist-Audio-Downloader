@@ -1,5 +1,6 @@
 package com.theeconomist.downloader.activity;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -96,6 +97,9 @@ public class MainActivity extends BaseMusicActivity {
     private final static int DISMISS_DELETE_DIALOG=0x9;
     private final static int START_DOWNLOADING_FILE=0x10;
     private final static int START_UNZIPPING_FILE=0x11;
+
+    // 判断MainActivity是否在最前面
+    private boolean isFronted;
 
     private static final String ACTION_MEDIA_SCANNER_SCAN_DIR = "android.intent.action.MEDIA_SCANNER_SCAN_DIR";
 
@@ -252,26 +256,24 @@ public class MainActivity extends BaseMusicActivity {
         });
 
         startScanningFile();
+
+        isFronted=true;
     }
 
     @Override
     public void onResume(){
         super.onResume();
-        if(ivMiniBg != null) {
-            Glide.with(this).load(getPlayBean().getImgByte()).apply(RequestOptions.errorOf(R.mipmap.file_mp3_icon)).into(ivMiniBg);
+        Glide.with(this).load(getPlayBean().getImgByte()).apply(RequestOptions.errorOf(R.mipmap.file_mp3_icon)).into(ivMiniBg);
+        if(!tvMiniName.getText().toString().trim().equals(getPlayBean().getName())) {
+            tvMiniName.setText(getPlayBean().getName());
         }
-        if(tvMiniName != null) {
-            if(!tvMiniName.getText().toString().trim().equals(getPlayBean().getName())) {
-                tvMiniName.setText(getPlayBean().getName());
-            }
+        if(TextUtils.isEmpty(getPlayBean().getAlbumName())) {
+            tvMiniSubName.setText("The Economist");
+        }else{
+            tvMiniSubName.setText("The Economist - "+getPlayBean().getAlbumName());
         }
-        if(tvMiniSubName != null) {
-            if(TextUtils.isEmpty(getPlayBean().getAlbumName())) {
-                tvMiniSubName.setText("The Economist");
-            }else{
-                tvMiniSubName.setText("The Economist - "+getPlayBean().getAlbumName());
-            }
-        }
+
+        isFronted=true;
     }
 
     private void startScanningFile(){
@@ -393,7 +395,7 @@ public class MainActivity extends BaseMusicActivity {
                 if(ivMiniPlayStatus != null) {
                     ivMiniPlayStatus.pause();
                 }
-                if(isPlaying()||!isExiting()) {
+                if((isPlaying()||!isExiting()) && isFronted) {
                     playNextMusic();
                 }
                 break;
@@ -589,5 +591,11 @@ public class MainActivity extends BaseMusicActivity {
         } else if(musicStatus == PLAY_STATUS_ERROR || musicStatus == PLAY_STATUS_COMPLETE) {
             playUrl = "";
         }
+    }
+
+    @Override
+    public void onStop(){
+        super.onStop();
+        isFronted=false;
     }
 }

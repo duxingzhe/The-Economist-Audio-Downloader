@@ -45,7 +45,9 @@ public class CoverLoader {
 
     public Bitmap loadBitmapFromByteArray(byte[] bitArray) {
         if (bitArray.length != 0) {
-            return BitmapFactory.decodeByteArray(bitArray, 0, bitArray.length);
+            Bitmap bitmap= BitmapFactory.decodeByteArray(bitArray, 0, bitArray.length);
+            bitmap = ImageUtil.resizeImage(bitmap, roundLength, roundLength);
+            return ImageUtil.createCircleImage(bitmap);
         } else {
             return null;
         }
