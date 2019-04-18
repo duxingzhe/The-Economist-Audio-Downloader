@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.util.AttributeSet;
 import android.view.View;
 
 /**
@@ -35,7 +36,18 @@ public class EqualizerView extends View {
     //构造函数初始化画笔
     public EqualizerView(Context context) {
         super(context);
+    }
 
+    public EqualizerView(Context context, AttributeSet attrs) {
+        this(context, attrs, 0);
+    }
+
+    public EqualizerView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        init();
+    }
+
+    private void init(){
         mPaint = new Paint();//初始化画笔工具
         mPaint.setAntiAlias(true);//抗锯齿
         mPaint.setColor(Color.RED);//画笔颜色
@@ -75,8 +87,16 @@ public class EqualizerView extends View {
             float y = (getHeight() / 2 - i * vgap - vgap);//计算y轴坐标
             float y1 = (getHeight() / 2 + i * vgap + vgap);
             //绘制频谱块
-            mPaint.setColor(Color.RED);//画笔颜色
-            canvas.drawLine(x, y, (x + strokeLength), y, mPaint);//绘制频谱块
+            if(i<=8) {
+                mPaint.setColor(Color.GREEN);//画笔颜色
+                canvas.drawLine(x, y, (x + strokeLength), y, mPaint);//绘制频谱块
+            }else if(i<=16){
+                mPaint.setColor(Color.YELLOW);//画笔颜色
+                canvas.drawLine(x, y, (x + strokeLength), y, mPaint);//绘制频谱块
+            }else{
+                mPaint.setColor(Color.RED);//画笔颜色
+                canvas.drawLine(x, y, (x + strokeLength), y, mPaint);//绘制频谱块
+            }
 
             //绘制音量柱倒影
             if (i <= 6 && value > 0) {

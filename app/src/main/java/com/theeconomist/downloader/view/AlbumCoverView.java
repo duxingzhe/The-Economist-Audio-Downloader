@@ -54,12 +54,10 @@ public class AlbumCoverView extends View implements ValueAnimator.AnimatorUpdate
 
     public AlbumCoverView(Context context) {
         this(context, null);
-        init();
     }
 
     public AlbumCoverView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
-        init();
     }
 
     public AlbumCoverView(Context context, AttributeSet attrs, int defStyleAttr) {
