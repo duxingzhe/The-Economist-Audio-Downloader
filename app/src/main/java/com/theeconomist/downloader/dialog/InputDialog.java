@@ -73,19 +73,19 @@ public class InputDialog extends BaseDialog {
 
                     String date=yearEditText.getText().toString()+month+day;
                     String downloadUrl;
-
+                    String fileName;
                     // 一年以后删除这个判断，只留下后半段
                     if(Integer.valueOf(issueEditText.getText().toString())<9136) {
                         downloadUrl="https://audiocdn.economist.com/sites/default/files/AudioArchive/" +
                                 yearEditText.getText().toString() + "/" + date + "/Issue_" + issueEditText.getText().toString() + "_" + date + "_The_Economist_Full_edition.zip";
                         FileUtil.isNeededUnzip=true;
+                        fileName="Issue_"+issueEditText.getText().toString() + "_" + date +"_The_Economist_Full_edition.zip";
                     }else{
                         downloadUrl="https://audiocdn.economist.com/sites/default/files/AudioArchive/" +
                                 yearEditText.getText().toString() + "/" + date + "/Issue_" + issueEditText.getText().toString() + "_" + date + "_The_Economist_Full_edition.m4a";
                         FileUtil.isNeededUnzip=false;
+                        fileName="Issue_"+issueEditText.getText().toString() + "_" + date +"_The_Economist_Full_edition.m4a";
                     }
-
-                    String fileName="Issue_"+issueEditText.getText().toString() + "_" + date +"_The_Economist_Full_edition.zip";
 
                     mListener.downloadFile(downloadUrl,fileName);
                     dismiss();
