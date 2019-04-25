@@ -8,6 +8,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.theeconomist.downloader.R;
+import com.theeconomist.downloader.utils.FileUtil;
 
 public class InputDialog extends BaseDialog {
 
@@ -71,8 +72,19 @@ public class InputDialog extends BaseDialog {
                     }
 
                     String date=yearEditText.getText().toString()+month+day;
-                    String downloadUrl="https://audiocdn.economist.com/sites/default/files/AudioArchive/" +
-                            yearEditText.getText().toString() + "/" + date + "/Issue_"+issueEditText.getText().toString() + "_" + date +"_The_Economist_Full_edition.zip";
+                    String downloadUrl;
+
+                    // 一年以后删除这个判断，只留下后半段
+                    if(Integer.valueOf(issueEditText.getText().toString())<9136) {
+                        downloadUrl="https://audiocdn.economist.com/sites/default/files/AudioArchive/" +
+                                yearEditText.getText().toString() + "/" + date + "/Issue_" + issueEditText.getText().toString() + "_" + date + "_The_Economist_Full_edition.zip";
+                        FileUtil.isNeededUnzip=true;
+                    }else{
+                        downloadUrl="https://audiocdn.economist.com/sites/default/files/AudioArchive/" +
+                                yearEditText.getText().toString() + "/" + date + "/Issue_" + issueEditText.getText().toString() + "_" + date + "_The_Economist_Full_edition.m4a";
+                        FileUtil.isNeededUnzip=false;
+                    }
+
                     String fileName="Issue_"+issueEditText.getText().toString() + "_" + date +"_The_Economist_Full_edition.zip";
 
                     mListener.downloadFile(downloadUrl,fileName);

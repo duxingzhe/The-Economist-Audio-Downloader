@@ -200,7 +200,11 @@ public class MainActivity extends BaseMusicActivity {
                     public void downloadFile(String downloadUrl, String fileName) {
                         FileUtil.url=downloadUrl;
                         FileUtil.fileName=fileName;
-                        handler.sendEmptyMessageDelayed(START_DOWNLOADING_FILE,500);
+                        if(FileUtil.isNeededUnzip) {
+                            handler.sendEmptyMessageDelayed(START_DOWNLOADING_FILE, 500);
+                        }else{
+                            handler.sendEmptyMessageDelayed(START_SCANNING_FILE, 500);
+                        }
                     }
                 });
 

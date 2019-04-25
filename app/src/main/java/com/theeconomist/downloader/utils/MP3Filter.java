@@ -8,7 +8,7 @@ public class MP3Filter implements FileFilter {
 
     @Override
     public boolean accept(File file){
-        if(file.getPath().contains("mp3")){
+        if(file.getPath().contains("mp3")||file.getPath().contains("m4a")){
             return true;
         }
         return false;
