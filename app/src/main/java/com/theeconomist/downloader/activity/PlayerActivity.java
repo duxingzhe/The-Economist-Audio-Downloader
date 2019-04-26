@@ -86,7 +86,7 @@ public class PlayerActivity extends BaseMusicActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 position = getTimeBean().getTotalSecs() * progress / 100;
-                tvNowTime.setText(WlTimeUtil.secdsToDateFormat(position, getTimeBean().getTotalSecs()));
+                tvNowTime.setText(WlTimeUtil.secdsToDateFormat(getTimeBean().getTotalSecs()));
             }
 
             @Override
@@ -264,14 +264,14 @@ public class PlayerActivity extends BaseMusicActivity {
                     seekBar.setVisibility(View.GONE);
                     tvTotalTime.setVisibility(View.GONE);
                 }
-                tvNowTime.setText(WlTimeUtil.secdsToDateFormat(timeBean.getCurrSecs(), timeBean.getTotalSecs()));
+                tvNowTime.setText(WlTimeUtil.secdsToDateFormat(timeBean.getTotalSecs()));
             } else {
                 if(seekBar.getVisibility() == View.GONE) {
                     seekBar.setVisibility(View.VISIBLE);
                     tvTotalTime.setVisibility(View.VISIBLE);
                 }
-                tvTotalTime.setText(WlTimeUtil.secdsToDateFormat(timeBean.getTotalSecs(), timeBean.getTotalSecs()));
-                tvNowTime.setText(WlTimeUtil.secdsToDateFormat(timeBean.getCurrSecs(), timeBean.getTotalSecs()));
+                tvTotalTime.setText(WlTimeUtil.secdsToDateFormat(timeBean.getTotalSecs()));
+                tvNowTime.setText(WlTimeUtil.secdsToDateFormat(timeBean.getTotalSecs()));
                 seekBar.setProgress(getProgress());
             }
         }
