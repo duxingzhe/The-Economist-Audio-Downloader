@@ -3,6 +3,7 @@ package com.luxuan.media;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Looper;
 import android.os.Parcel;
@@ -15,7 +16,9 @@ import java.io.File;
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class FFmpegMediaPlayer {
 
@@ -336,5 +339,74 @@ public class FFmpegMediaPlayer {
     public native int getCurrentPosition();
 
     public native int getDuration();
+
+    public Metadata getMetadata(){
+        boolean update_only=false;
+        boolean apply_filter=false;
+
+        Metadata data=new Metadata();
+        HashMap<String, String> metadata=null;
+        if((metadata=native_getMetadata(update_only, apply_filter, metadata))==null){
+            return null;
+        }
+
+        if(!data.parse(metadata)){
+            return null;
+        }
+
+        return data;
+    }
+
+    public int setMetadataFilter(Set<String> allow, Set<String> block){
+        int i=0;
+
+        String[] allowed=new String[allow.size()];
+        String[] blocked=new String[block.size()];
+
+        for(String s : allow){
+            allowed[i]=s;
+            i++;
+        }
+
+        i=0;
+
+        for(String s : block){
+            blocked[i]=s;
+            i++;
+        }
+
+        return native_setMetadataFilter(allowed, blocked);
+    }
+
+    public native void setNativeMediaPlayer(FFmpegMediaPlayer next);
+
+    public void release(){
+        stayAwake(false);
+        updateSurfaceScreenOn();
+        mOnPreparedListener=null;
+        mOnBufferingUpdateListener=null;
+        mOnSeekCompleteListener=null;
+        mOnErrorListener=null;
+        mOnInfoListener=null;
+        mOnVideoSizeChangedListener=null;
+        mOnTimedTextListener=null;
+        _release();
+    }
+
+    private native void _release();
+
+    public native void setAudioStreamType(int streamType);
+
+    public native void setLooping(boolean looping);
+
+    public native void setVolume(float leftVolume, float rightVolume);
+
+    public native Bitmap getFrameAt(int mesc) throws IllegalStateException;
+
+    public native void setAudioSessionid(int sessionId) throws IllegalArgumentException, IllegalStateException;
+
+    public native void getAudioSessionId();
+
+    public native void attachAuxEffect(int effectId);
 
 }
