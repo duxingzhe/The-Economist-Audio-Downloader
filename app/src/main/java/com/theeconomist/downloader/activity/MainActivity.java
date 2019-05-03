@@ -1,6 +1,5 @@
 package com.theeconomist.downloader.activity;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -45,7 +44,6 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.OnClick;
-import butterknife.Optional;
 
 public class MainActivity extends BaseMusicActivity {
 

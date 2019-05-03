@@ -1,1 +1,1 @@
-include ':app', ':musiclib', ':musicapp'
+include ':app', ':musiclib', ':musicapp', ':ffmpegmediaplayer', ':ffmpegmediametaretriever'
