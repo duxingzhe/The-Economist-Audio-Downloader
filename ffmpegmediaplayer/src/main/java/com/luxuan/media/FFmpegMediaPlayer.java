@@ -409,4 +409,69 @@ public class FFmpegMediaPlayer {
 
     public native void attachAuxEffect(int effectId);
 
+    private static final int KEY_PARAMETER_TIMED_TEXT_TRACK_INDEX=1000;
+
+    private static final int KEY_PARAMETER_TIMED_TEXT_ADD_OUT_OF_BAND_SOURCE=1001;
+
+    public native boolean setParameter(int key, Parcel value);
+
+    public boolean setParam(int key, String value){
+        Parcel p=Parcel.obtain();
+        p.writeString(value);
+        boolean ret=setParameter(key, p);
+        p.recycle();
+        return ret;
+    }
+
+    public boolean setParameter(int key, int value){
+        Parcel p=Parcel.obtain();
+        p.writeInt(value);
+        boolean ret=setParameter(key, p);
+        p.recycle();
+        return ret;
+    }
+
+    private native void getParameter(int key, Parcel reply);
+
+    public Parcel getParcelParameters(int key){
+        Parcel p=Parcel.obtain();
+        getParameter(key, p);
+        return p;
+    }
+
+    public String getStringParameter(int key){
+        Parcel p=Parcel.obtain();
+        getParameter(key, p);
+        String ret=p.readString();
+        p.recycle();
+        return ret;
+    }
+
+    public int getIntParameter(int key){
+        Parcel p=Parcel.obtain();
+        getParameter(key, p);
+        int ret=p.readInt();
+        p.recycle();
+        return ret;
+    }
+
+    public native void setAuxEffectSendLevel(float level);
+
+    private native final int native_invke(Parcel request, Parcel reply);
+
+    private native final HashMap<String, String> native_getMetadata(boolean update_only,
+                                                                    boolean apply_filter,
+                                                                    HashMap<String, String> reply);
+    private native final int native_setMeadataFilter(String[] allowed, String[] blocked);
+
+    private native final void native_setup(Object mediaplayer_this);
+
+    private native final void native_finalize();
+
+    public boolean enableTimedTextTrackIndex(int index){
+        if(index<0){
+            return false;
+        }
+        return setParameter(KEY_PARAMETER_TIMED_TEXT_TRACK_INDEX, index);
+    }
 }
