@@ -5,7 +5,9 @@ import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.os.Parcel;
 import android.os.PowerManager;
 import android.util.Log;
@@ -473,5 +475,116 @@ public class FFmpegMediaPlayer {
             return false;
         }
         return setParameter(KEY_PARAMETER_TIMED_TEXT_TRACK_INDEX, index);
+    }
+
+    /**
+     * {@hide}
+    */
+    public boolean enableTimedText(){
+        return enableTimedTextTrackIndex(0);
+    }
+
+    /**
+     * {@hide}
+     */
+    public boolean disableTimedText(){
+        return setParameter(KEY_PARAMETER_TIMED_TEXT_TRACK_INDEX, -1);
+    }
+
+    /**
+     * {@hide}
+     */
+    public native static int native_pullBatteryData(Parcel reply);
+
+    @Override
+    protected void finalize(){
+        native_finalize();
+    }
+
+    private static final int MEDIA_NOP=0;
+    private static final int MEDIA_PREPARED=1;
+    private static final int MEDIA_PLAYBACK_COMPLETE=2;
+    private static final int MEDIA_BUFFERING_UPDATE=3;
+    private static final int MEDIA_SEEK_COMPLETE=4;
+    private static final int MEDIA_SET_VIDEO_SIZE=5;
+    private static final int MEDIA_TIMED_TEXT=99;
+    private static final int MEDIA_ERROR=100;
+    private static final int MEDIA_INFO=200;
+
+    private class EventHandler extends Handler{
+        private FFmpegMediaPlayer mMediaPlayer;
+
+        public EventHandler(FFmpegMediaPlayer mp, Looper looper){
+            super(looper);
+            mMediaPlayer=mp;
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+             if(mMediaPlayer.mMativeContext==0){
+                 Log.w(TAG, "mediaplayer went away with unhandled events");
+                 return;
+             }
+
+             switch(msg.what){
+                 case MEDIA_PREPARED:
+                     if(mOnPreparedListener!=null){
+                         mOnPreparedListener.onPrepared(mMediaPlayer);
+                     }
+                     return;
+                 case MEDIA_PLAYBACK_COMPLETE:
+                     if(mOnCompletionListener!=null) {
+                         mOnCompletionListener.onCompletion(mMediaPlayer);
+                     }
+                     stayAwake(false);
+                     return;
+                 case MEDIA_BUFFERING_UPDATE:
+                     if(mOnBufferingUpdateListener!=null){
+                         mOnBufferingUpdateListener.onBufferingUpdate(mMediaPlayer, msg.arg1);
+                     }
+                     return;
+                 case MEDIA_SET_VIDEO_SIZE:
+                     if(mOnVideoSizeChangedListener!=null) {
+                         mOnVideoSizeChangedListener.onVideoSizeChanged(mMediaPlayer, msg.arg1, msg.arg2);
+                     }
+                     return;
+                 case MEDIA_ERROR:
+                     Log.e(TAG, "Error ("+msg.arg1+","+msg.arg2+")");
+                     boolean error_was_handled=false;
+                     if(mOnErrorListener!=null){
+                         error_was_handled=mOnErrorListener.onError(mMediaPlayer, msg.arg1, msg.arg2);
+                     }
+                     if(mOnCompletionListener!=null&&!error_was_handled){
+                         mOnCompletionListener.omCompletion(mMediaPlayer0);
+                     }
+                     stayAwake(false);
+                     return;
+                 case MEDIA_INFO:
+                     if(msg.arg1!=MEDIA_INFO_VIDEO_TRACK_LAGGING){
+                         Log.i(TAG,"Info ("+msg.arg1+","+msg.arg2+")");
+                     }
+                     if(mOnInfoListener!=null){
+                         mOnInfoListener.onInfo(mMediaPlayer, msg.arg1, msg.arg2);
+                     }
+                     return;
+                 case MEDIA_TIMED_TEXT:
+                     if(mOnTimedTextListener!=null){
+                         if(msg.obj==null){
+                             mOnTimedTextListener.onTimedText(mMediaPlayer, null);
+                         }else{
+                             if(msg.obj instanceof byte[]){
+                                 TimedText text=new TimedText((byte[])(msg.obj));
+                                 mOnTimedTextListener.onTimedText(mMediaPlayer,text);
+                             }
+                         }
+                     }
+                     return;
+                 case MEDIA_NOP:
+                    break;
+                 default:
+                     Log.e(TAG,"Unknown message type "+msg.what);
+                     return;
+             }
+        }
     }
 }
