@@ -68,6 +68,8 @@ target_link_libraries( native-lib
                        avutil-56
                        swresample-3
                        swscale-5
+                        ssl
+                        crypto
                        log
                        android
                        OpenSLES

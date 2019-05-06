@@ -121,7 +121,7 @@ public class FFmpegMediaPlayer {
             FFmpegMediaPlayer mp=new FFmpegMediaPlayer();
             mp.setDataSource(context, uri);
             if(holder!=null){
-                mp.setDisplay(hodler);
+                mp.setDisplay(holder);
             }
             mp.prepare();
             return mp;
@@ -521,7 +521,7 @@ public class FFmpegMediaPlayer {
 
         @Override
         public void handleMessage(Message msg) {
-             if(mMediaPlayer.mMativeContext==0){
+             if(mMediaPlayer.mNativeContext==0){
                  Log.w(TAG, "mediaplayer went away with unhandled events");
                  return;
              }
@@ -541,6 +541,11 @@ public class FFmpegMediaPlayer {
                  case MEDIA_BUFFERING_UPDATE:
                      if(mOnBufferingUpdateListener!=null){
                          mOnBufferingUpdateListener.onBufferingUpdate(mMediaPlayer, msg.arg1);
+                     }
+                     return;
+                 case MEDIA_SEEK_COMPLETE:
+                     if(mOnSeekCompleteListener!=null){
+                         mOnSeekCompleteListener.onSeekComplete(mMediaPlayer);
                      }
                      return;
                  case MEDIA_SET_VIDEO_SIZE:
@@ -586,5 +591,125 @@ public class FFmpegMediaPlayer {
                      return;
              }
         }
+    }
+
+    private static void postEventFromNative(Object mediaplayer_ref, int what, int arg1, int arg2, object obj){
+        FFmpegMediaPlayer mp=(FFmpegMediaPlayer)((WeakReference)mediaplayer_ref).get();
+        if(mp==null){
+            return;
+        }
+
+        if(mp.mEventHandler!=null){
+            Message m= mp.mEventHandler.obtainMessage(what, arg1, arg2, obj);
+            mp.mEventHandler.sendMessage(m);
+        }
+    }
+
+    public interface OnPreparedListener{
+
+        void onPrepared(FFmpegMediaPlayer mp);
+    }
+
+    public void setOnPreparedListener(OnPreparedListener listener){
+        mOnPreparedListener=listener;
+    }
+
+    private OnPreparedListener mOnPreparedListener;
+
+    public interface OnCompletionListener{
+
+        void onCompletion(FFmpegMediaPlayer mp);
+    }
+
+    public void setOnCompletionListener(OnCompletionListener listener){
+        mOnCompletionListener= listener;
+    }
+
+    private OnCompletionListener mOnCompletionListener;
+
+    public interface OnBufferingUpdateListener{
+
+        void onBufferingUpdate(FFmpegMediaPlayer mp, int percent);
+    }
+
+    public void setOnBufferingUpdateListener(OnBufferingUpdateListener listener){
+        mOnBufferingUpdateListener=listener;
+    }
+
+    private OnBufferingUpdateListener mOnBufferingUpdateListener;
+
+    public interface OnSeekCompleteListener{
+
+        void onSeekComplete(FFmpegMediaPlayer mp);
+    }
+
+    public void setOnSeekCompleteListener(OnSeekCompleteListener listener){
+        mOnSeekCompleteListener=listener;
+    }
+
+    private OnSeekCompleteListener mOnSeekCompleteListener;
+
+    public interface OnVideoSizeChangedListener{
+
+        void onVideoSizeChanged(FFmpegMediaPlayer mp, int width, int height);
+    }
+
+    public void setOnVideoSizeChangedListener(OnVideoSizeChangedListener listener){
+        mOnVideoSizeChangedListener=listener;
+    }
+
+    private OnVideoSizeChangedListener mOnVideoSizeChangedListener;
+
+    /**
+     * {@hide}
+     */
+    public interface OnTimedTextListener{
+
+        void onTimedText(FFmpegMediaPlayer mp, TimedText text);
+    }
+
+    /**
+     * {@hide}
+     */
+    public void setOnTimedTextListener(OnTimedTextListener listener){
+        mOnTimedTextListener=listener;
+    }
+
+    private OnTimedTextListener mOnTimedTextListener;
+
+    public interface OnErrorListener{
+
+        boolean onError(FFmpegMediaPlayer mp, int what, int extra);
+    }
+
+    public void setOnErrorListener(OnErrorListener listener){
+        mOnErrorListener=listener;
+    }
+
+    private OnErrorListener mOnErrorListener;
+
+    public static final int MEDIA_INFO_UNKNOWN =1;
+    public static final int MEDIA_INFO_VIDEO_TRACK_LAGGING=700;
+    public static final int MEDIA_INFO_BUFFERING_START=701;
+    public static final int MEDIA_INFO_BUFFERING_END=702;
+    public static final int MEDIA_INFO_BAD_INTERLEAVIN=800;
+    public static final int MEDIA_INFO_NOT_SEEKABLE=801;
+    public static final int MEDIA_INFO_METADATA_UPDATE=802;
+
+    public interface OnInfoListener{
+
+        boolean onInfo(FFmpegMediaPlayer mp, int what, int extra);
+    }
+
+    public void setOnInfoListener(OnInfoListener listener){
+        mOnInfoListener=listener;
+    }
+
+    private OnInfoListener mOnInfoListener;
+
+    private int attachAuxEffectCompat(int effectId){
+        int ret=-3;
+
+        return ret;
     }
 }
