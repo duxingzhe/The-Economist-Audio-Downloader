@@ -68,7 +68,7 @@ public class FFmpegMediaPlayer {
         Looper looper;
         if((looper=Looper.myLooper())!=null){
             mEventHandler=new EventHandler(this, looper);
-        }else if((looper=Looper.getMainLooper(this, looper))!=NULL){
+        }else if((looper=Looper.getMainLooper())!=null){
             mEventHandler=new EventHandler(this,looper);
         }else{
             mEventHandler=null;
@@ -112,7 +112,7 @@ public class FFmpegMediaPlayer {
         updateSurfaceScreenOn();
     }
 
-    public static FFmepegMediaPlayer create(Context context, Uri uri){
+    public static FFmpegMediaPlayer create(Context context, Uri uri){
         return create(context, uri, null);
     }
 
@@ -268,7 +268,7 @@ public class FFmpegMediaPlayer {
 
     private native void _start() throws IllegalStateException;
 
-    public void stop() throws IllegalStateexception{
+    public void stop() throws IllegalStateException{
         stayAwake(false);
         _stop();
     }
@@ -459,15 +459,15 @@ public class FFmpegMediaPlayer {
 
     public native void setAuxEffectSendLevel(float level);
 
-    private native final int native_invke(Parcel request, Parcel reply);
+    private native final int native_invoke(Parcel request, Parcel reply);
 
     private native final HashMap<String, String> native_getMetadata(boolean update_only,
                                                                     boolean apply_filter,
                                                                     HashMap<String, String> reply);
-    private native final int native_setMeadataFilter(String[] allowed, String[] blocked);
+    private native final int native_setMetadataFilter(String[] allowed, String[] blocked);
 
+    private static native final void native_init();
     private native final void native_setup(Object mediaplayer_this);
-
     private native final void native_finalize();
 
     public boolean enableTimedTextTrackIndex(int index){
@@ -560,7 +560,7 @@ public class FFmpegMediaPlayer {
                          error_was_handled=mOnErrorListener.onError(mMediaPlayer, msg.arg1, msg.arg2);
                      }
                      if(mOnCompletionListener!=null&&!error_was_handled){
-                         mOnCompletionListener.omCompletion(mMediaPlayer0);
+                         mOnCompletionListener.onCompletion(mMediaPlayer);
                      }
                      stayAwake(false);
                      return;
@@ -593,7 +593,7 @@ public class FFmpegMediaPlayer {
         }
     }
 
-    private static void postEventFromNative(Object mediaplayer_ref, int what, int arg1, int arg2, object obj){
+    private static void postEventFromNative(Object mediaplayer_ref, int what, int arg1, int arg2, Object obj){
         FFmpegMediaPlayer mp=(FFmpegMediaPlayer)((WeakReference)mediaplayer_ref).get();
         if(mp==null){
             return;
