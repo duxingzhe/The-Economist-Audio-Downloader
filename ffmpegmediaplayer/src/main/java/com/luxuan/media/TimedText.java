@@ -3,6 +3,7 @@ package com.luxuan.media;
 import android.os.Parcel;
 
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Class to hold the timed text's metadata.
@@ -59,7 +60,82 @@ public class TimedText {
     private List<Style> mStyleList=null;
     private List<HyperText> mHyperTextList=null;
 
-    private TExtPos mTextPos;
+    private TextPos mTextPos;
     private Justification mJustification;
-    private TExt mTextStruct;
+    private Text mTextStruct;
+
+    public class Text{
+        public int textLen;
+        public byte[] text;
+        public Text(){
+
+        }
+    }
+
+    public class CharPos{
+        public int startChar=-1;
+        public int endChar=-1;
+        public CharPos(){
+
+        }
+    }
+
+    public class TextPos{
+        public int top=-1;
+        public int left=-1;
+        public int bottom=-1;
+        public int right=-1;
+        public TextPos(){
+
+        }
+    }
+
+    public class Justification{
+        public int horizontalJustification=-1;
+        public int verticalJustification=-1;
+        public Justification(){
+
+        }
+    }
+
+    public class Style{
+        public int startChar=-1;
+        public int endChar=-1;
+        public int fontID=-1;
+        public boolean isBold=false;
+        public boolean isItalic=false;
+        public boolean isUnderlined=false;
+        public int fontsize=-1;
+        public int colorRGBA=-1;
+        public Style(){
+
+        }
+    }
+
+    public class Font{
+        public int ID=-1;
+        public String naem;
+        public Font(){
+
+        }
+    }
+
+    public class Karaoke{
+        public int startTimeMs=-1;
+        public int endTimeMs=-1;
+        public int endChar=-1;
+        public Karaoke(){
+
+        }
+    }
+
+    public class HyperText{
+        public int startChar=-1;
+        public int endChar=-1;
+        public String URL;
+        public String altString;
+        public HyperText(){
+
+        }
+    }
 }
