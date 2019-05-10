@@ -1,6 +1,7 @@
 package com.luxuan.media;
 
 import android.os.Parcel;
+import android.util.Log;
 
 import java.util.HashMap;
 import java.util.List;
@@ -44,6 +45,7 @@ public class TimedText {
 
     private static final int LAST_PRIVATE_KEY=107;
 
+    private static final String TAG = "TimedText";
     private Parcel mParcel= Parcel.obtain();
     private final HashMap<Integer, Object> mKeyObjectMap=new HashMap<Integer, Object>();
 
@@ -138,4 +140,65 @@ public class TimedText {
 
         }
     }
+
+    public TimedText(byte[] obj){
+        mParcel.unmarshall(obj,0,obj.length);
+
+        if(!parseParcel()){
+            mKeyObjectMap.clear();
+            throw new IllegalArgumentException("parseParcel() failes");
+        }
+    }
+
+    private boolean parseParcel(){
+        mParcel.setDataPosition(0);
+        if(mParcel.dataAvail()==0){
+            return false;
+        }
+
+        int type=mParcel.readInt();
+        if(type==KEY_LOCAL_SETTING){
+            type=mParcel.readInt();
+            if(type!=KEY_START_TIME){
+                return false;
+            }
+            int mStartTimeMs=mParcel.readInt();
+            mKeyObjectMap.put(type, mStartTimeMs);
+
+            type=mParcel.readInt();
+            if(type!=KEY_STRUCT_TEXT){
+                return false;
+            }
+
+            mTextStruct=new Text();
+            mTextStruct.textLen=mParcel.readInt();
+
+            mTextStruct.text=mParcel.createByteArray();
+            mKeyObjectMap.put(type, mTextStruct);
+        }
+        else if(type!=KEY_GLOBAL_SETTING) {
+            Log.w(TAG, "Invalid timed text key found: " + type);
+            return false;
+        }
+        while(mParcel.dataAvail()>0){
+            int key=mParcel.readInt();
+            if(!isValidKey(key)){
+                Log.w(TAG,"INvalid timed key found:"+key);
+                return false;
+            }
+
+            Object object=null;
+
+            if(object!=null){
+                if(mKeyObjectMap.containsKey(key)){
+                    mKeyObjectMap.remove(key);
+                }
+                mKeyObjectMap.put(key, object);
+            }
+        }
+
+        mParcel.recycle();
+        return true;
+    }
+
 }
