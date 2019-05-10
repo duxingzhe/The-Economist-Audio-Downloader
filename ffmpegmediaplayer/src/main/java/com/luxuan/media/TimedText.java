@@ -56,7 +56,7 @@ public class TimedText {
     private int mWrapText=-1;
 
     private List<CharPos> mBlinkingPosList=null;
-    private List<CharPos> mHighListPosList=null;
+    private List<CharPos> mHighlightPosList=null;
     private List<Karaoke> mKaraokeList=null;
     private List<Font> mFontList=null;
     private List<Style> mStyleList=null;
@@ -189,6 +189,44 @@ public class TimedText {
 
             Object object=null;
 
+            switch(key){
+                case KEY_STRUCT_STYLE_LIST:
+                    readStyle();
+                    object=mStyleList;
+                    break;
+                case KEY_STRUCT_FONT_LIST:
+                    readFont();
+                    object=mFontList;
+                    break;
+                case KEY_STRUCT_HIGHLIGHT_LIST:
+                    readHighlight();
+                    object=mHighlightPostList;
+                    break;
+                case KEY_STRUCT_KARAOKE_LIST:
+                    readKaraoke();
+                    object=mKaraokeList;
+                    break;
+                case KEY_STRUCT_HYPER_TEXT_LIST:
+                    readHyperText();
+                    object=mHyperTextList;
+                    break;
+                case KEY_STRUCT_BLINKING_TEXT_LIST:
+                    readBlinkingText();
+                    object=mBlinkingPosList;
+                    break;
+                case KEY_WRAP_TEXT:
+                    mWrapText=mParcel.readInt();
+                    object=mWrapText;
+                    break;
+                case KEY_HIGHLIGHT_COLOR_RGBA:
+                    mHightlightColorRGBA=mParcel.readInt();
+                    object=mHighlightPosList;
+                    break;
+                case KEY_DISPLAY_FLAGS:
+                    mDisplayFlags=mParcel.readInt();
+                    object=mDisplayFlags;
+                    break;
+            }
             if(object!=null){
                 if(mKeyObjectMap.containsKey(key)){
                     mKeyObjectMap.remove(key);
