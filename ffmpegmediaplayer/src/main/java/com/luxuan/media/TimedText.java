@@ -3,6 +3,7 @@ package com.luxuan.media;
 import android.os.Parcel;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -107,7 +108,7 @@ public class TimedText {
         public boolean isBold=false;
         public boolean isItalic=false;
         public boolean isUnderlined=false;
-        public int fontsize=-1;
+        public int fontSize=-1;
         public int colorRGBA=-1;
         public Style(){
 
@@ -146,7 +147,7 @@ public class TimedText {
 
         if(!parseParcel()){
             mKeyObjectMap.clear();
-            throw new IllegalArgumentException("parseParcel() failes");
+            throw new IllegalArgumentException("parseParcel() fails");
         }
     }
 
@@ -200,7 +201,7 @@ public class TimedText {
                     break;
                 case KEY_STRUCT_HIGHLIGHT_LIST:
                     readHighlight();
-                    object=mHighlightPostList;
+                    object=mHighlightPosList;
                     break;
                 case KEY_STRUCT_KARAOKE_LIST:
                     readKaraoke();
@@ -226,7 +227,36 @@ public class TimedText {
                     mDisplayFlags=mParcel.readInt();
                     object=mDisplayFlags;
                     break;
+                case KEY_STRUCT_JUSTIFICATION:
+                    mJustification=new Justification();
+
+                    mJustification.horizontalJustification=mParcel.readInt();
+                    mJustification.verticalJustification=mParcel.readInt();
+
+                    object=mJustification;
+                    break;
+                case KEY_BACKGROUND_COLOR_RGBA:
+                    mBackgroundColorRGBA=mParcel.readInt();
+                    object=mBackgroundColorRGBA;
+                    break;
+                case KEY_STRUCT_TEXT_POS:
+                    mTextPos=new TextPos();
+
+                    mTextPos.top=mParcel.readInt();
+                    mTextPos.left=mParcel.readInt();
+                    mTextPos.bottom=mParcel.readInt();
+                    mTextPos.right=mParcel.readInt();
+
+                    object=mTextPos;
+                    break;
+                case KEY_SCROLL_DELAY:
+                    mScrollDelay=mParcel.readInt();
+                    object=mScrollDelay;
+                    break;
+                default:
+                    break;
             }
+
             if(object!=null){
                 if(mKeyObjectMap.containsKey(key)){
                     mKeyObjectMap.remove(key);
@@ -237,6 +267,49 @@ public class TimedText {
 
         mParcel.recycle();
         return true;
+    }
+
+    private void readStyle(){
+        Style style=new Style();
+        boolean endOfStyle=false;
+
+        while(!endOfStyle&&(mParcel.dataAvail()>0)){
+            int key=mParcel.readInt();
+            switch(key){
+                case KEY_START_CHAR:
+                    style.startChar=mParcel.readInt();
+                    break;
+                case KEY_END_CHAR:
+                    style.endChar=mParcel.readInt();
+                    break;
+                case KEY_FONT_ID:
+                    style.fontID=mParcel.readInt();
+                    break;
+                case KEY_STYLE_FLAGS:
+                    int flags=mParcel.readInt();
+
+                    style.isBold=((flags%2)==1);
+                    style.isItalic=((flags%4)>=2);
+                    style.isUnderlined=((flags/4)==1);
+                    break;
+                case KEY_FONT_SIZE:
+                    style.fontSize=mParcel.readInt();
+                    break;
+                case KEY_TEXT_COLOR_RGBA:
+                    style.colorRGBA=mParcel.readInt();
+                    break;
+                default:
+                    mParcel.setDataPosition(mParcel.dataPosition());
+                    endOfStyle=true;
+                    break;
+            }
+        }
+
+        if(mStyleList==null){
+            mStyleList=new ArrayList<Style>();
+        }
+
+        mStyleList.add(style);
     }
 
 }
