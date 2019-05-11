@@ -117,7 +117,7 @@ public class TimedText {
 
     public class Font{
         public int ID=-1;
-        public String naem;
+        public String name;
         public Font(){
 
         }
@@ -303,13 +303,33 @@ public class TimedText {
                     endOfStyle=true;
                     break;
             }
+
+            if(mStyleList==null){
+                mStyleList=new ArrayList<Style>();
+            }
+
+            mStyleList.add(style);
         }
 
-        if(mStyleList==null){
-            mStyleList=new ArrayList<Style>();
-        }
+    }
 
-        mStyleList.add(style);
+    private void readFont(){
+        int entryCount=mParcel.readInt();
+
+        for(int i=0;i<entryCount;i++){
+            Font font=new Font();
+            font.ID=mParcel.readInt();
+            int nameLen=mParcel.readInt();
+
+            byte[] text=mParcel.createByteArray();
+            font.name=new String(text, 0, nameLen);
+
+            if(mFontList==null){
+                mFontList=new ArrayList<Font>();
+            }
+
+            mFontList.add(font);
+        }
     }
 
 }
