@@ -385,4 +385,16 @@ public class TimedText {
         mHyperTextList.add(hyperText);
     }
 
+    private void readBlinkingText(){
+        CharPos blinkingPos=new CharPos();
+
+        blinkingPos.startChar=mParcel.readInt();
+        blinkingPos.endChar=mParcel.readInt();
+
+        if(mBlinkingPosList==null){
+            mBlinkingPosList=new ArrayList<CharPos>();
+        }
+        mBlinkingPosList.add(blinkingPos);
+    }
+
 }
