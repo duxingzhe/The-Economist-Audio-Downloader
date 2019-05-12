@@ -333,7 +333,7 @@ public class TimedText {
         }
     }
 
-    private void readHighligth(){
+    private void readHighlight(){
         CharPos pos=new CharPos();
         pos.startChar=mParcel.readInt();
         pos.endChar=mParcel.readInt();
