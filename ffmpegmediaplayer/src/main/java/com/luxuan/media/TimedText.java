@@ -126,6 +126,7 @@ public class TimedText {
     public class Karaoke{
         public int startTimeMs=-1;
         public int endTimeMs=-1;
+        public int startChar=-1;
         public int endChar=-1;
         public Karaoke(){
 
@@ -330,6 +331,58 @@ public class TimedText {
 
             mFontList.add(font);
         }
+    }
+
+    private void readHighligth(){
+        CharPos pos=new CharPos();
+        pos.startChar=mParcel.readInt();
+        pos.endChar=mParcel.readInt();
+
+        if(mHighlightPosList==null){
+            mHighlightPosList=new ArrayList<CharPos>();
+        }
+
+        mHighlightPosList.add(pos);
+    }
+
+    private void readKaraoke(){
+        int entryCount=mParcel.readInt();
+
+        for(int i=0;i<entryCount;i++){
+            Karaoke karaoke=new Karaoke();
+
+            karaoke.startTimeMs=mParcel.readInt();
+            karaoke.endTimeMs=mParcel.readInt();
+            karaoke.startChar=mParcel.readInt();
+            karaoke.endChar=mParcel.readInt();
+
+            if(mKaraokeList==null){
+                mKaraokeList=new ArrayList<Karaoke>();
+            }
+
+            mKaraokeList.add(karaoke);
+        }
+    }
+
+    private void readHyperText(){
+        HyperText hyperText=new HyperText();
+
+        hyperText.startChar=mParcel.readInt();
+        hyperText.endChar=mParcel.readInt();
+
+        int len=mParcel.readInt();
+        byte[] url=mParcel.createByteArray();
+        hyperText.URL=new String(url, 0, len);
+
+        len=mParcel.readInt();
+        byte[] alt=mParcel.createByteArray();
+        hyperText.altString=new String(alt, 0, len);
+
+        if(mHyperTextList==null){
+            mHyperTextList=new ArrayList<HyperText>();
+        }
+
+        mHyperTextList.add(hyperText);
     }
 
 }
