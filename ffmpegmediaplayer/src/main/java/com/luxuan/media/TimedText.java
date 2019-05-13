@@ -6,6 +6,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Class to hold the timed text's metadata.
@@ -33,7 +34,7 @@ public class TimedText {
     public static final int KEY_STRUCT_JUSTIFICATION=15;
     public static final int KEY_STRUCT_TEXT=16;
 
-    private static final int LST_PUBLIC_KEY=16;
+    private static final int LAST_PUBLIC_KEY=16;
     private static final int FIRST_PRIVATE_KEY=101;
 
     private static final int KEY_GLOBAL_SETTING=101;
@@ -395,6 +396,35 @@ public class TimedText {
             mBlinkingPosList=new ArrayList<CharPos>();
         }
         mBlinkingPosList.add(blinkingPos);
+    }
+
+    public boolean isValidKey(final int key){
+        if(!((key>=FIRST_PUBLIC_KEY)&&(key<=LAST_PUBLIC_KEY))
+            &&!((key>=FIRST_PRIVATE_KEY)&&(key<=LAST_PRIVATE_KEY))){
+            return false;
+        }
+
+        return true;
+    }
+
+    public boolean containsKey(final int key){
+        if(isValidKey(key)&&mKeyObjectMap.containsKey(key)){
+            return true;
+        }
+
+        return false;
+    }
+
+    public Set keySet(){
+        return mKeyObjectMap.keySet();
+    }
+
+    public Object getObject(final int key){
+        if(containsKey(key)){
+            return mKeyObjectMap.get(key);
+        }else{
+            throw new IllegalArgumentException("Invalid key: "+key);
+        }
     }
 
 }

@@ -81,7 +81,7 @@ public class FFmpegMediaPlayer {
 
     public Parcel newRequest(){
         Parcel parcel=Parcel.obtain();
-        parcel.writeInterfaceToken(IMediaPlayer);
+        parcel.writeInterfaceToken(IMEDIA_PLAYER);
         return parcel;
     }
 
