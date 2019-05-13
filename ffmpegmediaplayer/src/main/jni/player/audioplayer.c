@@ -2,33 +2,23 @@
 // Created by Luxuan on 2019/5/13.
 //
 
-#include <SLES/OpenSLES.h>
-#include <SLES/OpenSLES_Android.h>
-#include <SLES/OpenSLES_AndroidConfiguration.h>
+#include "audioplayer.h"
 
-#include <sys/types.h>
-#include <ffmpeg_mediaplayer.h>
-#include <stdin.h>
-
-static const int BUFFER_COUNT=2;
-
-static const SLEnvironmentalReverbSettings reverbSettings=
-        SL_I3DL2_ENVIRONMENT_PRESET_STONECORRIDOR;
-
-typedef struct AudioPlayer
+void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 {
-    SLObjectItf engineObject;
-    SLEngineItf engineEngine;
+    VideoState *is=(VideoState *)context;
 
-    SLObjectItf outputMixObject;
+    AudioPlayer *player=&is->audio_player;
 
-    SLObjectItf bqPlayerObject;
-    SLPlayItf bqPlayerPlay;
-    SLAndroidSimpleBufferQueueItf bqPlayerBufferQueue;
-    SLEffectSendItf bqPlayerEffectSend;
-    SLMuteSoloItf bqPlayerMuteSolo;
-    SLVolumeItf bqPlayerVolume;
+    if(player->buffer!=NULL)
+    {
+        free(player->buffer);
+        player->buffer=NULL;
+    }
 
-    void (*bqPlayerCallback) (SLAndroidSimpleBufferQueueItf, void*);
-    void (*audio_callback) (void *userdata, uint8_t *stream, int len);
-} AudioPlayer;
+    int len=4096;
+    plyaer->buffer=malloc(len);
+
+    is->audio_callback(context, player->buffer, len);
+    enqueue(&is->audio_player, (int16_t *)player->buffer, len);
+}
