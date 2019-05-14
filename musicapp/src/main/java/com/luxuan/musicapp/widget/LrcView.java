@@ -35,6 +35,8 @@ import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.Scroller;
 
+import com.luxuan.musicapp.R;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -122,7 +124,7 @@ public class LrcView extends View {
         mTimelineColor = ta.getColor(R.styleable.LrcView_lrcTimelineColor, getResources().getColor(R.color.lrc_timeline_color));
         float timelineHeight = ta.getDimension(R.styleable.LrcView_lrcTimelineHeight, getResources().getDimension(R.dimen.lrc_timeline_height));
         mPlayDrawable = ta.getDrawable(R.styleable.LrcView_lrcPlayDrawable);
-        mPlayDrawable = (mPlayDrawable == null) ? getResources().getDrawable(R.drawable.lrc_play) : mPlayDrawable;
+        mPlayDrawable = (mPlayDrawable == null) ? getResources().getDrawable(R.mipmap.lrc_play) : mPlayDrawable;
         mTimeTextColor = ta.getColor(R.styleable.LrcView_lrcTimeTextColor, getResources().getColor(R.color.lrc_time_text_color));
         float timeTextSize = ta.getDimension(R.styleable.LrcView_lrcTimeTextSize, getResources().getDimension(R.dimen.lrc_time_text_size));
         mTextGravity = ta.getInteger(R.styleable.LrcView_lrcTextGravity, LrcEntry.GRAVITY_CENTER);

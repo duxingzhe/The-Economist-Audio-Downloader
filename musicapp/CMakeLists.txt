@@ -5,6 +5,7 @@ set(lib_DIR F:\\Project\\Android\\NDK\\musiclib\\libs)
 add_library( native-lib
         SHARED
         src/main/cpp/native-lib.cpp
+        ../musiclib/src/main/cpp/FFmpegMusic.cpp
         )
 add_library( ssl
         SHARED

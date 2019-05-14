@@ -88,7 +88,7 @@ void createPlayer()
         SLuint32		endianness;    end标志位
     } SLDataFormat_PCM;
      */
-     SLDataFormat_PCM pcm={SL_DATAFORMAT_PCM, channels, rate*1000, SL_PCMSAMPLEFORMAT_FIXED_16,
+     SLDataFormat_PCM pcm={SL_DATAFORMAT_PCM, (SLuint32)channels, (SLuint32)rate*1000, SL_PCMSAMPLEFORMAT_FIXED_16,
                            SL_PCMSAMPLEFORMAT_FIXED_16, SL_SPEAKER_FRONT_LEFT|SL_SPEAKER_FRONT_RIGHT,
                            SL_BYTEORDER_LITTLEENDIAN};
     /*
