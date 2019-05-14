@@ -40,7 +40,7 @@ void createEngine(AudioPlayer **ps)
 
     const SLInterfaceID ids[1]={SL_IID_ENVIRONMENTALREVERB};
     const SLboolean req[1]={SL_BOOLEAN_FALSE};
-    result=(*player->engineObject)->CreateOutputMix(player->engineEngine, &player->outputMixObject, 0, ids, req);
+    result=(*player->engineEngine)->CreateOutputMix(player->engineEngine, &player->outputMixObject, 0, ids, req);
     assert(SL_RESULT_SUCCESS==result);
     (void)result;
 
