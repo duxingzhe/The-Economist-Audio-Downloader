@@ -1,0 +1,8 @@
+//
+// Created by Luxuan on 2019/5/14.
+//
+
+#ifndef NDK_FFMPEG_MEDIAPLAYER_H
+#define NDK_FFMPEG_MEDIAPLAYER_H
+
+#endif //NDK_FFMPEG_MEDIAPLAYER_H

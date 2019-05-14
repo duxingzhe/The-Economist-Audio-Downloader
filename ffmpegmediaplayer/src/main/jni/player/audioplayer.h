@@ -17,7 +17,7 @@
 
 #include <sys/types.h>
 #include <ffmpeg_mediaplayer.h>
-#include <stdin.h>
+#include <stdint.h>
 
 static const int BUFFER_COUNT=2;
 
@@ -49,4 +49,5 @@ void setVolumeUriAudioPlayer(AudioPlayer **ps, int millibel);
 void queueAudioSamples(AudioPlayer **ps, void *state);
 int enqueue(AudioPlayer **ps, int16_t *data, int size);
 void shutdown(AudioPlayer **ps);
+
 #endif //NDK_AUDIOPLAYER_H
