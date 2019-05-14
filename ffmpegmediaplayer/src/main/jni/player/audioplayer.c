@@ -17,7 +17,7 @@ void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
     }
 
     int len=4096;
-    plyaer->buffer=malloc(len);
+    player->buffer=malloc(len);
 
     is->audio_callback(context, player->buffer, len);
     enqueue(&is->audio_player, (int16_t *)player->buffer, len);
