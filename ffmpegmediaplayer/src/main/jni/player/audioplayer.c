@@ -108,4 +108,14 @@ void createBufferQueueAudioPlayer(AudioPlayer **ps, void *state, int numChannels
     result=(*player->bqPlayerObject)->GetInterface(player->bqPlayerObject, SL_IID_BUFFERQUEUE, &player->bqPlayerBufferQueue);
     assert(SL_RESULT_SUCCESS==result);
     (void)result;
+
+#if 0
+    result=(*player->bqPlayerObject)->GetInterface(player->bqPlayerObject, SL_IID_MUTESOLO, &player->bqPlayerMuteSolo);
+    assert(SL_RESULT_SUCCESS==result);
+    (void)result;
+#endif
+
+    result=(*player->bqPlayerObject)->GetInterface(player->bqPlayerObject, SL_IID_VOLUME, &player->bqPlayerVolume);
+    assert(SL_RESULT_SUCCESS==result);
+    (void)result;
 }
