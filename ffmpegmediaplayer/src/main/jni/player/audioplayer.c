@@ -119,3 +119,32 @@ void createBufferQueueAudioPlayer(AudioPlayer **ps, void *state, int numChannels
     assert(SL_RESULT_SUCCESS==result);
     (void)result;
 }
+
+void setPlayingAudioPlayer(AudioPlayer **ps, int playstate)
+{
+    AudioPlayer *player=*ps;
+
+    SLresult result;
+
+    int state=0;
+
+    if(playstate==0)
+    {
+        state=SL_PLAYSTATE_PLAYING;
+    }
+    else if(playstate==1)
+    {
+        state=SL_PLAYSTAE_PAUSED;
+    }
+    else
+    {
+        state=SL_PLAYSTATE_STOPPED;
+    }
+
+    if(NULL!=player->bqPlayerPlay)
+    {
+        result=(*player->bqPlayerPlay)->SetPlayState(player->bqPlayerPlay, state);
+        assert(SL_RESULT_SUCCESS==result);
+        (void)result;
+    }
+}
