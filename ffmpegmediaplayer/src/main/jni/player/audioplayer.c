@@ -174,3 +174,24 @@ void setVolumeUriAudioPlayer(AudioPlayer **ps, int millibel)
         (void)result;
     }
 }
+
+void queueAudioSamples(AudioPlayer **ps, void *state)
+{
+    AudioPlayer *player=*ps;
+
+    bqPlayerCallback(NULL, state);
+}
+
+int enqueue(AudioPlayer **ps, int16_t *data, int size)
+{
+    AudioPlayer *player=*ps;
+
+    SLresult result;
+    result=(*player->bqPlayerBufferQueue)->Enqueue(player->bqPlayerBufferQueue, data, size);
+    if(SL_RESULT_SUCCESS!=result)
+    {
+        return 0;
+    }
+
+    return 0;
+}
