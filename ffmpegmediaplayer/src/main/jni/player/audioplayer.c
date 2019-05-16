@@ -195,3 +195,39 @@ int enqueue(AudioPlayer **ps, int16_t *data, int size)
 
     return 0;
 }
+
+void shutdown(AudioPlayer **ps)
+{
+    AudioPlayer *player=*ps;
+
+    if(player->bqPlayerObject!=NULL)
+    {
+        (*player->bqPlayerObject)->Destroy(player->bqPlayerObject);
+        player->bqPlayerObject=NULL;
+        player->bqPlayerPlay=NULL;
+        player->bqPlayerBufferQueue=NULL;
+        player->bqPlayerEffectSend=NULL;
+        player->bqPlayerMuteSolo=NULL;
+        player->bqPlayerVolume=NULL;
+    }
+
+    if(player->outputMixObject!=NULL)
+    {
+        (*player->outputMixObject)->Destroy(player->outputMixObject);
+        player->outputMixObject=NULL;
+    }
+
+    if(player->engineObject!=NULL)
+    {
+        (*player->engineObject)->Destroy(player->engineObject);
+        player->engineObject=NULL;
+        player->engineEngine=NULL;
+    }
+
+    if(player->buffer!=NULL)
+    {
+        free(player->buffer);
+        player->buffer=NULL;
+    }
+
+}

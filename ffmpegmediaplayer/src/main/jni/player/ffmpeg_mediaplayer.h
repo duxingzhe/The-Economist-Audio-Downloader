@@ -42,4 +42,11 @@
 #define VIDEO_PICTURE_QUEUE_SIZE 1
 #define DEFAULT_AV_SYNC_TYPE AV_SYNC_VIDEO_MASTER
 
+typedef struct VideoState
+{
+    AVFormatContext *pFormatCtx;
+    struct AudioPlayer *audio_player;
+    void (*audio_callback)(void *userdata, uint8_t *stream, int len);
+} VideoState;
+
 #endif //NDK_FFMPEG_MEDIAPLAYER_H
