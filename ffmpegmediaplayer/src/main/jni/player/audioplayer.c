@@ -134,7 +134,7 @@ void setPlayingAudioPlayer(AudioPlayer **ps, int playstate)
     }
     else if(playstate==1)
     {
-        state=SL_PLAYSTAE_PAUSED;
+        state=SL_PLAYSTATE_PAUSED;
     }
     else
     {
@@ -144,6 +144,32 @@ void setPlayingAudioPlayer(AudioPlayer **ps, int playstate)
     if(NULL!=player->bqPlayerPlay)
     {
         result=(*player->bqPlayerPlay)->SetPlayState(player->bqPlayerPlay, state);
+        assert(SL_RESULT_SUCCESS==result);
+        (void)result;
+    }
+}
+
+SLVolumeItf getVolume(AudioPlayer *player)
+{
+    return player->bqPlayerVolume;
+}
+
+void setVolumeUriAudioPlayer(AudioPlayer **ps, int millibel)
+{
+    AudioPlayer *player=*ps;
+
+    SLresult result;
+    SLVolumeItf volumeItf=getVolume(player);
+    if(NULL!=volumeItf)
+    {
+        SLmillibel MinVolume=SL_MILLIBEL_MIN;
+        SLmillibel MaxVolume=SL_MILLIBEL_MIN;
+
+        (*volumeItf)->GetMaxVolumeLevel(volumeItf, &MaxVolume);
+
+        SLmillibel volume=MinVolume+(SLmillibel)(((float)(MaxVolume-MinVolume))*millibel);
+
+        result=(*volumeItf)->SetVolumeLevel(volumeItf, volume);
         assert(SL_RESULT_SUCCESS==result);
         (void)result;
     }
