@@ -68,6 +68,23 @@ typedef enum media_info_type
     MEDIA_INFO_SUBTITLE_TIMED_OUT=902,
 } media_info_type;
 
+typedef int media_error_type;
+static const media_error_type MEDIA_ERROR_UNKNOWN=1;
+static const  media_error_type MEIDA_ERROR_SERVER_DIED=100;
+
+typedef enum
+{
+    MEDIA_PLAYER_STATE_ERROR=0,
+    MEDIA_PLAYER_IDLE=1<<0,
+    MEDIA_PLAYER_INITIALIZED=1<<1,
+    MEDIA_PLAYER_PREPARING=1<<2,
+    MEDIA_PLAYER_PREPARED=1<<3,
+    MEDIA_PLAYER_STARTED=1<<4;
+    MEDIA_PLAYER_PAUSED=1<<5;
+    MEDIA_PLAYER_STOPPED=1<<6;
+    MEDIA_PLAYER_PLAYBACK_COMPLETE=1<<7;
+} media_player_states;
+
 typedef struct PacketQueue
 {
     SDL_Window *screen;
@@ -80,6 +97,19 @@ typedef struct PacketQueue
     SDL_mutex* mutex;
     SDL_cond *cond;
 } PacketQueue;
+
+typedef struct Picture
+{
+    int linesize;
+    void *buffer;
+} Picture;
+typedef struct VideoPicture
+{
+    Picture *bmp;
+    int width, height;
+    int allocated;
+    double pts;
+} VideoPicture;
 
 typedef struct VideoState
 {
@@ -103,9 +133,41 @@ typedef struct VideoState
     unsigned int audio_buf_index;
     AVPacket audio_pkt;
     uint8_t *audio_pkt_data;
+    int audio_pkt_size;
+    int audio_hw_buf_size;
+    double audio_diff_cum;
+    double audio_diff_avg_coef;
+    double audio_diff_threashold;
+    int audio_diff_avg_count;
+    double frame_timer;
+    double frame_last_pts;
+    double frame_last_delay;
+    double video_clock;
+    double video_current_pts;
+    int64_t video_current_pts_time;
+    AVStream *video_st;
+    PacketQueue videoq;
+    VideoPicture pictq[VIDEO_PICTURE_QUEUE_SIZE];
+    int pictq_size, pictq_rindex, pictq_windex;
+    SDL_mutex *pictq_mutex;
+    SDL_cond *pictq_cond;
+    pthread_t *parse_tid;
+    pthread_t *video_tid;
+    pthread_t *video_refresh_tid;
 
+    char filename[1024];
+    int quit;
+
+    AVIOContext *io_context;
+    struct SwsContext *sws_ctx;
+    struct swrContext *sws_ctx_audio;
     struct AudioPlayer *audio_player;
+    struct VideoPlayer *video_player;
     void (*audio_callback)(void *userdata, uint8_t *stream, int len);
+    int prepared;
+
+    char headers[2048];
+
 } VideoState;
 
 #endif //NDK_FFMPEG_MEDIAPLAYER_H

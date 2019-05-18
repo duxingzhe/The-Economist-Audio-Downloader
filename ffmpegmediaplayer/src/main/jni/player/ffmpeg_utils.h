@@ -37,4 +37,5 @@ void set_video_dimensions(AVFormatContext *ic, AVStream *video_st);
 const char* extract_metadata_internal(AVFormatContext *ic, AVStream *audio_st, AVStream *video_st, const char* key);
 int get_metadata_internal(AVFormatContext *ic, AVDictionary **metadata);
 const char* extract_metadata_from_chapter_internal(AVFormatContext *ic, AVStream *audio_st, AVStream video_st, const char* key, int chapter);
+
 #endif //NDK_FFMPEG_UTILS_H
