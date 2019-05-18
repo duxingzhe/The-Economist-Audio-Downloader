@@ -168,6 +168,81 @@ typedef struct VideoState
 
     char headers[2048];
 
+    int fd;
+    int64_t offset;
+    int prepare_sync;
+
+    void (*notify_callback)(void*, int, int, int, int);
+    void* clazz;
+
+    int read_pause_return;
+    int last_pasued;
+
+    pthread_t *tid;
+    int player_started;
+    AVPacket flush_pkt;
+    void *net;
+    void *native_window;
+
+    int stream_type;
 } VideoState;
+
+struct AVDictionary
+{
+    int count;
+    AVDictionaryEntry *elems;
+};
+
+typedef struct Message
+{
+    VideoState* is;
+    int msg;
+    int ext1;
+    int ext2;
+    int from_thread;
+} Message;
+
+enum
+{
+    AV_SYNC_AUDIO_MASTER,
+    AV_SYNC_VIDEO_MASTER,
+    AV_SYNC_EXTERNAL_MASTER,
+};
+
+int private_main(int argc, char *argv[]);
+
+VideoState *create();
+VideoState *getNextMediaPlayer(VideoState **ps);
+void disconnect(VideoState **ps);
+int setDataSourceURI(VideoState **ps, const char *url, const char *headers);
+int setDataSourceFD(VideoState **ps, int fd, int64_t offset, int64_t length);
+int setVideoSurface(VideoState **ps, void *native_window);
+int setListener(VideoState **ps, void* clazz, void (*listener)(void*, int, int, int, int));
+int setMetadataFilter(VideoState **ps, char *allow[], char *block[]);
+int getMetadata(VideoState **ps, AVDictionary **metadata);
+int prepare(VideoState **ps);
+int prepareAsync(VideoState **ps);
+int start(VideoState **ps);
+int stop(VideoState **ps);
+int pause_l(VideoState **ps);
+int isPlaying(VideoState **ps);
+int getVideoWidth(VideoState **ps, int *w);
+int getVideoHeight(VideoState **ps, int *h);
+int seekTo(VideoState **ps, int msec);
+int getCurrentPosition(VideoState **ps, int *mesc);
+int getDuration(VideoState **ps, int msec);
+int reset(VideoState **ps);
+int setAudioStreamType(VideoState **ps, int type);
+int setLooping(VideoState **ps, int type);
+int isLooping(VideoState **ps);
+int setVolume(VideoState **ps, float leftVolume, float rightVolume);
+void notify(VideoState *is, int msg, int ext1, int ext2);
+void notify_from_thread(VideoState *is, int msg, int ext1, int ext2);
+int setNextPlayer(VideoState **ps, VideoState *next);
+
+void clear_l(VideoState **ps);
+int setTo_l(VideoState **ps, int msec);
+int prepareAsync_l(VideoState **ps);
+int getDuration_l(VideoState **ps, int *msec);
 
 #endif //NDK_FFMPEG_MEDIAPLAYER_H
