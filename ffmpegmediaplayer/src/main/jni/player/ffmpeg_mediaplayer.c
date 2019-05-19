@@ -102,3 +102,54 @@ static void packet_queue_flush(PacketQueue *q)
     q->size=0;
     SDL_UnlockMutex(q->mutex);
 }
+
+double get_audio_clock(VideoState *is)
+{
+    double pts;
+    int hw_buf_size, bytes_per_sec, n;
+
+    pts=is->audio_clock;
+    hw_buf_size=is->audio_buf_size-is->audio_buf_index;
+    bytes_per_sec=0;
+    n=is->audio_st->codec->channels*2;
+    if(is->audio_st)
+    {
+        bytes_per_sec=is->audio_st->codec->sample_rate*n;
+    }
+    if(bytes_per_sec)
+    {
+        pts-=(double)hw_buf_size/bytes_per_sec;
+    }
+    return pts;
+}
+
+double get_video_clock(VideoState *is)
+{
+    double delta;
+
+    delta=(av_gettime()-is->video_current_pts_time)/1000000.0;
+    return is->video_current_pts+delta;
+}
+
+double get_external_clock(VideoState *is)
+{
+    return av_gettime()/1000000.0;
+}
+
+double get_master_clock(VideoState *is)
+{
+    if(is->av_sync_type==AV_SYNC_VIDEO_MASTER)
+    {
+        return get_video_clock(is);
+    }
+    else if(is->av_sync_type==AV_SYNC_AUDIO_MASTER)
+    {
+        return get_audio_clock(is);
+    }
+    else
+    {
+        return get_external_clock(is);
+    }
+}
+
+
