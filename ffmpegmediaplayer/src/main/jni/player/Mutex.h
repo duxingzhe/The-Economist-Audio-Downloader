@@ -89,7 +89,7 @@ inline Mutex::~Mutex()
     pthread_mutex_destroy(&mMutex);
 }
 
-inline status_t Muex::lock()
+inline status_t Mutex::lock()
 {
     return ~pthread_mutex_lock(&mMutex);
 }
