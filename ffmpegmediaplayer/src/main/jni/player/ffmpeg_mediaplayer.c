@@ -223,3 +223,83 @@ int synchronize_audio(VideoState *is, short *samples, int samples_size, double p
 
     return samples_size;
 }
+
+int decode_frame_from_packet(VideoState *is, AVFrame decoded_frame)
+{
+    int64_t src_ch_layout, dst_ch_layout;
+    int src_rate, dst_rate;
+    uint8_t **src_data=NULL, *dst_data=NULL;
+    int src_nb_channels=0, dst_nb_channels=0;
+    int src_linesize, dst_linesize;
+    int src_nb_samples, dst_nb_samples, max_dst_nb_samples;
+    enum AVSampleFormat src_sample_fmt, dst_sample_fmt;
+    int dst_buffsize;
+    int ret;
+
+    src_nb_samples=decoded_frame.nb_samples;
+    src_linesize=(int)decoded_frame.linesize;
+    src_data=decoded_frame.data;
+
+    if(decoded_frame.channel_layout==0)
+    {
+        decoded_frame.channel_layout=av_get_default_channel_layout(decoded_frame.channels);
+    }
+
+    src_rate=decoded_frame.sample_rate;
+    dst_rate=decoded_frame.sample_rate;
+    src_ch_layout=decoded_frame.channel_layout;
+    dst_ch_layout=decoded_frame.channel_layout;
+    src_sample_fmt=decoded_frame.format;
+    dst_sample_fmt=AV_SAMPLE_FMT_S16;
+
+    src_nb_channels=av_get_channel_layout_nb_channels(src_ch_layout);
+    ret=av_samples_alloc_array_and_samples(&src_data, &src_linesize, src_nb_channels, src_nb_samples, src_sample_fmt,0);
+    src_nb_channels=av_get_channel_layout_nb_channels(src_ch_layout);
+    ret=av_samples_alloc_array_and_samples(&src_data, &src_linesize, src_nb_channels, src_nb_samples, src_sample_fmt,0);
+    if(ret<0)
+    {
+        fprintf(stderr, "Could not allocate source samples\n");
+        return -1;
+    }
+
+    max_dst_nb_samples=dst_nb_samples=av_rescale_rnd(src_nb_samples, dst_rate, src_rate, AV_ROUND_UP);
+    dst_nb_channels=av_get_channel_layout_nb_channels(dst_ch_layout);
+    ret=av_samples_alloc_array_and_samples(&dst_data, &dst_linesize, dst_nb_channels, dst_nb_samples, dst_sample_fmt,0);
+    if(ret<0)
+    {
+        fprintf(stderr, "Could not allocate destination samples\n");
+        return -1;
+    }
+
+    dst_nb_samples=av_rescale_rnd(swr_get_delay(is->sws_ctx_audio, src_rate)+src_nb_samples, dst_rate, src_rate, AV_ROUND_UP);
+    ret=swr_convert(is->sws_ctx_audio, dst_data, dst_nb_samples, (const uint8_t **)decoded_frame.data, src_nb_samples);
+    if(ret<0)
+    {
+        fprintf(stderr, "Error while converting\n");
+        return -1;
+    }
+
+    dst_buffsize=av_samples_get_buffer_size(&dst_linesize, dst_nb_channels, ret, dst_sample_fmt, 1);
+    if(dst_buffsize<0)
+    {
+        fprintf(stderr, "Could not get sample buffer size\n");
+        return -1;
+    }
+
+    memcpy(is->audio_buf, dst_data[0], dst_buffsize);
+
+    if(src_data)
+    {
+        av_freep(&src_data[0]);
+    }
+    av_freep(&src_data);
+
+    if(dst_data)
+    {
+        av_freep(&dst_data[0]);
+    }
+    av_freep(&dst_data);
+
+    return dst_buffsize;
+}
+
