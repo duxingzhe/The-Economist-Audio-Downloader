@@ -403,3 +403,16 @@ void audio_callback(void *userdata, Uint8 *stream, int len)
         }
     }
 }
+
+void video_refresh_timer(void *userdata);
+
+static Uint32 sdl_refresh_timer_cb(Uint32 interval, void *opaque)
+{
+    video_refresh_timer(opaque);
+    return 0;
+}
+
+static void schedule_refresh(VideoState *is, int delay)
+{
+    SDL_AddTimer(delay, sdl_refresh_timer_cb, is);
+}
