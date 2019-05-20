@@ -303,3 +303,68 @@ int decode_frame_from_packet(VideoState *is, AVFrame decoded_frame)
     return dst_buffsize;
 }
 
+int audio_decode_frame(VideoState *is, double *pts_ptr)
+{
+    int len1, data_size=0, n;
+    AVPacket *pkt=&is->audio_pkt;
+    double pts;
+
+    for( ; ; )
+    {
+        while(is->audio_pkt_size>0)
+        {
+            int got_frame=0;
+            len1=avcodec_decode_audio4(is->audio_st->codec, &is->audio_frame, &got_frame, pkt);
+            if(len1<0)
+            {
+                is->audio_pkt_size=0;
+                break;
+            }
+
+            if(got_frame)
+            {
+                if(is->audio_frame.format!=AV_SAMPLE_FMT_S16)
+                {
+                    data_size=decode_frame_from_packet(is, is->audio_frame);
+                }
+                else
+                {
+                    data_size=av_samples_get_buffer_size(NULL, is->audio_st->codec->channels,is->audio_frame.nb_samples,
+                                is->audio_st->codec->sample_fmt,1);
+                    memcpy(is->audio_buf, is->audio_frame.data[0], data_size);
+                }
+            }
+            is->audio_pkt_data+=len1;
+            is->audio_pkt_size-=len1;
+
+            if(data_size<=0)
+            {
+                continue;
+            }
+            pts=is->audio_clock;
+            *pts_ptr=pts;
+            n=2*is->audio_st->codec->channels;
+            is->audio_clock+=(double)data_size/(double)(n*is->audio_st->codec->sample_rate);
+            return data_size;
+        }
+
+        if(pkt->data)
+            av_packet_unref(pkt);
+
+        if(is->quit)
+            return -1;
+
+        if(packet_queue_get(is, &is->audioq, pkt, 1)<0)
+        {
+            avcodec_flush_buffers(is->audio_st->codec);
+            continue;
+        }
+        is->audio_pkt_data=pkt->data;
+        is->audio_pkt_size=pkt->size;
+
+        if(pkt->pts!=AV_NOPTS_VALUE)
+        {
+            is->audio_clock=av_q2d(is->audio_st->time_base);
+        }
+    }
+}
