@@ -368,3 +368,38 @@ int audio_decode_frame(VideoState *is, double *pts_ptr)
         }
     }
 }
+
+void audio_callback(void *userdata, Uint8 *stream, int len)
+{
+    VideoState *is=(VideoState *)userdata;
+    int len1, audio_size;
+    double pts;
+
+    while(len>0)
+    {
+        if(is->audio_buf_index>=is->audio_buf_size)
+        {
+            audio_size=audio_decode_frame(is, &pts);
+            if(audio_size<0)
+            {
+                is->audio_buf_size=1024;
+                memset(is->audio_buf, 0, is->audio_buf_size);
+            }
+            else
+            {
+                audio_size=synchronize_audio(is, (int16_t *)is->audio_buf, audio_size, pts);
+                is->audio_buf_index=0;
+            }
+            is->audio_buf_index=0;
+        }
+        len1=is->audio_buf_size-is->audio_buf_index;
+        if(len1>len)
+        {
+            len1=len;
+            memcpy(stream, (uint8_t *)is->audio_buf+is->audio_buf_index, len1);
+            len-=len1;
+            stream+=len1;
+            is->audio_buf_index+=len1;
+        }
+    }
+}
