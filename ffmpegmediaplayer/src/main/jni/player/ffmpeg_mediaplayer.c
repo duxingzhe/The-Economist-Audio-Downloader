@@ -416,3 +416,115 @@ static void schedule_refresh(VideoState *is, int delay)
 {
     SDL_AddTimer(delay, sdl_refresh_timer_cb, is);
 }
+
+void video_display(VideoState *is)
+{
+    SDL_Rect rect;
+    VideoPicture *vp;
+
+    float aspect_ratio;
+    int w, h, x, y;
+
+    vp=&is->pictq[is->pictq_rindex];
+    if(vp->bmp)
+    {
+        if(is->video_st->codec->sample_aspect_ratio.num==0)
+        {
+            aspect_ratio=0;
+        }
+        else
+        {
+            aspect_ratio=av_q2d(is->video_st->codec->sample_aspect_ratio)* is->video_st->codec->width/is->video_st->codec->height;
+        }
+
+        if(aspect_ratio<=0.0)
+        {
+            aspect_ratio = (float) is->video_st->codec->width / (float) is->video_st->codec->height;
+        }
+
+        displayBmp(&is->video_player, vp->bmp, is->video_st->codec, is->video_st->codec->width, is->video_st->codec->height);
+        free(vp->bmp->buffer);
+    }
+}
+
+void video_refresh_timer(void *opaque)
+{
+    VideoState *is=(VideoState *)opaque;
+    VideoPicture *vp;
+    double actual_delay, delay, sync_threshold, ref_clock, diff;
+
+    for( ; ; )
+    {
+        if(is->quit)
+        {
+            break;
+        }
+
+        if(is->video_st)
+        {
+            if(is->pictq_size==0)
+            {
+                SDL_Delay(1);
+                continue;
+            }
+            else
+            {
+                vp=&is->pictq[is->pictq_rindex];
+
+                is->video_current_pts=vp->pts;
+                is->video_current_pts_time=av_gettime();
+
+                delay=vp->pts - is->frame_last_pts;
+                if(delay<=0||delay>=1.0)
+                {
+                    delay=is->frame_last_delay;
+                }
+
+                is->frame_last_delay=delay;
+                is->frame_last_pts=vp->pts;
+
+                if(is->av_sync_type!=AV_SYNC_VIDEO_MASTER)
+                {
+                    ref_clock=get_master_clock(is);
+                    diff=vp->pts-ref_clock;
+                    sync_threshold=(delay>AV_SYNC_THRESHOLD)?delay: AV_SYNC_THRESHOLD;
+                    if(fabs(diff)<AV_NOSYNC_THRESHOLD)
+                    {
+                        if(diff<=-sync_threshold)
+                        {
+                            delay=0;
+                        }
+                        else if(diff>=sync_threshold)
+                        {
+                            delay=2*delay;
+                        }
+                    }
+                }
+                is->frame_timer+=delay;
+                actual_delay=is->frame_timer-(av_gettime()/100.0);
+                if(actual_delay<0.010)
+                {
+                    actual_delay=0.010;
+                }
+
+                video_display(is);
+                if(++is->pictq_rindex==VIDEO_PICTURE_QUEUE_SIZE)
+                {
+                    is->pictq_rindex=0;
+                }
+                SDL_LockMutex(is->pictq_mutex);
+                is->pictq_size--;
+                SDL_CondSignal(is->pictq_cond);
+                SDL_UnlockMutex(is->pictq_mutex);
+
+                SDL_Delay((int)(actual_delay*1000+0.5));
+                continue;
+            }
+        }
+        else
+        {
+            SDL_Delay(100);
+            continue;
+        }
+    }
+}
