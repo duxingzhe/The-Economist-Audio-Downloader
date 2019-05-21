@@ -570,6 +570,33 @@ int queue_picture(VideoState *is, AVFrame *pFrame, double pts)
 
     if(!vp->bmp|| vp->width!=is->video_st->codec->width || vp->height!=is->video_st->codec->height)
     {
+        vp->allocated=0;
 
+        alloc_picture(is);
+        SDL_LockMutex(is->pictq_mutex);
+        while(~vp->allocated&&!is->quit)
+        {
+            SDL_CondWait(is->pictq_cond, is->pictq_mutex);
+        }
+        SDL_UnlockMutex(is->pictq_mutex);
+        if(is->quit)
+        {
+            return -1;
+        }
     }
+
+    if(vp->bmp)
+    {
+        updateBmp(&is->video_player, is->sws_ctx, is->video_st->codec, vp->bmp, pFrame, is->video_st->codec->width, is->video_st->codec->height);
+        vp->pts=pts;
+
+        if(++is->pictq_windex==VIDEO_PICTURE_QUEUE_SIZE)
+        {
+            is->pictq_windex=0;
+        }
+        SDL_LockMutex(is->pictq_mutex);
+        is->pictq_size++;
+        SDL_UnlockMutex(is->pictq_mutex);
+    }
+    return 0;
 }
