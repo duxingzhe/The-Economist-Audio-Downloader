@@ -528,3 +528,48 @@ void video_refresh_timer(void *opaque)
         }
     }
 }
+
+void alloc_picture(void *userdata)
+{
+    VideoState *is=(VideoState *)userdata;
+    VideoPicture *vp;
+
+    vp=&is->pictq[is->pictq_windex];
+    if(vp->bmp)
+    {
+        destroyBmp(&is->video_player, vp->bmp);
+    }
+
+    vp->bmp=createBmp(&is->video_player, is->video_st->codec->width, is->video_st->codec->height);
+
+    vp->width=is->video_st->codec->width;
+    vp->height=is->video_st->codec->height;
+
+    SDL_LockMutex(is->pictq_mutex);
+    vp->allocated=1;
+    SDL_CondSignal(is->pictq_cond);
+    SDL_UnlockMutex(is->pictq_mutex);
+}
+
+int queue_picture(VideoState *is, AVFrame *pFrame, double pts)
+{
+    VideoPicture *vp;
+    AVPicture pict;
+
+    SDL_LockMutex(is->pictq_mutex);
+    while(is->pictq_size>=VIDEO_PICTURE_QUEUE_SIZE&&!is->quit)
+    {
+        SDL_CondWait(is->pictq_cond, is->pictq_mutex);
+    }
+    SDL_UnlockMutex(is->pictq_mutex);
+
+    if(is->quit)
+        return -1;
+
+    vp=&is->pictq[is->pictq_windex];
+
+    if(!vp->bmp|| vp->width!=is->video_st->codec->width || vp->height!=is->video_st->codec->height)
+    {
+
+    }
+}
