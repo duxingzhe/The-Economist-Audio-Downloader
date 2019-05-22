@@ -28,7 +28,7 @@
 
 #include "ffmpeg_utils.h"
 
-#define SDL_AUDIO_BUFF3ER_SIZE 1024
+#define SDL_AUDIO_BUFFER_SIZE 1024
 #define MAX_AUDIO_FRAME_SIZE 192000
 #define MAX_AUDIO_SZIE (5*16*1024)
 #define MAX_VIDEO_SIZE (5*256*1024)
@@ -137,7 +137,7 @@ typedef struct VideoState
     int audio_hw_buf_size;
     double audio_diff_cum;
     double audio_diff_avg_coef;
-    double audio_diff_threashold;
+    double audio_diff_threshold;
     int audio_diff_avg_count;
     double frame_timer;
     double frame_last_pts;

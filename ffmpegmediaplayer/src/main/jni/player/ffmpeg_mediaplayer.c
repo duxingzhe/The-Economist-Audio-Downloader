@@ -623,7 +623,7 @@ double synchronize_video(VideoState *is, AVFrame *src_frame, double pts)
 
 uint64_t global_video_pkt_pts=AV_NOPTS_VALUE;
 
-int out_get_buffer(struct AVCodecContext *c, AVFrame *pic, int flags)
+int our_get_buffer(struct AVCodecContext *c, AVFrame *pic, int flags)
 {
     int ret=avcodec_default_get_buffer2(c, pic, flags);
     uint64_t *pts=av_malloc(sizeof(uint64_t));
@@ -687,5 +687,109 @@ int video_thread(void *arg)
     av_free(pFrame);
 
     two=1;
+    return 0;
+}
+
+int stream_component_open(VideoState *is, int stream_index)
+{
+    AVFormatContext *pFormatCtx=is->pFormatCtx;
+    AVCodecContext *codecCtx=NULL;
+    AVCodec *codec=NULL;
+    AVDictionary *optionsDict=NULL;
+
+    if(stream_index<0||stream_index>=pFormatCtx->nb_streams)
+    {
+        return -1;
+    }
+
+    codecCtx=pFormatCtx->streams[stream_index]->codec;
+
+    if(codecCtx->codec_type==AVMEDIA_TYPE_AUDIO)
+    {
+        is->audio_callback=audio_callback;
+
+        AudioPlayer *player=malloc(sizeof(AudioPlayer));
+        is->audio_player=player;
+        createEngine(&is->audio_player);
+        createBufferQueueAudioPlayer(&is->audio_player, is, codecCtx->channels, codecCtx->sample_rate, is->stream_type);
+    }
+    else if(codecCtx->codec_type==AVMEDIA_TYPE_VIDEO)
+    {
+        VideoPlayer *player=malloc(sizeof(VideoPlayer));
+        is->video_player=player;
+        createVideoEngine(&is->video_player);
+        createScreen(&is->video_player, is->native_window, 0, 0);
+    }
+    codec=avcodec_find_decoder(codecCtx->codec_id);
+    if(!codec||(avcodec_open2(codecCtx, codec, &optionsDict)<0))
+    {
+        fprintf(stderr, "Unsupported codec!\n");
+        return -1;
+    }
+    switch(codecCtx->codec_type)
+    {
+        case AVMEDIA_TYPE_AUDIO:
+            is->audioStream=stream_index;
+            is->audio_st=pFormatCtx->streams[stream_index];
+            is->audio_buf_size=0;
+            is->audio_buf_index=0;
+
+            is->audio_diff_avg_coef=exp(log(0.01/AUDIO_DIFF_AVG_NB));
+            is->audio_diff_avg_count=0;
+
+            is->audio_diff_threshold=2.0*SDL_AUDIO_BUFFER_SIZE/codecCtx->sample_rate;
+            is->sws_ctx_audio=swr_alloc();
+            if(!is->sws_ctx_audio)
+            {
+                fprintf(stderr, "Could not allocate resampler context\n");
+                return -1;
+            }
+
+            uint64_t channel_layout=is->audio_st->codec->channel_layout;
+
+            if(channel_layout==0)
+            {
+                channel_layout=av_get_default_channel_layout(is->audio_st->codec->channels);
+            }
+
+            av_opt_set_int(is->sws_ctx_audio, "in_channel_layout", channel_layout, 0);
+            av_opt_set_int(is->sws_ctx_audio, "out_channel_layout", channel_layout, 0);
+            av_opt_set_int(is->sws_ctx_audio, "in_sample_rate", is->audio_st->codec->sample_rate, 0);
+            av_opt_set_int(is->sws_ctx_audio, "out_sample_rate", is->audio_st->codec->sample_rate, 0);
+            av_opt_set_sample_fmt(is->sws_ctx_audio,"in_sample_fmt", is->audio_st->codec->sample_fmt, 0);
+            av_opt_set_sample_fmt(is->sws_ctx_audio, "out_sample_fmt", AV_SAMPLE_FMT_S16, 0);
+
+            if((swr_init(is->sws_ctx_audio))<0)
+            {
+                fprintf(stderr, "Failed to initialize the resampling context\n");
+                return -1;
+            }
+            memset(&is->audio_pkt, 0, sizeof(is->audio_pkt));
+            packet_queue_init(&is->audioq);
+            break;
+        case AVMEDIA_TYPE_VIDEO:
+            is->videoStream=stream_index;
+            is->video_st=pFormatCtx->streams[stream_index];
+
+            is->frame_timer=(double)av_gettime()/1000000.0;
+            is->frame_last_delay=40e-3;
+            is->video_current_pts_time=av_gettime();
+
+            packet_queue_init(&is->videoq);
+
+            createScreen(&is->video_player, is->native_window, is->video_st->codec->width, is->video_st->codec->height);
+
+            is->video_tid=malloc(sizeof(*(is->video_tid)));
+
+            pthread_create(is->video_tid, NULL, (void *)&video_thread, is);
+            is->sws_ctx=createScaler(&is->video_player, is->video_st->codec);
+
+            codecCtx->get_buffer2=our_get_buffer;
+
+            break;
+        default:
+            break;
+    }
+
     return 0;
 }
