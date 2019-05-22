@@ -793,3 +793,54 @@ int stream_component_open(VideoState *is, int stream_index)
 
     return 0;
 }
+
+int decode_interrupt_cb(void *opaque)
+{
+    VideoState *is=(VideoState *)opaque;
+
+    return (is&&is->quit);
+}
+
+int decode_thread(void *arg)
+{
+    VideoState *is=(VideoState *)arg;
+    AVPacket pkt1, *packet = &pkt1;
+
+    AVDictionary *io_dict=NULL;
+    AVIOInterruptCB callback;
+
+    int video_idnex=-1;
+    int audio_index=-1;
+    int i;
+
+    int ret;
+    int eof=0;
+
+    is->videoStream=-1;
+    is->audioStream=-1;
+
+    AVDictionary *options=NULL;
+    av_dict_set(&options, "icy", "1", 0);
+    av_dict_set(&options, "user-agent", "FFmpegMediaPlayer", 0);
+
+    if(is->headers)
+    {
+        av_dict_set(&options, "headers", is->headers, 0);
+    }
+
+    if(is->offset>0)
+    {
+        is->pFormatCtx=avformat_alloc_context();
+        is->pFormatCtx->skip_initial_bytes=is->offset;
+    }
+
+    callback.callback=decode_interrupt_cb;
+    callback.opaque=is;
+
+    if(avio_open2(&is->io_context, is->filename, 0, &callback, &io_dict))
+    {
+        fprintf(stderr, "Unable to open I/O for %s\n", is->filename);
+        notify_from_thread(is, MEDIA_ERROR, 0, 0);
+        return -1;
+    }
+}
