@@ -600,3 +600,92 @@ int queue_picture(VideoState *is, AVFrame *pFrame, double pts)
     }
     return 0;
 }
+
+double synchronize_video(VideoState *is, AVFrame *src_frame, double pts)
+{
+    double frame_delay;
+
+    if(pts!=0)
+    {
+        is->video_clock=pts;
+    }
+    else
+    {
+        pts=is->video_clock;
+    }
+
+    frame_delay=av_q2d(is->video_st->codec->time_base);
+    frame_delay+=src_frame->repeat_pict*(frame_delay * 0.5);
+    is->video_clock+=frame_delay;
+
+    return pts;
+}
+
+uint64_t global_video_pkt_pts=AV_NOPTS_VALUE;
+
+int out_get_buffer(struct AVCodecContext *c, AVFrame *pic, int flags)
+{
+    int ret=avcodec_default_get_buffer2(c, pic, flags);
+    uint64_t *pts=av_malloc(sizeof(uint64_t));
+    *pts=global_video_pkt_pts;
+    pic->opaque=pts;
+    return ret;
+}
+
+int video_thread(void *arg)
+{
+    VideoState *is=(VideoState *) arg;
+    AVPacket pkt1, *packet=&pkt1;
+    int frameFinished;
+    AVFrame *pFrame;
+    double pts;
+
+    pFrame=av_frame_alloc();
+
+    for( ; ; )
+    {
+        if(packet_queue_get(is, &is->videoq, packet, 1)<0)
+        {
+            break;
+        }
+        if(packet->data==is->flush_pkt.data)
+        {
+            avcodec_flush_buffers(is->video_st->codec);
+            continue;
+        }
+
+        pts=0;
+
+        global_video_pkt_pts=packet->pts;
+
+        avcodec_decode_video2(is->video_st->codec, pFrame, &frameFinished, packet);
+
+        if(packet->dts==AV_NOPTS_VALUE&&pFrame->opaque&&*(uint64_t*)pFrame->opaque!=AV_NOPTS_VALUE)
+        {
+            pts=*(uint64_t*)pFrame->opaque;
+        }
+        else if(packet->dts!=AV_NOPTS_VALUE)
+        {
+            pts=packet->dts;
+        }
+        else
+        {
+            pts=0;
+        }
+        pts*=av_q2d(is->video_st->time_base);
+
+        if(frameFinished)
+        {
+            pts=synchronize_video(is,pFrame, pts);
+            if(queue_picture(is, pFrame, pts)<0)
+            {
+                break;
+            }
+        }
+        av_packet_unref(packet);
+    }
+    av_free(pFrame);
+
+    two=1;
+    return 0;
+}
