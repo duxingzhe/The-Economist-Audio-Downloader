@@ -160,7 +160,7 @@ typedef struct VideoState
 
     AVIOContext *io_context;
     struct SwsContext *sws_ctx;
-    struct swrContext *sws_ctx_audio;
+    struct SwrContext *sws_ctx_audio;
     struct AudioPlayer *audio_player;
     struct VideoPlayer *video_player;
     void (*audio_callback)(void *userdata, uint8_t *stream, int len);

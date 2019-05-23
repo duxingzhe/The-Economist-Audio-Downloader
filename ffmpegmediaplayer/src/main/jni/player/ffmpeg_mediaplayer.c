@@ -1002,3 +1002,131 @@ void stream_seek(VideoState *is, int64_t pos, int64_t rel, int seek_by_bytes)
         is->seek_req=1;
     }
 }
+
+VideoState *getNextMediaPlayer(VideoState **ps)
+{
+    return NULL;
+}
+
+void disconnect(VideoState **ps)
+{
+    VideoState *is=*ps;
+
+    if(is)
+    {
+        if(is->pFormatCtx)
+        {
+            avformat_close_input(&is->pFormatCtx);
+            is->pFormatCtx=NULL;
+        }
+
+        if(is->audioq.initialized==1)
+        {
+            if(is->audioq.first_pkt)
+            {
+                free(is->audioq.first_pkt);
+            }
+
+            if(is->audioq.mutex)
+            {
+                free(is->audioq.mutex);
+                is->audioq.mutex=NULL;
+            }
+
+            if(is->audioq.cond)
+            {
+                free(is->audioq.cond);
+                is->audioq.cond=NULL;
+            }
+
+            is->audioq.initialized=0;
+        }
+
+        AVPacket *pkt=&is->audio_pkt;
+        if(pkt->data)
+        {
+            av_packet_unref(pkt);
+        }
+
+        if(is->videoq.initialized==1)
+        {
+            if(is->videoq.first_pkt)
+            {
+                free(is->videoq.first_pkt);
+            }
+
+            if(is->videoq.mutex)
+            {
+                free(is->videoq.mutex);
+                is->videoq.mutex=NULL;
+            }
+
+            if(is->videoq.cond)
+            {
+                free(is->videoq.cond);
+                is->videoq.cond=NULL;
+            }
+
+            is->videoq.initialized=0;
+        }
+
+        if(is->pictq_mutex)
+        {
+            free(is->pictq_mutex);
+            is->pictq_mutex=NULL;
+        }
+
+        if(is->pictq_cond)
+        {
+            free(is->pictq_cond);
+            is->pictq_cond=NULL;
+        }
+
+        if(is->parse_tid)
+        {
+            free(is->parse_tid);
+            is->parse_tid=NULL;
+        }
+
+        if(is->video_tid)
+        {
+            free(is->video_tid);
+            is->video_tid=NULL;
+        }
+
+        if(is->io_context)
+        {
+            avio_close(is->io_context);
+            is->io_context=NULL;
+        }
+
+        if(is->sws_ctx)
+        {
+            sws_freeContext(is->sws_ctx);
+            is->sws_ctx=NULL;
+        }
+
+        if(is->sws_ctx_audio)
+        {
+            swr_free(&is->sws_ctx_audio);
+            is->sws_ctx_audio=NULL;
+        }
+
+        if(is->audio_player)
+        {
+            shutdown(&is->audio_player);
+            is->audio_player=NULL;
+        }
+
+        if(is->tid)
+        {
+            free(is->tid);
+            is->tid=NULL;
+        }
+
+        av_packet_unref(&is->flush_pkt);
+
+        av_freep(&is);
+        *ps=NULL;
+    }
+}
