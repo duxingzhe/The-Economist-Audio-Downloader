@@ -809,7 +809,7 @@ int decode_thread(void *arg)
     AVDictionary *io_dict=NULL;
     AVIOInterruptCB callback;
 
-    int video_idnex=-1;
+    int video_index=-1;
     int audio_index=-1;
     int i;
 
@@ -842,5 +842,68 @@ int decode_thread(void *arg)
         fprintf(stderr, "Unable to open I/O for %s\n", is->filename);
         notify_from_thread(is, MEDIA_ERROR, 0, 0);
         return -1;
+    }
+
+    if(avformat_open_input(&is->pFormatCtx, is->filename, NULL, &options)!=0)
+    {
+        notify_from_thread(is, MEDIA_ERROR, 0,0);
+        return -1;
+    }
+
+    if(avformat_find_stream_info(is->pFormatCtx, NULL)<0)
+    {
+        notify_from_thread(is, MEDIA_ERROR, 0, 0);
+        return -1;
+    }
+
+    av_dump_format(is->pFormatCtx, 0, is->filename, 0);
+
+    for(i=0;i<is->pFormatCtx->nb_streams;i++)
+    {
+        if(is->pFormatCtx->streams[i]->codec->codec_type==AVMEDIA_TYPE_VIDEO&&
+            video_index<0)
+        {
+            video_index=i;
+        }
+        if(is->pFormatCtx->streams[i]->codec->codec_type==AVMEDIA_TYPE_AUDIO&&
+           audio_index<0) {
+            audio_index = i;
+        }
+        set_codec(is->pFormatCtx, i);
+    }
+
+    if(audio_index>=0)
+    {
+        stream_component_open(is, audio_index);
+    }
+
+    if(video_index>=0)
+    {
+        stream_component_open(is, video_index);
+    }
+
+    if(is->videoStream<0&& is->audioStream<0)
+    {
+        stream_component_open(is, audio_index);
+    }
+
+    if(is->videoStream<0&&is->audioStream<0)
+    {
+        fprintf(stderr, "%s: could not open codecs\n", is->filename);
+        notify_from_thread(is, MEDIA_ERROR, 0, 0);
+        return 0;
+    }
+
+    set_rotation(is->pFormatCtx, is->audio_st, is->video_st);
+    set_framerate(is->pFormatCtx, is->audio_st, is->video_st);
+    set_filesize(is->pFormatCtx);
+    set_chapter_count(is->pFormatCtx);
+
+    notify_from_thread(is, MEDIA_INFO, MEDIA_INFO_METADATA_UPDATE, 0);
+
+    for( ; ; )
+    {
+        if(is->quit)
+            break;
     }
 }
