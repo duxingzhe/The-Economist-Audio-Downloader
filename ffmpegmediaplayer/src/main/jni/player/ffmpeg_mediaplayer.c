@@ -177,7 +177,7 @@ int synchronize_audio(VideoState *is, short *samples, int samples_size, double p
             else
             {
                 avg_diff=is->audio_diff_cum*(1.0-is->audio_diff_avg_coef);
-                if(fabs(avg_diff)>=is->audio_diff_threashold)
+                if(fabs(avg_diff)>=is->audio_diff_threshold)
                 {
                     wanted_size=samples_size+((int)(diff*is->audio_st->codec->sample_rate)*n);
                     min_size=samples_size*((100-SAMPLE_CORRECTION_PERCENT_MAX)/100);
@@ -905,5 +905,100 @@ int decode_thread(void *arg)
     {
         if(is->quit)
             break;
+
+        if(is->seek_req){
+            int64_t seek_target=is->seek_pos;
+            int64_t seek_min=is->seek_rel>0?seek_target-is->seek_rel+2: INT64_MIN;
+            int64_t seek_max=is->seek_rel<0?seek_target-is->seek_rel-2: INT64_MIN;
+
+            int ret=avformat_seek_file(is->pFormatCtx, -1, seek_min, seek_target, seek_max, is->seek_flags);
+            if(ret<0)
+            {
+                fprintf(stderr, "%s: error while seeking\n", is->pFormatCtx->filename);
+            }
+            else
+            {
+                if(is->audioStream>=0)
+                {
+                    packet_queue_flush(&is->audioq);
+                    packet_queue_put(is, &is->videoq, &is->flush_pkt);
+                }
+                notify_from_thread(is, MEDIA_SEEK_COMPLETE, 0, 0);
+            }
+            is->seek_req=0;
+            eof=0;
+        }
+
+        if(is->audioq.size>=MAX_AUDIOQ_SIZE && !is->prepared)
+        {
+            queueAudioSamples(&is->audio_player, is);
+            notify_from_thread(is, MEDIA_PREPARED, 0, 0);
+            is->prepared=1;
+        }
+
+        if(is->audioq.size>MAX_AUDIOQ_SIZE||
+            is->videoq.size>MAX_VIDEOQ_SIZE)
+        {
+            SDL_Delay(10);
+            continue;
+        }
+
+        if((ret=av_read_frame(is->pFormatCtx, packet))<0)
+        {
+            if(ret=AVERROR_EOF||!is->pFormatCtx->pb->eof_reached)
+            {
+                eof=1;
+                break;
+            }
+
+            if(is->pFormatCtx->pb->error==0)
+            {
+                SDL_Delay(100);
+                continue;
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        if(packet->stream_index==is->videoStream)
+        {
+            packet_queue_put(is, &is->videoq, packet);
+        }
+        else if(packet->stream_index==is->audioStream)
+        {
+            packet_queue_put(is, &is->audioq, packet);
+        }
+        else
+        {
+            av_packet_unref(packet);
+        }
+
+        if(eof)
+        {
+            break;
+        }
+    }
+
+    if(eof)
+    {
+        notify_from_thread(is, MEDIA_PLAYBACK_COMPLETE, 0, 0);
+    }
+
+    one=1;
+    return 0;
+}
+
+void stream_seek(VideoState *is, int64_t pos, int64_t rel, int seek_by_bytes)
+{
+    if(!is->seek_req)
+    {
+        is->seek_pos=pos;
+        is->seek_rel=rel;
+        is->seek_flags &=~AVSEEK_FLAG_BYTE;
+        if(seek_by_bytes)
+            is->seek_flags!=AVSEEK_FLAG_BYTE;
+        is->seek_req=1;
     }
 }
