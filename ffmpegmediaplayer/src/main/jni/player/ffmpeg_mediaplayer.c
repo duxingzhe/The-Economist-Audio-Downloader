@@ -1254,3 +1254,101 @@ int start(VideoState **ps)
 
     return INVALID_OPERATION;
 }
+
+int stop(VideoState **ps)
+{
+    VideoState *is=*ps;
+
+    if(is)
+    {
+        is->quit=1;
+
+        if(is->audioq.initialized==1)
+        {
+            SDL_CondSignal(is->audioq.cond);
+        }
+
+        if(is->videoq.initialized==1)
+        {
+            SDL_CondSignal(is->videoq.cond);
+        }
+
+        if(is->parse_tid)
+        {
+            pthread_join(*(is->parse_tid), NULL);
+            printf("one: %d:\n", one);
+        }
+
+        if(is->video_tid)
+        {
+            SDL_CondSignal(is->pictq_cond);
+            pthread_join(*(is->video_tid),NULL);
+            printf("two: %d\n", two);
+        }
+
+        setPlayingAudioPlayer(&is->audio_player, 2);
+
+        clear_l(&is);
+
+        return NO_ERROR;
+    }
+
+    return INVALID_OPERATION;
+}
+
+int pause_l(VideoState **ps)
+{
+    VideoState *is=*ps;
+
+    if(is&&is->audio_player)
+    {
+        is->paused=!is->paused;
+        setPlayingAudioPlayer(&is->audio_player, 1);
+        return NO_ERROR;
+    }
+
+    return INVALID_OPERATION;
+}
+
+int isPlaying(VideoState **Ps)
+{
+    VideoState *is=*ps;
+
+    if(is)
+    {
+        if(!is->player_started)
+            return 0;
+        else
+            return !is->paused;
+    }
+
+    return 0;
+}
+
+int getVideoWidth(VideoState **ps, int *w)
+{
+    VideoState *is=*ps;
+
+    if(!is||!is->video_st)
+    {
+        return INVALID_OPERATION;
+    }
+
+    *w=is->video_st->codec->width;
+
+    return NO_ERROR;
+}
+
+int getVideoHeight(VideoState **ps, int *h)
+{
+    VideoState *is=*ps;
+
+    if(!is||!is->video_st)
+    {
+        return INVALID_OPERATION;
+    }
+
+    *h=is->video_st->codec->height;
+
+    return NO_ERROR;
+}
