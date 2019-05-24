@@ -1130,3 +1130,127 @@ void disconnect(VideoState **ps)
         *ps=NULL;
     }
 }
+
+int setDataSourceURI(VideoState **ps, const char *url, const char *headers)
+{
+    printf("setDataSource\n");
+
+    if(!url)
+    {
+        return INVALID_OPERATION;
+    }
+
+    VideoState *is=*ps;
+
+    char *restrict_to=strstr(url, "mms://");
+    if(restrict_to)
+    {
+        strncpy(restrict_to, "mmsh://", 6);
+        puts(url);
+    }
+
+    strncpy(is->filename, url, sizeof(is->filename));
+
+    if(headers)
+    {
+        strncpy(is->headers, headers, sizeof(is->headers));
+    }
+
+    return NO_ERROR;
+}
+
+int setDataSourceFD(VideoState **ps, int fd, int64_t offset, int64_t length)
+{
+    printf("setDataSource\n");
+
+    VideoState *is=*ps;
+
+    int myfd=dup(fd);
+
+    char str[20];
+    sprintf(str, "pipe:%d", myfd);
+    strncpy(is->filename, str, sizeof(is->filename));
+
+    is->fd=myfd;
+    is->offset=offset;
+
+    *ps=is;
+
+    return NO_ERROR;
+}
+
+int setVideoSurface(VideoState **ps, void *native_window)
+{
+    printf("set_native_window\n");
+
+    VideoState *is=*ps;
+
+    is->native_window=native_window;
+
+    if(is&&is->video_player)
+    {
+        setSurface(&is->video_player, is->native_window);
+    }
+
+    *ps=is;
+
+    return NO_ERROR;
+}
+
+int setListener(VideoState **ps, void *clazz, void (*listener)(void*, int, int, int, int))
+{
+    VideoState *is=*ps;
+    is->clazz=clazz;
+    is->notify_callback=listener;
+
+    return NO_ERROR;
+}
+
+int prepare(VideoState **ps)
+{
+    VideoState *is=*ps;
+
+    if(is->prepare_sync)
+    {
+        return -EALREADY;
+    }
+
+    is->prepare_sync=1;
+    int ret=prepareAsync_l(ps);
+    if(ret!=NO_ERROR)
+    {
+        return ret;
+    }
+
+    if(is->prepare_sync)
+    {
+        while(!is->prepared)
+        {
+            sleep(1);
+        }
+
+        is->prepare_sync=0;
+    }
+
+    return is->prepare_sync;
+}
+
+int prepareAsync(VideoState **ps)
+{
+    return prepareAsync_l(ps);
+}
+
+int start(VideoState **ps)
+{
+    VideoState *is=*ps;
+
+    if(is&&is->audio_player)
+    {
+        is->paused=0;
+        is->player_started=1;
+        setPlayingAudioPlayer(&is->audio_player, 0);
+        return NO_ERROR;
+    }
+
+    return INVALID_OPERATION;
+}

@@ -176,6 +176,8 @@ typedef struct VideoState
     void* clazz;
 
     int read_pause_return;
+
+    int paused;
     int last_pasued;
 
     pthread_t *tid;
