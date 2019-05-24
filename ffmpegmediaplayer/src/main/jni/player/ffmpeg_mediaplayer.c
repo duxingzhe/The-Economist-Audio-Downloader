@@ -1467,3 +1467,45 @@ int setVolume(VideoState **ps, float leftVolume, float rightVolume)
 
     return INVALID_OPERATION;
 }
+
+static Uint32 notify_from_thread_cb(Uint32 interval, void *opaque)
+{
+    Message *message=(Message *)opaque;
+    if(!message)
+    {
+        return 0;
+    }
+
+    if(message->is && message->is->notify_callback)
+    {
+        message->is->notify_callback(message->is->clazz, message->msg, message->ext1, message->ext2, message->from_thread);
+    }
+
+    free(message);
+    return 0;
+}
+
+void notify(VideoState *is, int msg, int ext1, int ext2)
+{
+    if(is->notify_callback)
+    {
+        is->notify_callback(is->clazz, msg, ext1, ext2, 0);
+    }
+}
+
+void notify_from_thread(VideoState *is, int msg, int ext1, int ext2)
+{
+    Message* message=malloc(sizeof(Message));
+    message->is=is;
+    message->msg=msg;
+    message->ext1=ext1;
+    message->ext2=ext2;
+    message->from_thread=1;
+
+    SDL_AddTimer(0, notify_from_thread_cb, message);
+}
+
+int setNextPlayer(VideoState **ps, VideoState *next)
+{
+    return NO_ERROR;
+}
