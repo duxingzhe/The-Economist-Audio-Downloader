@@ -302,6 +302,7 @@ public class MainActivity extends BaseMusicActivity {
                 File file=new File(FileUtil.path);
 
                 if(!file.exists()){
+                    handler.sendEmptyMessageDelayed(DISMISS_ADD_FILE_DIALOG,1000);
                     return;
                 }
                 // 获取MP3文件
