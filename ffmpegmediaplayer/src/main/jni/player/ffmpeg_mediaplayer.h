@@ -232,7 +232,7 @@ int getVideoWidth(VideoState **ps, int *w);
 int getVideoHeight(VideoState **ps, int *h);
 int seekTo(VideoState **ps, int msec);
 int getCurrentPosition(VideoState **ps, int *mesc);
-int getDuration(VideoState **ps, int msec);
+int getDuration(VideoState **ps, int *msec);
 int reset(VideoState **ps);
 int setAudioStreamType(VideoState **ps, int type);
 int setLooping(VideoState **ps, int type);
@@ -243,7 +243,7 @@ void notify_from_thread(VideoState *is, int msg, int ext1, int ext2);
 int setNextPlayer(VideoState **ps, VideoState *next);
 
 void clear_l(VideoState **ps);
-int setTo_l(VideoState **ps, int msec);
+int seekTo_l(VideoState **ps, int msec);
 int prepareAsync_l(VideoState **ps);
 int getDuration_l(VideoState **ps, int *msec);
 

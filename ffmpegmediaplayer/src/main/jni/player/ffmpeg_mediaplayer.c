@@ -1310,7 +1310,7 @@ int pause_l(VideoState **ps)
     return INVALID_OPERATION;
 }
 
-int isPlaying(VideoState **Ps)
+int isPlaying(VideoState **ps)
 {
     VideoState *is=*ps;
 
@@ -1351,4 +1351,119 @@ int getVideoHeight(VideoState **ps, int *h)
     *h=is->video_st->codec->height;
 
     return NO_ERROR;
+}
+
+int seekTo(VideoState **ps, int mesc)
+{
+    int result=seekTo_l(ps, mesc);
+    return result;
+}
+
+int getCurrentPosition(VideoState **ps, int*msec)
+{
+    VideoState *is=*ps;
+
+    if(is)
+    {
+        *msec=is->audio_clock*1000;
+        return NO_ERROR;
+    }
+
+    return INVALID_OPERATION;
+}
+
+int getDuration(VideoState **ps, int *msec)
+{
+    return getDuration_l(ps, msec);
+}
+
+int reset(VideoState **ps)
+{
+    VideoState *is=*ps;
+
+    if(is)
+    {
+        is->quit=1;
+
+        if(is->audioq.initialized==1)
+        {
+            SDL_CondSignal(is->audioq.cond);
+        }
+
+        if(is->videoq.initialized==1)
+        {
+            SDL_CondSignal(is->videoq.cond);
+        }
+
+        if(is->video_refresh_tid)
+        {
+            pthread_join(*(is->video_refresh_tid), NULL);
+        }
+
+        if(is->parse_tid)
+        {
+            pthread_join(*(is->parse_tid), NULL);
+        }
+
+        if(is->video_tid)
+        {
+            SDL_CondSignal(is->pictq_cond);
+            pthread_join(*(is->video_tid), NULL);
+        }
+
+        clear_l(&is);
+
+        return NO_ERROR;
+    }
+
+    return INVALID_OPERATION;
+}
+
+int setAudioStreamType(VideoState **ps, int type)
+{
+    VideoState *is=*ps;
+    if(is)
+    {
+        is->stream_type=type;
+        return NO_ERROR;
+    }
+
+    return INVALID_OPERATION;
+}
+
+int setLooping(VideoState **ps, int loop)
+{
+    VideoState *is=*ps;
+
+    if(is)
+    {
+        return NO_ERROR;
+    }
+
+    return INVALID_OPERATION;
+}
+
+int isLooping(VideoState **ps)
+{
+    VideoState *is=*ps;
+
+    if(is)
+    {
+        return NO_ERROR;
+    }
+
+    return INVALID_OPERATION;
+}
+
+int setVolume(VideoState **ps, float leftVolume, float rightVolume)
+{
+    VideoState *is=*ps;
+
+    if(is&&is->audio_player)
+    {
+        setVolumeUriAudioPlayer(&is->audio_player, leftVolume);
+        return NO_ERROR;
+    }
+
+    return INVALID_OPERATION;
 }
