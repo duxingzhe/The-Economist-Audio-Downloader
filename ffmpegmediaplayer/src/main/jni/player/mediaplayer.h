@@ -72,7 +72,7 @@ private:
     int mDuration;
     int mCurrentPosition;
     int mSeekPosition;
-    bool mPrepraeSync;
+    bool mPrepareSync;
     status_t mPrepareStatus;
     int mStreamType;
     bool mLoop;

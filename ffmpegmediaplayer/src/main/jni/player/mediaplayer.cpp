@@ -32,7 +32,7 @@ MediaPlayer::MediaPlayer()
     mPrepareSync=false;
     mPrepareStatus=NO_ERROR;
     mLoop=false;
-    mLefVolume=mRightVolume=1.0;
+    mLeftVolume=mRightVolume=1.0;
     mVideoWidth=mVideoHeight=0;
 
     mAudioSessionId=0;
@@ -41,7 +41,7 @@ MediaPlayer::MediaPlayer()
 
 MediaPlayer::~MediaPlayer()
 {
-    disconnet();
+    disconnect();
 }
 
 void MediaPlayer::disconnect()
@@ -68,7 +68,7 @@ void MediaPlayer::clear_l()
     mVideoWidth=mVideoHeight=0;
 }
 
-static void notifyListener(void *clazz, int smg, int ext1, int ext2, int fromThread)
+static void notifyListener(void *clazz, int msg, int ext1, int ext2, int fromThread)
 {
     MediaPlayer *mp=(MediaPlayer *)clazz;
     mp->notify(msg, ext1, ext2, fromThread);
@@ -87,7 +87,7 @@ status_t MediaPlayer::setListener(MediaPlayerListener *listener)
     return NO_ERROR;
 }
 
-MediaPlayerListener *MedeiaPlayer::getListener(VideoState *player)
+MediaPlayerListener *MediaPlayer::getListener()
 {
     return mListener;
 }
