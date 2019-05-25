@@ -59,7 +59,7 @@ public:
     VideoState *state;
 
 private:
-    void clean_l();
+    void clear_l();
     status_t seekTo_l(int msec);
     status_t prepareAysnc_l();
     status_t setDataSource(VideoState *state);
