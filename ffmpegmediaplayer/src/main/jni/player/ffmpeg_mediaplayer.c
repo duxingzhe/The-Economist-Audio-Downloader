@@ -1690,3 +1690,77 @@ int seekTo_l(VideoState **ps, int msec)
 
     return INVALID_OPERATION;
 }
+
+int prepareAsync_l(VideoState **ps)
+{
+    VideoState *is=*ps;
+
+    if(is!=0)
+    {
+        is->pictq_mutex=SDL_CreateMutex();
+        is->pictq_cond=SDL_CreateCond();
+
+        is->video_refresh_tid=malloc(sizeof(*(is->video_refresh_tid)));
+        pthread_create(is->video_refresh_tid, NULL, (void *)&video_refresh_timer, is);
+
+        is->av_sync_type=DEFAULT_AV_SYNC_TYPE;
+        is->parse_tid=malloc(sizeof(*(is->parse_tid)));
+
+        if(!is->parse_tid)
+        {
+            av_free(is);
+            return UNKNOWN_ERROR;
+        }
+
+        pthread_create(is->parse_tid, NULL, (void *)&decode_thread, is);
+
+        av_init_packet(&is->flush_pkt);
+        is->flush_pkt.data=(unsigned char *)"FLUSH";
+
+        return NO_ERROR;
+    }
+
+    return INVALID_OPERATION;
+}
+
+int getDuration_l(VideoState **ps, int *msec)
+{
+    VideoState *is=*ps;
+
+    if(is)
+    {
+        if(is->pFormatCtx && (is->pFormatCtx->duration!=AV_NOPTS_VALUE))
+        {
+            *msec=(is->pFormatCtx->duration/AV_TIME_BASE)*1000;
+        }
+        else
+        {
+            *msec=0;
+        }
+
+        return NO_ERROR;
+    }
+
+    return INVALID_OPERATION;
+}
+
+int setMetadataFilter(VideoState **ps, char *allow[], char *block[])
+{
+    return 0;
+}
+
+int getMetadataFilter(VideoState **ps, AVDictionary **metadata)
+{
+    printf("get_metadata\n");
+
+    VideoState *state=*ps;
+
+    if(!state||!state->pFormatCtx)
+    {
+        return FAILURE;
+    }
+
+    get_metadata_internal(state->pFormatCtx, metadata);
+
+    return SUCCESS;
+}
