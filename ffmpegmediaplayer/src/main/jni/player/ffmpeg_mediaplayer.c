@@ -1509,3 +1509,184 @@ int setNextPlayer(VideoState **ps, VideoState *next)
 {
     return NO_ERROR;
 }
+
+void clear_l(VideoState **ps)
+{
+    VideoState *is=*ps;
+    if(is)
+    {
+        if(is->pFormatCtx)
+        {
+            avformat_close_input(&is->pFormatCtx);
+            is->pFormatCtx=NULL;
+        }
+
+        is->videoStream=0;
+        is->audioStream=0;
+
+        is->av_sync_type=0;
+        is->external_clock=0;
+        is->external_clock_time=0;
+        is->seek_req=0;
+        is->seek_flags=0;
+        is->seek_pos=0;
+        is->seek_rel=0;
+
+        is->audio_clock=0;
+        is->audio_st=NULL;
+
+        if(is->audioq.initialized==1)
+        {
+            if(is->audioq.first_pkt)
+            {
+                free(is->audioq.first_pkt);
+            }
+
+            if(is->audioq.mutex)
+            {
+                free(is->audioq.mutex);
+                is->audioq.mutex=NULL;
+            }
+
+            if(is->audioq.cond)
+            {
+                free(is->audioq.cond);
+                is->audioq.cond=NULL;
+            }
+
+            is->audioq.initialized=0;
+        }
+
+        is->audio_buf[0]='\0';
+        is->audio_buf_size=0;
+        is->audio_buf_index=0;
+
+        AVPacket *pkt=&is->audio_pkt;
+        if(pkt->data)
+        {
+            av_packet_unref(pkt);
+        }
+
+        is->audio_pkt_data=NULL;
+        is->audio_pkt_size=0;
+        is->audio_hw_buf_size=0;
+        is->audio_diff_cum=0;
+        is->audio_diff_avg_coef=0;
+        is->audio_diff_threshold=0;
+        is->audio_diff_avg_count=0;
+        is->frame_timer=0;
+        is->frame_last_pts=0;
+        is->frame_last_delay=0;
+        is->video_clock=0;
+        is->video_current_pts=0;
+        is->video_current_pts_time=0;
+        is->video_st=NULL;
+
+        if(is->videoq.initialized==1)
+        {
+            if(is->videoq.first_pkt)
+            {
+                free(is->videoq.first_pkt);
+            }
+
+            if(is->videoq.mutex)
+            {
+                free(is->videoq.mutex);
+                is->videoq.mutex=NULL;
+            }
+
+            if(is->videoq.cond)
+            {
+                free(is->videoq.cond);
+                is->videoq.cond=NULL;
+            }
+
+            is->videoq.initialized=0;
+        }
+
+        is->pictq_size=0;
+        is->pictq_rindex=0;
+        is->pictq_windex=0;
+
+        if(is->pictq_mutex)
+        {
+            free(is->pictq_mutex);
+            is->pictq_mutex=NULL;
+        }
+
+        if(is->pictq_cond)
+        {
+            free(is->pictq_cond);
+            is->pictq_cond=NULL;
+        }
+
+        if(is->video_refresh_tid)
+        {
+            free(is->video_refresh_tid);
+            is->video_refresh_tid=NULL;
+        }
+
+        if(is->parse_tid)
+        {
+            free(is->parse_tid);
+            is->parse_tid=NULL;
+        }
+
+        if(is->video_tid)
+        {
+            free(is->video_tid);
+            is->video_tid=NULL;
+        }
+
+        if(is->io_context)
+        {
+            avio_close(is->io_context);
+            is->io_context=NULL;
+        }
+
+        if(is->sws_ctx)
+        {
+            sws_freeContext(is->sws_ctx);
+            is->sws_ctx=NULL;
+        }
+
+        if(is->sws_ctx_audio)
+        {
+            swr_free(&is->sws_ctx_audio);
+            is->sws_ctx_audio=NULL;
+        }
+
+        is->prepared=0;
+
+        if(is->fd!=-1)
+        {
+            close(is->fd);
+        }
+
+        is->fd=-1;
+        is->offset=0;
+
+        is->prepare_sync=0;
+
+        is->read_pause_return=0;
+
+        is->paused=0;
+        is->last_paused=-1;
+        is->player_started=0;
+
+        av_packet_unref(&is->flush_pkt);
+    }
+}
+
+int seekTo_l(VideoState **ps, int msec)
+{
+    VideoState *is=*ps;
+
+    if(is)
+    {
+        stream_seek(is, msec*1000, msec*1000, 0);
+        return NO_ERROR;
+    }
+
+    return INVALID_OPERATION;
+}

@@ -178,7 +178,7 @@ typedef struct VideoState
     int read_pause_return;
 
     int paused;
-    int last_pasued;
+    int last_paused;
 
     pthread_t *tid;
     int player_started;
