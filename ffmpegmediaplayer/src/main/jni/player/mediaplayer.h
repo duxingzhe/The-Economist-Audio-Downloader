@@ -41,7 +41,7 @@ public:
     status_t pause();
     bool isPlaying();
     status_t getVideoWidth(int *w);
-    status_t getVideoHieght(int *h);
+    status_t getVideoHeight(int *h);
     status_t seekTo(int msec);
     status_t getCurrentPosition(int *msec);
     status_t getDuration(int *msec);

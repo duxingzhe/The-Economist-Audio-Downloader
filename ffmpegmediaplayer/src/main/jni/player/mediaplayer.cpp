@@ -322,7 +322,7 @@ status_t MediaPlayer::getVideoWidth(int *w)
     if(state==0)
         return INVALID_OPERATION;
     *w=mVideoWidth;
-    ::getVideowidth(&state, w);
+    ::getVideoWidth(&state, w);
     return NO_ERROR;
 }
 
@@ -334,7 +334,7 @@ status_t MediaPlayer::getVideoHeight(int *h)
         return INVALID_OPERATION;
     }
 
-    *h=mVideoHieght;
+    *h=mVideoHeight;
     ::getVideoHeight(&state, h);
     return NO_ERROR;
 }
