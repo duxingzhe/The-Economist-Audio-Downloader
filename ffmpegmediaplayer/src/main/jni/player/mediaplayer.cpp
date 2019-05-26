@@ -212,3 +212,129 @@ status_t MediaPlayer::prepare()
 
     return mPrepareStatus;
 }
+
+status_t MediaPlayer::start()
+{
+    Mutex::Autolock _l(mLock);
+    if(mCurrentState & MEDIA_PLAYER_STARTED)
+        return NO_ERROR;
+    if((state!=0)&&(mCurrentState & (MEDIA_PLAYER_PREPARED | MEDIA_PLAYER_PLAYBACK_COMPLETE
+            | MEDIA_PLAYER_PAUSED)))
+    {
+        ::setLooping(&state, mLoop);
+        ::setVolume(&state, mLeftVolume, mRightVolume);
+
+        mCurrentState=MEDIA_PLAYER_STARTED;
+        status_t ret=::start(&state);
+
+        if(ret!=NO_ERROR)
+        {
+            mCurrentState=MEDIA_PLAYER_STATE_ERROR;
+        }
+        else
+        {
+            if(mCurrentState==MEDIA_PLAYER_PLAYBACK_COMPLETE)
+            {
+
+            }
+        }
+        return ret;
+    }
+
+    return INVALID_OPERATION;
+}
+
+status_t MediaPlayer::stop()
+{
+    Mutex::Autolock _l(mLock);
+    if(mCurrentState & MEDIA_PLAYER_STOPPED)
+        return NO_ERROR;
+    if((state!=0)&&(mCurrentState &(MEDIA_PLAYER_STARTED| MEDIA_PLAYER_PREPARED |
+                        MEDIA_PLAYER_PAUSED | MEDIA_PLAYER_PLAYBACK_COMPLETE)))
+    {
+        status_t ret=::stop(&state);
+        if(ret!=NO_ERROR)
+        {
+            mCurrentState=MEDIA_PLAYER_STATE_ERROR;
+        }
+        else
+        {
+            mCurrentState=MEDIA_PLAYER_STOPPED;
+        }
+
+        return ret;
+    }
+
+    return INVALID_OPERATION;
+}
+
+status_t MediaPlayer::pause()
+{
+    Mutex::Autolock _l(mLock);
+    if(mCurrentState&(MEDIA_PLAYER_PAUSED| MEDIA_PLAYER_PLAYBACK_COMPLETE))
+    {
+        return NO_ERROR;
+    }
+    if((state!=0)&&(mCurrentState & MEDIA_PLAYER_STARTED))
+    {
+        status_t ret=::pause_l(&state);
+        if(ret!=NO_ERROR)
+        {
+            mCurrentState=MEDIA_PLAYER_STATE_ERROR;
+        }
+        else
+        {
+            mCurrentState=MEDIA_PLAYER_PAUSED;
+        }
+
+        return ret;
+    }
+
+    return INVALID_OPERATION;
+}
+
+bool MediaPlayer::isPlaying()
+{
+    Mutex::Autolock _l(mLock);
+    if(state!=0)
+    {
+        bool temp=false;
+
+        if(::isPlaying(&state))
+        {
+            temp=true;
+        }
+
+        if((mCurrentState&MEDIA_PLAYER_STARTED) && !temp)
+        {
+            mCurrentState=MEDIA_PLAYER_PAUSED;
+        }
+
+        return temp;
+    }
+
+    return false;
+}
+
+status_t MediaPlayer::getVideoWidth(int *w)
+{
+    Mutex::Autolock _l(mLock);
+    if(state==0)
+        return INVALID_OPERATION;
+    *w=mVideoWidth;
+    ::getVideowidth(&state, w);
+    return NO_ERROR;
+}
+
+status_t MediaPlayer::getVideoHeight(int *h)
+{
+    Mutex::Autolock _l(mLock);
+    if(state==0)
+    {
+        return INVALID_OPERATION;
+    }
+
+    *h=mVideoHieght;
+    ::getVideoHeight(&state, h);
+    return NO_ERROR;
+}
