@@ -338,3 +338,43 @@ status_t MediaPlayer::getVideoHeight(int *h)
     ::getVideoHeight(&state, h);
     return NO_ERROR;
 }
+
+status_t MediaPlayer::getCurrentPosition(int *msec)
+{
+    Mutex::Autolock _l(mLock);
+    if(state!=0)
+    {
+        if(mCurrentPosition>=0)
+        {
+            *msec=mCurrentPosition;
+            return NO_ERROR;
+        }
+
+        return ::getCurrentPosition(&state, msec);
+    }
+    return INVALID_OPERATION;
+}
+
+status_t MediaPlayer::getDuration_l(int *msec)
+{
+    bool isValidState=(mCurrentState &(MEDIA_PLAYER_PREPARED|MEDIA_PLAYER_STARTED|MEDIA_PLAYER_PAUSED|MEDIA_PLAYER_STOPPED|MEDIA_PLAYER_PLAYBACK_COMPLETE));
+    if(state!=0&&isValidState)
+    {
+        status_t ret=NO_ERROR;
+        if(mDuration<=0)
+        {
+            ret=::getDuration(&state, &mDuration);
+        }
+        if(msec)
+            *msec=mDuration;
+        return ret;
+    }
+
+    return INVALID_OPERATION;
+}
+
+status_t MediaPlayer::getDuration(int *msec)
+{
+    Mutex::Autolock _l(mLock);
+    return getDuration_l(msec);
+}

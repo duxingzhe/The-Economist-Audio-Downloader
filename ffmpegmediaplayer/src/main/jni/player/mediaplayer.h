@@ -62,6 +62,7 @@ private:
     void clear_l();
     status_t seekTo_l(int msec);
     status_t prepareAsync_l();
+    status_t getDuration_l(int *msec);
     status_t setDataSource(VideoState *state);
 
     Mutex mLock;
