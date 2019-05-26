@@ -30,7 +30,7 @@ public:
     status_t setDataSource(const char *url, const char *headers);
     status_t setDataSource(int fd, int64_t offset, int64_t length);
     status_t setMetadataFilter(char *allow[], char *block[]);
-    status_t getMetadata(AVDictionary **metadata);
+    status_t getMetadata(bool update_only, bool apply_filter, AVDictionary **metadata);
     status_t setVideoSurface(void* native_window);
     status_t setListener(MediaPlayerListener *listener);
     MediaPlayerListener *getListener();
@@ -61,7 +61,7 @@ public:
 private:
     void clear_l();
     status_t seekTo_l(int msec);
-    status_t prepareAysnc_l();
+    status_t prepareAsync_l();
     status_t setDataSource(VideoState *state);
 
     Mutex mLock;

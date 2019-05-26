@@ -92,3 +92,123 @@ MediaPlayerListener *MediaPlayer::getListener()
     return mListener;
 }
 
+status_t MediaPlayer::setDataSource(VideoState *player)
+{
+    status_t err=UNKNOWN_ERROR;
+    VideoState *p;
+
+    {
+        Mutex::Autolock _l(mLock);
+
+        if(!((mCurrentState&MEDIA_PLAYER_IDLE)||(mCurrentState==MEDIA_PLAYER_STATE_ERROR)))
+        {
+            return INVALID_OPERATION;
+        }
+
+        ::clear_l(&player);
+        ::setListener(&player, this, notifyListener);
+        clear_l();
+        p=state;
+        state=player;
+        if(player!=0) {
+            mCurrentState = MEDIA_PLAYER_INITIALIZED;
+            err = NO_ERROR;
+        }
+        else
+        {
+
+        }
+    }
+
+    if(p!=0)
+    {
+        ::disconnect(&p);
+    }
+
+    return err;
+}
+
+status_t MediaPlayer::setDataSource(const char *url, const char *headers)
+{
+    status_t err=BAD_VALUE;
+    if(url!=NULL)
+    {
+        VideoState* state=::create();
+        err=::setDataSourceURI(&state, url, headers);
+        if(err==NO_ERROR)
+        {
+            err=setDataSource(state);
+        }
+    }
+
+    return err;
+}
+
+status_t MediaPlayer::setMetadataFilter(char *allow[], char *block[])
+{
+    Mutex::Autolock lock(mLock);
+    if(state==NULL)
+    {
+        return NO_INIT;
+    }
+
+    return ::setMetadataFilter(&state, allow, block);
+}
+
+status_t MediaPlayer::getMetadata(bool update_only, bool apply_filter, AVDictionary **metadata)
+{
+    Mutex::Autolock lock(mLock);
+    if(state==NULL)
+    {
+        return NO_INIT;
+    }
+
+    return ::getMetadata(&state, metadata);
+}
+
+status_t MediaPlayer::setVideoSurface(void *native_window)
+{
+    Mutex::Autolock _l(mLock);
+    if(state==0)
+        return NO_INIT;
+    if(native_window!=NULL)
+        return ::setVideoSurface(&state, native_window);
+    else
+        return ::setVideoSurface(&state, NULL);
+}
+
+status_t MediaPlayer::prepareAsync_l()
+{
+    if((state!=0)&&(mCurrentState&(MEDIA_PLAYER_INITIALIZED | MEDIA_PLAYER_STOPPED)))
+    {
+        mCurrentState=MEDIA_PLAYER_PREPARING;
+        return ::prepareAsync(&state);
+    }
+
+    return INVALID_OPERATION;
+}
+
+status_t MediaPlayer::prepare()
+{
+    Mutex::Autolock _l(mLock);
+
+    if(mPrepareSync)
+    {
+        return -EALREADY;
+    }
+
+    mPrepareSync=true;
+    status_t ret=::prepare(&state);
+
+    if(ret!=NO_ERROR)
+    {
+        return ret;
+    }
+
+    if(mPrepareSync)
+    {
+        mPrepareSync=false;
+    }
+
+    return mPrepareStatus;
+}
