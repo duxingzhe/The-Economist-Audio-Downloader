@@ -485,3 +485,130 @@ status_t MediaPlayer::setVolume(float leftVolume, float rightVolume)
 
     return OK;
 }
+
+status_t MediaPlayer::setAudioSessionId(int sessionId)
+{
+    Mutex::Autolock _l(mLock);
+    if(!(mCurrentState & MEDIA_PLAYER_IDLE))
+    {
+        return INVALID_OPERATION;
+    }
+
+    if(sessionId<0)
+    {
+        return BAD_VALUE;
+    }
+    mAudioSessionId=sessionId;
+    return NO_ERROR;
+}
+
+int MediaPlayer::getAudioSessionId()
+{
+    Mutex::Autolock _l(mLock);
+    return mAudioSessionId;
+}
+
+status_t MediaPlayer::setAuxEffectSendLevel(float level)
+{
+    Mutex::Autolock _l(mLock);
+    mSendLevel=level;
+    if(state!=0)
+    {
+        MediaPlayerListener *listener=mListener;
+        if(listener!=0)
+        {
+            return 0;
+        }
+    }
+
+    return OK;
+}
+
+status_t MediaPlayer::attachAuxEffect(int effectId)
+{
+    Mutex::Autolock _l(mLock);
+    if(state==0||(mCurrentState&MEDIA_PLAYER_IDLE)||
+            (mCurrentState==MEIDA_PLAYER_STATE_ERROR))
+    {
+        return INVALID_OPERATION;
+    }
+
+    MeidaPlayerListener *listener=mListener;
+    if(listener!=0)
+    {
+        return 0;
+    }
+    else
+    {
+        return -3;
+    }
+}
+
+void MediaPlayer::notify(int msg, int ext1, int ext2, int fromThread)
+{
+    bool send=true;
+    bool locked=false;
+
+    if(!(msg==MEDIA_ERROR && mCurrentState == MEDIA_PLAYER_IDLE)&&state==0)
+    {
+        return;
+    }
+
+    switch(msg)
+    {
+        case MEDIA_NOP:
+            break;
+        case MEDIA_PREPARED:
+            mCurrentState=MEDIA_PLAYER_PREPARED;
+            if(mPrepareSync)
+            {
+                mPrepareSync=false;
+                mPrepareStatus=NO_ERROR;
+            }
+            break;
+        case MEDIA_PLAYERBACK_COMPLETE:
+            if(mCurrentState==MEDIA_PLAYER_IDLE)
+            {
+
+            }
+            if(!mLoop)
+            {
+                mCurrentState=MEDIA_PLAYER_PLAYBACK_COMPLETE;
+            }
+            break;
+        case MEDIA_ERROR:
+            mCurrentState=MEDIA_PLAYER_STATE_ERROR;
+            if(mPrepareSync)
+            {
+                mPrepareSync=false;
+                mPrepareStatus=ext1;
+                send=false;
+            }
+            break;
+        case MEDIA_INFO:
+            break;
+        case MEDIA_SEEK_COMPLETE:
+            if(mSeekPosition!=mCurrentPosition)
+            {
+                mSeekPosition=-1;
+                seekTo_l(mCurrentPosition);
+            }
+            else
+            {
+                mCurrentPosition=mSeekPosition=-1;
+            }
+            break;
+        case MEDIA_BUFFERING_UPDATE:
+            break;
+        default:
+            break;
+    }
+
+    MediaPlayerListener *listener=mListener;
+
+    if((listener!=0)&&send)
+    {
+        Mutex::Autolock _l(mNotifyLock);
+        listener->notify(msg, ext1, ext2, fromThread);
+    }
+}
