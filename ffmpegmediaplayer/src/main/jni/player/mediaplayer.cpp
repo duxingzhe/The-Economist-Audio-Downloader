@@ -378,3 +378,110 @@ status_t MediaPlayer::getDuration(int *msec)
     Mutex::Autolock _l(mLock);
     return getDuration_l(msec);
 }
+
+status_t MediaPlayer::seekTo_l(int msec)
+{
+    if((state!=0)&&(mCurrentState & (MEDIA_PLAYER_STARTED | MEIDA_PLAYER_PREPARED | MEDIA_PLAYER_PAUSED | MEDIA_PLAYER_PLAYBACK_COMPLETE)))
+    {
+        if(msec<0)
+        {
+            msec=0;
+        }
+        else if((mDuration>0)&&(msec>mDuration))
+        {
+            msec=mDuration;
+        }
+
+        mCurrentPosition=msec;
+        if(mSeekPosition<0)
+        {
+            getDuration_l(NULL);
+            mSeekPosition=msec;
+            return ::sekTo(&state, msec);
+        }
+        else
+        {
+            return NO_ERROR;
+        }
+    }
+
+    return INVALID_OPERATION;
+}
+
+status_t MediaPlayer::seekTo(int msec)
+{
+    Mutex::Auto _l(mLock);
+    status_t result= seekTo_l(msec);
+
+    return result;
+}
+
+status_t MediaPlayer::reset()
+{
+    Mutex::Autolock _l(mLock);
+    mLoop=false;
+    if(mCurrentState==MEDIA_PLAYER_IDLE)
+        return NO_ERROR;
+    mPrepareSync=false;
+    if(state!=0)
+    {
+        status_t ret=::reset(&state);
+        if(ret!=NO_ERROR)
+        {
+            mCurrentState=MEDIA_PLAYER_STATE_ERROR;
+        }
+        else
+        {
+            mCurrentState=MEDIA_PLAYER_IDLE;
+        }
+        return ret;
+    }
+    clear_l();
+    return NO_ERROR;
+}
+
+status_t MediaPlayer::setAudioStreamType(int type)
+{
+    Mutex::Autolock _l(mLock);
+    if(mStreamType==type)
+        return NO_ERROR;
+    if(mCurrentState&(MEDIA_PLAYER_PREPARED|MEDIA_PLAYER_STARTED|MEDIA_PLAYER_PAUSED|MEDIA_PLAYER_PLAYBACK_COMPLETE))
+    {
+        return INVALID_OPERATION;
+    }
+
+    mStreamType=type;
+    if(state!=0)
+    {
+        return ::setAudioStreamType(&state, type);
+    }
+    return OK;
+}
+
+status_t MediaPlayer::setLooping(int loop)
+{
+    Mutex::Autolock _l(mLock);
+    mLoop=(loop!=0);
+    if(state!=0)
+    {
+        return ::setLooping(&state, loop);
+    }
+    return OK;
+}
+
+status_t MediaPlayer::setVolume(float leftVolume, float rightVolume)
+{
+    Mutex::Autolock _l(mLock);
+    mLeftVolume=leftVolume;
+    mRightVolume=rightVolume;
+    if(state!=0)
+    {
+        MediaPlayerListener *listener=mListener;
+        if(listener!=0)
+        {
+            return ::setVolume(&state, leftVolume, rightVolume);
+        }
+    }
+
+    return OK;
+}
