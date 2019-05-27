@@ -410,7 +410,7 @@ status_t MediaPlayer::seekTo_l(int msec)
 
 status_t MediaPlayer::seekTo(int msec)
 {
-    Mutex::AutoLock _l(mLock);
+    Mutex::Autolock _l(mLock);
     status_t result= seekTo_l(msec);
 
     return result;
