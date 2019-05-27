@@ -13,7 +13,7 @@ LOCAL_SRC_FILES := $(SDL_PATH)/src/main/android/SDL_android_main.c \
                audioplayer.c \
                videoplayer.c \
                ffmpeg_utils.c
-LOCAL_SHARED_LIBRARIES := SDL2 libswresample-3 libswscale-5 libavcodec-58 libavformat-58 libavutil-56 libavfilter-7 libssl
+LOCAL_SHARED_LIBRARIES := SDL2 libswresample-3 libswscale-5 libavcodec-58 libavformat-58 libavutil-56 libavfilter-7 libssl libcrypto
 LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/../ffmpeg/include
 # for native audio
 LOCAL_LDLIBS += -lOpenSLES -lGLESv1_CM -lGLESv2
