@@ -381,7 +381,7 @@ status_t MediaPlayer::getDuration(int *msec)
 
 status_t MediaPlayer::seekTo_l(int msec)
 {
-    if((state!=0)&&(mCurrentState & (MEDIA_PLAYER_STARTED | MEIDA_PLAYER_PREPARED | MEDIA_PLAYER_PAUSED | MEDIA_PLAYER_PLAYBACK_COMPLETE)))
+    if((state!=0)&&(mCurrentState & (MEDIA_PLAYER_STARTED | MEDIA_PLAYER_PREPARED | MEDIA_PLAYER_PAUSED | MEDIA_PLAYER_PLAYBACK_COMPLETE)))
     {
         if(msec<0)
         {
@@ -397,7 +397,7 @@ status_t MediaPlayer::seekTo_l(int msec)
         {
             getDuration_l(NULL);
             mSeekPosition=msec;
-            return ::sekTo(&state, msec);
+            return ::seekTo(&state, msec);
         }
         else
         {
@@ -410,7 +410,7 @@ status_t MediaPlayer::seekTo_l(int msec)
 
 status_t MediaPlayer::seekTo(int msec)
 {
-    Mutex::Auto _l(mLock);
+    Mutex::AutoLock _l(mLock);
     status_t result= seekTo_l(msec);
 
     return result;
