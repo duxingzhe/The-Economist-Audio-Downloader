@@ -527,13 +527,13 @@ status_t MediaPlayer::setAuxEffectSendLevel(float level)
 status_t MediaPlayer::attachAuxEffect(int effectId)
 {
     Mutex::Autolock _l(mLock);
-    if(state==0||(mCurrentState&MEDIA_PLAYER_IDLE)||
-            (mCurrentState==MEIDA_PLAYER_STATE_ERROR))
+    if(state==0||(mCurrentState & MEDIA_PLAYER_IDLE)||
+            (mCurrentState==MEDIA_PLAYER_STATE_ERROR))
     {
         return INVALID_OPERATION;
     }
 
-    MeidaPlayerListener *listener=mListener;
+    MediaPlayerListener *listener=mListener;
     if(listener!=0)
     {
         return 0;
