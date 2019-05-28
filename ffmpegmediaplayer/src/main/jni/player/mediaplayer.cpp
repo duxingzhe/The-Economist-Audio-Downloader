@@ -612,3 +612,12 @@ void MediaPlayer::notify(int msg, int ext1, int ext2, int fromThread)
         listener->notify(msg, ext1, ext2, fromThread);
     }
 }
+
+status_t MediaPlayer::setNextMediaPlayer(const MeidaPlayer* next)
+{
+    if(state==NULL)
+    {
+        return NO_INIT;
+    }
+    return ::setNextPlayer(&state, next==NULL?NULL: next->state);
+}

@@ -55,7 +55,7 @@ public:
     int getAudioSessionId();
     status_t setAuxEffectSendLevel(float level);
     int attachAuxEffect(int effectId);
-    status_t setnextMediaPlayer(const MediaPlayer* player);
+    status_t setNextMediaPlayer(const MediaPlayer* player);
     VideoState *state;
 
 private:

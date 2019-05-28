@@ -15,7 +15,7 @@
 
 typedef struct VideoPlayer
 {
-    ANativeWindow* nativeWindow;
+    ANativeWindow* native_window;
 } VideoPlayer;
 
 void createVideoEngine(VideoPlayer **ps);
