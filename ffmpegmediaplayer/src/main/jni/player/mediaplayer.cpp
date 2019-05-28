@@ -566,7 +566,7 @@ void MediaPlayer::notify(int msg, int ext1, int ext2, int fromThread)
                 mPrepareStatus=NO_ERROR;
             }
             break;
-        case MEDIA_PLAYERBACK_COMPLETE:
+        case MEDIA_PLAYER_PLAYBACK_COMPLETE:
             if(mCurrentState==MEDIA_PLAYER_IDLE)
             {
 
@@ -613,7 +613,7 @@ void MediaPlayer::notify(int msg, int ext1, int ext2, int fromThread)
     }
 }
 
-status_t MediaPlayer::setNextMediaPlayer(const MeidaPlayer* next)
+status_t MediaPlayer::setNextMediaPlayer(const MediaPlayer *player)
 {
     if(state==NULL)
     {
