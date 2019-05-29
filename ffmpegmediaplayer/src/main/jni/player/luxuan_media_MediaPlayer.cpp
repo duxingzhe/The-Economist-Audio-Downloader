@@ -102,3 +102,129 @@ void JNIMediaPlayerListener::notify(int msg, int ext1, int ext2, int fromThread)
         m_vm->DetachCurrentThread();
     }
 }
+
+static MediaPlayer* getMediaPlayer(JNIEnv *env, jobject thiz)
+{
+    MediaPlayer *const p=(MediaPlayer*)env->GetLongField(thiz, fields.context);
+    return p;
+}
+
+static MediaPlayer* setMediaPlayer(JNIEnv* env, jobject thiz, long mp)
+{
+    MediaPlayer* old=(MediaPlayer*)env->GetLongField(thiz, fields.context);
+    env->SetLongField(thiz, fields.context, mp);
+    return old;
+}
+
+static void process_media_player_call(JNIEnv *env, jobject thiz, int opStatus, const char* exception, const char* message)
+{
+    if(exception==NULL)
+    {
+        if(opStatus!=(int)OK)
+        {
+            MediaPlayer* mp=getMediaPlayer(env, thiz);
+            if(mp!=0)
+                mp->notify(MEDIA_ERROR, opStatus, 0, 0);
+        }
+    }
+    else
+    {
+        if(opStatus==(int)INVALID_OPERATION)
+        {
+            jniThrowException(env, "java/lang/IllegalStateException", NULL);
+        }
+        else if(opStatus==(int) PERMISSION_DENIED)
+        {
+            jniThrowException(env, "java/lang/SecurityException", NULL);
+        }
+        else if(opStatus!=(int)OK)
+        {
+            if(strlen(message)>230)
+            {
+                jniThrowException(env, exception, message);
+            }
+            else
+            {
+                char msg[256];
+                sprintf(msg, "%s: status=0x%x", message, opStatus);
+                jniThrowException(env, exception, msg);
+            }
+        }
+    }
+}
+
+static void luxuan_media_FFmpegMediaPlayer_setDataSourceAndHeaders(JNIEnv *env, jobject thiz, jstring path, jobjectArray keys, jobjectArray values)
+{
+    MediaPlayer *mp=getMediaPlayer(env, thiz);
+    if(mp==NULL)
+    {
+        jniThrowException(env, "java/lang/IllegalStateException", NULL);
+        return;
+    }
+
+    if(path==NULL)
+    {
+        jniThrowException(env, "java/lang/IllegalArgumentException", NULL);
+        return;
+    }
+
+    const char *tmp=env->GetStringUTFChars(path, NULL);
+    if(tmp==NULL)
+    {
+        return;
+    }
+
+    char *restrict_to=(char *)strstr(tmp, "mms://");
+    if(restrict_to)
+    {
+        strncpy(restrict_to, "mmsh://", 6);
+        puts(tmp);
+    }
+
+    char *headers=NULL;
+
+    if(keys&&values!=NULL)
+    {
+        int keysCount=env->GetArrayLength(keys);
+        int valuesCount=env->GetArrayLength(values);
+
+        if(keysCount!=valuesCount)
+        {
+            __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "keys and values arrays have differnt length");
+            jniThrowException(env, "java/lang/IllegalArgumentException", NULL);
+            return;
+        }
+
+        int i=0;
+        const char *rawString=NULL;
+        char hdrs[2048];
+
+        strcpy(hdrs, "");
+
+        for(i=0;i<keysCount;i++)
+        {
+            jstring key=(jstring)env->GetObjectArrayElement(keys, i);
+            rawString=env->GetStringUTFChars(key, NULL);
+            strcat(hdrs, rawString);
+            strcat(hdrs, ": ");
+            env->ReleaseStringUTFChars(key, rawString);
+
+            jstring value=(jstring) env->GetObjectArrayElement(values, i);
+            rawString=env->GetStringUTFChars(value, NULL);
+            strcat(hdrs, rawString);
+            strcat(hdrs, "\r\n");
+            env->ReleaseStringUTFChars(value, rawString);
+        }
+
+        headers=&hdrs[0];
+    }
+
+    __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, "setDataSource: path %s", tmp);
+
+    status_t opStatus=mp->setDataSource(tmp, headers);
+
+    process_media_player_call(env, thiz, opStatus, "java/io/IOException", "setDataSource failed.");
+
+    env->ReleaseStringUTFChars(path, tmp);
+    tmp=NULL;
+}
