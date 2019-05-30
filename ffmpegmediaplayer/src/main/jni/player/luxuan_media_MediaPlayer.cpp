@@ -438,3 +438,107 @@ static int luxuan_media_FFmpegMediaPlayer_getCurrentPosition(JNIEnv *env, jobjec
     __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, "getCurrentPosition: %d (msec)", msec);
     return msec;
 }
+
+static int luxuan_media_FFmpegMediaPlayer_getDuration(JNIEnv *env, jobject thiz)
+{
+    MediaPlayer* mp=getMediaPlayer(env, thiz);
+    if(mp==NULL)
+    {
+        jniThrowException(env, "java/lang/IllegalStateException", NULL);
+        return 0;
+    }
+    int msec;
+    process_media_player_call(env, thiz, mp->getDuration(&msec), NULL, NULL);
+    __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, "getDuration: %d (msec)", msec);
+    return msec;
+}
+
+static void luxuan_media_FFmpegMediaPlayer_reset(JNIEnv *env, jobject thiz)
+{
+    __android_log_write(ANDROID_LOG_VERBOSE, LOG_TAG, "reset");
+    MediaPlayer* mp=getMediaPlayer(env, thiz);
+    if(mp==NULL)
+    {
+        jniThrowException(env, "java/lang/IllegalStateException", NULL);
+        return;
+    }
+    process_media_player_call(env, thiz, mp->reset(), NULL, NULL);
+}
+
+static void luxuan_media_FFmpegMediaPlayer_setAudioStreamType(JNIEnv *env, jobject thiz, int streamtype)
+{
+    __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, "setAudioStreamType: %s", streamtype);
+    MediaPlayer* mp=getMediaPlayer(env, thiz);
+    if(mp==NULL)
+    {
+        jniThrowException(env, "java/lang/IllegalStateException", NULL);
+        return;
+    }
+    process_media_player_call(env, thiz, mp->setAudioStreamType(streamtype), NULL, NULL);
+}
+
+static void luxuan_media_FFmpegMediaPlayer_setLooping(JNIEnv *env, jobject thiz, jboolean looping)
+{
+    __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, "setLooping: %d", looping);
+    MediaPlayer* mp=getMediaPlayer(env, thiz);
+    if(mp==NULL)
+    {
+        jniThrowException(env, "java/lang/IllegalStateException", NULL);
+        return;
+    }
+    process_media_player_call(env, thiz, mp->setLooping(looping), NULL, NULL);
+}
+
+static jboolean luxuan_media_FFmpegMediaPlayer_isLooping(JNIEnv *env, jobject thiz)
+{
+    __android_log_write(ANDROID_LOG_VERBOSE, LOG_TAG, "isLooping");
+    MediaPlayer* mp=getMediaPlayer(env, thiz);
+    if(mp==NULL)
+    {
+        jniThrowException(env, "java/lang/IllegalStateException", NULL);
+        return false;
+    }
+    return mp->isLooping();
+}
+
+static void luxuan_media_FFmpegMediaPlayer_setVolume(JNIEnv *env, jobject thiz, float leftVolume, float rightVolume)
+{
+    __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, "setVolume: left: %f, right: %f", leftVolume, rightVolume);
+    MediaPlayer* mp=getMediaPlayer(env, thiz);
+    if(mp==NULL)
+    {
+        jniThrowException(env, "java/lang/IllegalStateException", NULL);
+        return;
+    }
+    process_media_player_call(env, thiz, mp->setVolume(leftVolume, rightVolume),NULL,NULL);
+}
+
+static jint luxuan_media_FFmpegMediaPlayer_setMetadataFilter(JNIEnv *env, jobject thiz, jobjectArray allow, jobjectArray block)
+{
+    MediaPlayer* media_player=getMediaPlayer(env, thiz);
+    if(media_player==NULL)
+    {
+        jniThrowException(env, "java/lang/IllegalStateException", NULL);
+        return UNKNOWN_ERROR;
+    }
+
+    int allowCount=env->GetArrayLength(allow);
+    char *allowed[allowCount];
+
+    for(int i=0;i<allowCount;i++)
+    {
+        jstring allowString=(jstring)env->GetObjectArrayElement(allow, i);
+        const char* rawAllowString=env->GetStringUTFChars(allowString, 0);
+    }
+
+    int blockCount=env->GetArrayLength(block);
+    char* blocked[blockCount];
+
+    for(int i=0;i<blockCount;i++)
+    {
+        jstring blockString=(jstring)env->GetObjectArrayElement(block,i);
+        const char *rawBlockString=env->GetStringUTFChars(blockString, 0);
+    }
+
+    return 0;
+}
