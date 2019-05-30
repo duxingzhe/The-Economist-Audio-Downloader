@@ -336,3 +336,105 @@ static void luxuan_media_FFmpegMediaPlayer_start(JNIEnv *env, jobject thiz)
 
     process_media_player_call(env, thiz, mp->start(), NULL, NULL);
 }
+
+static void luxuan_media_FFmpegMediaPlayer_stop(JNIEnv *env, jobject thiz)
+{
+    __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, "stop");
+    MediaPlayer* mp=getMediaPlayer(env, thiz);
+    if(mp==NULL)
+    {
+        jniThrowException(env, "java/lang/IllegalStateException", NULL);
+        return;
+    }
+    process_media_player_call(env, thiz, mp->stop(), NULL, NULL);
+}
+
+static void luxuan_media_FFmpegMediaPlayer_pause(JNIEnv *env, jobject thiz)
+{
+    __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, "pause");
+    MediaPlayer* mp=getMediaPlayer(env, thiz);
+    if(mp==NULL)
+    {
+        jniThrowException(env, "java/lang/IllegalStateException", NULL);
+        return;
+    }
+    process_media_player_call(env, thiz, mp->pause(), NULL, NULL);
+}
+
+static jboolean luxuan_media_FFmpegMediaPlayer_isPlaying(JNIEnv *env, jobject thiz)
+{
+    MediaPlayer* mp=getMediaPlayer(env, thiz);
+    if(mp==NULL)
+    {
+        jniThrowException(env, "java/lang/IllegalStateException", NULL);
+        return false;
+    }
+    const jboolean is_playing=mp->isPlaying();
+
+    __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, "isPlaying: %d", is_playing);
+    return is_playing;
+}
+
+static void luxuan_media_FFmpegMediaPlayer_seekTo(JNIEnv *env, jobject thiz, int msec)
+{
+    MediaPlayer* mp=getMediaPlayer(env, thiz);
+    if(mp==NULL)
+    {
+        jniThrowException(env, "java/lang/IllegalStateException", NULL);
+        return;
+    }
+
+    __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, "seekTo: %d(msec)", msec);
+    process_media_player_call(env, thiz, mp->seekTo(msec), NULL, NULL);
+}
+
+static int luxuan_media_FFmpegMediaPlayer_getVideoWidth(JNIEnv *env, jobject thiz)
+{
+    MediaPlayer* mp=getMediaPlayer(env, thiz);
+    if(mp==NULL)
+    {
+        jniThrowException(env, "java/lang/IllegalStateException", NULL);
+        return 0;
+    }
+    int w;
+    if(0!=mp->getVideoWidth(&w))
+    {
+        __android_log_write(ANDROID_LOG_ERROR, LOG_TAG, "getVideoWidth failed");
+        w=0;
+    }
+    __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, "getVideoWidth: %d", w);
+    return w;
+}
+
+static int luxuan_media_FFmpegMediaPlayer_getVideoHeight(JNIEnv *env, jobject thiz)
+{
+    MediaPlayer* mp=getMediaPlayer(env, thiz);
+    if(mp==NULL)
+    {
+        jniThrowException(env, "java/lang/IllegalStateException", NULL);
+        return 0;
+    }
+    int h;
+    if(0!=mp->getVideoHeight(&h))
+    {
+        __android_log_write(ANDROID_LOG_ERROR, LOG_TAG, "getVideoHeight failed");
+        h=0;
+    }
+    __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, "getVideoHeight: %d", h);
+    return h;
+}
+
+static int luxuan_media_FFmpegMediaPlayer_getCurrentPosition(JNIEnv *env, jobject thiz)
+{
+
+    MediaPlayer* mp=getMediaPlayer(env, thiz);
+    if(mp==NULL)
+    {
+        jniThrowException(env, "java/lang/IllegalStateException", NULL);
+        return 0;
+    }
+    int msec;
+    process_media_player_call(env, thiz, mp->getCurrentPosition(&msec),NULL, NULL);
+    __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, "getCurrentPosition: %d (msec)", msec);
+    return msec;
+}
