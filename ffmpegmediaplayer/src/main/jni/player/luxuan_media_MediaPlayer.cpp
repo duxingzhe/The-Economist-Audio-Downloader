@@ -228,3 +228,111 @@ static void luxuan_media_FFmpegMediaPlayer_setDataSourceAndHeaders(JNIEnv *env, 
     env->ReleaseStringUTFChars(path, tmp);
     tmp=NULL;
 }
+
+static int jniGetFDFromFileDescriptor(JNIEnv *env, jobject fileDescriptor)
+{
+    jint fd=-1;
+    jclass fdClass=env->FindClass("java/io/FileDescriptor");
+
+    if(fdClass!=NULL)
+    {
+        jfieldID fdClassDescriptorFieldID=env->GetFieldID(fd, fdClazz, "descriptor", "I");
+        if(fdClassDescriptorFieldID!=NULL && fileDescriptor!=NULL)
+        {
+            fd=env->GetIntField(fileDescriptor, fdClassDescriptorFieldID);
+        }
+    }
+
+    return fd;
+}
+
+static void luxuan_media_FFmpegMediaPlayer_setDataSourceFD(JNIEnv *env, jobject thiz, jobject fileDescriptor, jlong offset, jlong length)
+{
+    MediaPlayer *mp=getMediaPlayer(env, thiz);
+    if(mp==NULL)
+    {
+        jniThrowException(env, "java/lang/IllegalStateException", NULL);
+        return;
+    }
+
+    if(fileDescriptor==NULL)
+    {
+        jniThrowException(env, "java/lang/IllegalArgumentException", NULL);
+        return;
+    }
+
+    int fd=jniGetFDFromFileDescriptor(env, fileDescriptor);
+    __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, "setDataSourceFD: fd %d", fd);
+    process_media_player_call(env, thiz, mp->setDataSource(fd, offset, length), "java/io/IOException", "setDataSourceFD failed.");
+}
+
+static void decVideoSurfaceRef(JNIEnv *env, jobject thiz)
+{
+
+}
+
+static void setVideoSurface(JNIEnv *env, jobject thiz, jobject jsurface, jboolean mediaPlayerMustBeAlive)
+{
+    MediaPlayer *mp=getMediaPlayer(env, thiz);
+    if(mp==NULL)
+    {
+        if(mediaPlayerMustBeAlive)
+        {
+            jniThrowException(env, "java.lang/IllegalStateException", NULL);
+        }
+
+        return;
+    }
+
+    decVideoSurfaceRef(env, thiz);
+
+    ANativeWindow* theNativeWindow=ANativeWindow_fromSurface(env, jsurface);
+
+    if(theNativeWindow!=NULL)
+    {
+        mp->setVideoSurface(theNativeWindow);
+    }
+}
+
+static void luxuan_media_FFmpegMediaPlayer_setVideoSurface(JNIEnv *env, jobject thiz, jobject jsurface)
+{
+    setVideoSurface(env, thiz, jsurface, true);
+}
+
+static void luxuan_media_FFmpegMediaPlayer_prepare(JNIEnv *env, jobject thiz)
+{
+    MediaPlayer* mp=getMediaPlayer(env, thiz);
+
+    if(mp==NULL)
+    {
+        jniThrowException(env, "java/lang/IllegalStateException", NULL);
+        return;
+    }
+
+    process_media_player_call(env,,thiz, mp->prepare(), "java/io/IOException", "Prepare failed.");
+}
+
+static void luxuan_meida_FFmpegMediaPlayer_prepareAsync(JNIEnv *env, jobject thiz)
+{
+    MediaPlayer* mp=getMeidaPlayer(env, thiz);
+    if(mp==NULL)
+    {
+        jniThrowException(env, "java/lang/IllegalStateException", NULL);
+        return;
+    }
+
+    process_media_player_call(env, thiz, mp->preapreAsync(), "java/io/IOException", "Prepare Async failed.");
+}
+
+static void luxuan_media_FFmpegMediaPlayer_start(JNIEnv *env, jobject thiz)
+{
+    __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, "start");
+    MediaPlayer *mp=getMediaPlayer(env, thiz);
+    if(mp==NULL)
+    {
+        jniThrowException(env, "java/lang/IllegalStateException",NULL);
+        return;
+    }
+
+    process_media_player_call(env, thiz, mp->start(), NULL, NULL);
+}
