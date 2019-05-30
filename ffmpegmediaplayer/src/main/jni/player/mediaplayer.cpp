@@ -613,7 +613,7 @@ void MediaPlayer::notify(int msg, int ext1, int ext2, int fromThread)
     }
 }
 
-status_t MediaPlayer::setNextMediaPlayer(const MediaPlayer *player)
+status_t MediaPlayer::setNextMediaPlayer(const MediaPlayer *next)
 {
     if(state==NULL)
     {
