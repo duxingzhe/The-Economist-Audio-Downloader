@@ -236,7 +236,7 @@ static int jniGetFDFromFileDescriptor(JNIEnv *env, jobject fileDescriptor)
 
     if(fdClass!=NULL)
     {
-        jfieldID fdClassDescriptorFieldID=env->GetFieldID(fd, fdClazz, "descriptor", "I");
+        jfieldID fdClassDescriptorFieldID=env->GetFieldID(fdClass, "descriptor", "I");
         if(fdClassDescriptorFieldID!=NULL && fileDescriptor!=NULL)
         {
             fd=env->GetIntField(fileDescriptor, fdClassDescriptorFieldID);
@@ -309,19 +309,19 @@ static void luxuan_media_FFmpegMediaPlayer_prepare(JNIEnv *env, jobject thiz)
         return;
     }
 
-    process_media_player_call(env,,thiz, mp->prepare(), "java/io/IOException", "Prepare failed.");
+    process_media_player_call(env, thiz, mp->prepare(), "java/io/IOException", "Prepare failed.");
 }
 
 static void luxuan_meida_FFmpegMediaPlayer_prepareAsync(JNIEnv *env, jobject thiz)
 {
-    MediaPlayer* mp=getMeidaPlayer(env, thiz);
+    MediaPlayer* mp=getMediaPlayer(env, thiz);
     if(mp==NULL)
     {
         jniThrowException(env, "java/lang/IllegalStateException", NULL);
         return;
     }
 
-    process_media_player_call(env, thiz, mp->preapreAsync(), "java/io/IOException", "Prepare Async failed.");
+    process_media_player_call(env, thiz, mp->prepareAsync(), "java/io/IOException", "Prepare Async failed.");
 }
 
 static void luxuan_media_FFmpegMediaPlayer_start(JNIEnv *env, jobject thiz)
