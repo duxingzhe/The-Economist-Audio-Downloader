@@ -542,3 +542,109 @@ static jint luxuan_media_FFmpegMediaPlayer_setMetadataFilter(JNIEnv *env, jobjec
 
     return 0;
 }
+
+static jobject luxuan_media_FFmpegMediaPalyer_getMetadata(JNIEnv *env, jobject thiz, jboolean update_only, jboolean apply_filter, jobject reply)
+{
+    MediaPlayer* media_player=getMediaPlayer(env, thiz);
+    if(media_player==NULL)
+    {
+        jniThrowException(env, "java/lang/IllegalStateException", NULL);
+        return JNI_FALSE;
+    }
+
+    AVDictionary *metadata=NULL;
+
+    if(media_player->getMetadata(update_only, apply_filter, &metadata)==0)
+    {
+        jclass hashMap_Clazz=env->FindClass("java/util/HashMap");
+        jmethodID gHashMap_initMethodID=env->GetMethodID(hashMap_Clazz, "<init>", "()V");
+        jobject map=env->NewObject(hashMap_Clazz, gHashMap_initMethodID);
+        jmethodID gHashMap_putMethodID=env->GetMethodID(hashMap_Clazz, "put", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
+
+        int i=0;
+        for(i=0;i<metadata->count;i++)
+        {
+            jstring jKey=env->NewStringUTF(metadata->elems[i].key);
+            jstring jValue=env->NewStringUTF(metadata->elems[i].value);
+            (jobject)env->CallObjectMethod(map, gHashMap_putMethodID, jKey, jValue);
+            env->DeleteLocalRef(jKey);
+            env->DeleteLocalRef(jValue);
+        }
+
+        if(metadata)
+        {
+            av_dict_free(&metadata);
+        }
+
+        return map;
+    }
+    else
+    {
+        return reply;
+    }
+}
+
+static void luxuan_media_FFmpegMediaPlayer_native_init(JNIEnv *env)
+{
+    __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, "native_init");
+    jclass clazz;
+
+    clazz=env->FindClass("luxuan/media/FFmpegMediaPlayer");
+    if(clazz==NULL)
+    {
+        return;
+    }
+
+    fields.context=env->GetFieldID(clazz, "mNativeContext", "J");
+    if(fields.context==NULL)
+    {
+        return;
+    }
+
+    fields.post_event=env->GetStaticMethodID(clazz, "postEventFromNative", "(Ljava/lang/Object;IIILjava/lang/object;)V");
+    if(fields.post_event==NULL)
+    {
+        return;
+    }
+
+    fields.surface_texture=env->GetFieldID(clazz, "mNativeSurfaceTexture","I");
+    if(fileds.surface_texture==NULL)
+    {
+        return;
+    }
+
+    av_register_all();
+    avformat_network_init();
+}
+
+static void luxuan_media_FFmpegMediaPlayer_native_setup(JNIEnv *env, jobject thiz, jobject weak_this)
+{
+    __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, "native_setup");
+    MediaPlayer* mp=new MediaPlayer();
+    if(mp==NULL)
+    {
+        jniThrowException(env, "java/lang/RuntimeException", "Out of memory");
+    }
+
+    JNIMediaPlayerListener *listener=new JNIMediaPlayerListener(env, thiz, weak_this);
+    mp->setListener(listener);
+
+    setMediaPlayer(env, thiz, (long)mp);
+}
+
+static void luxuan_media_FFmpegMediaPlayer_release(JNIEnv *env, jobject thiz)
+{
+    __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, "release");
+
+    MediaPlayer* mp=setMediaPlayer(env, thiz, 0);
+    if(mp!=NULL)
+    {
+        JNIMediaPlayerListener *listener=(JNIMediaPlayerListener *)mp->getListener();
+        delete listener;
+        mp->setListener(0);
+        mp->disconnect();
+
+        delete mp;
+        setMediaPlayer(env, thiz, 0);
+    }
+}
