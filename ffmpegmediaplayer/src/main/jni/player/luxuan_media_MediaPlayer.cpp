@@ -67,6 +67,15 @@ JNIMediaPlayerListener::JNIMediaPlayerListener(JNIEnv* env, jobject thiz, jobjec
     mObject=env->NewGlobalRef(weak_thiz);
 }
 
+JNIMediaPlayerListener::~JNIMediaPlayerListener()
+{
+    JNIEnv *env=0;
+    m_vm->GetEnv((void**)&env, JNI_VERSION_1_6);
+    env->DeleteGlobalRef(mObject);
+    env->DeleteGlobalRef(mClass);
+    env->DeleteGlobalRef(mThiz);
+}
+
 void JNIMediaPlayerListener::notify(int msg, int ext1, int ext2, int fromThread)
 {
     __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, "notify: %d", msg);

@@ -144,6 +144,17 @@ status_t MediaPlayer::setDataSource(const char *url, const char *headers)
     return err;
 }
 
+status_t MediaPlayer::setDataSource(int fd, int64_t offset, int64_t length)
+{
+    status_t err=UNKNOWN_ERROR;
+
+    VideoState* state=create();
+    err=::setDataSourceFD(&state, fd, offset, length);
+    err=setDataSource(state);
+
+    return err;
+}
+
 status_t MediaPlayer::setMetadataFilter(char *allow[], char *block[])
 {
     Mutex::Autolock lock(mLock);
@@ -211,6 +222,12 @@ status_t MediaPlayer::prepare()
     }
 
     return mPrepareStatus;
+}
+
+status_t MediaPlayer::prepareAsync()
+{
+    Mutex::Autolock _l(mLock);
+    return prepareAsync_l();
 }
 
 status_t MediaPlayer::start()
@@ -467,6 +484,17 @@ status_t MediaPlayer::setLooping(int loop)
         return ::setLooping(&state, loop);
     }
     return OK;
+}
+
+bool MediaPlayer::isLooping()
+{
+    Mutex::Autolock _l(mLock);
+    if(state!=0)
+    {
+        return mLoop;
+    }
+
+    return false;
 }
 
 status_t MediaPlayer::setVolume(float leftVolume, float rightVolume)

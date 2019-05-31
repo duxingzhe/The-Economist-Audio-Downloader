@@ -10,7 +10,7 @@
 
 #include <stdio.h>
 
-void set_shoucast_metadata(AVFormatContext *ic)
+void set_shoutcast_metadata(AVFormatContext *ic)
 {
     char *value=NULL;
 
@@ -112,4 +112,124 @@ void set_filesize(AVFormatContext *ic)
     int64_t size=ic->pb?avio_size(ic->pb):-1;
     sprintf(value, "%"PRId64, size);
     av_dict_set(&ic->metadata, FILESIZE, value, 0);
+}
+
+void set_chapter_count(AVFormatContext *ic)
+{
+    char value[30]="0";
+    int count=0;
+
+    if(ic)
+    {
+        if(ic->nb_chapters)
+        {
+            count=ic->nb_chapters;
+        }
+    }
+
+    sprintf(value, "%d", count);
+    av_dict_set(&ic->metadata, CHAPTER_COUNT, value, 0);
+}
+
+void set_video_dimensions(AVFormatContext *ic, AVStream *video_st)
+{
+    char value[30]="0";
+
+    if(video_st)
+    {
+        sprintf(value, "%d", video_st->codec->width);
+        av_dict_set(&ic->metadata, VIDEO_WIDTH, value, 0);
+
+        sprintf(value, "%d", video_st->codec->height);
+        av_dict_set(&ic->metadata, VIDEO_HEIGHT, value, 0);
+    }
+}
+
+const char* extract_metadata_internal(AVFormatContext *ic, AVStream *audio_st, AVStream *video_st, const char* key)
+{
+    char* value=NULL;
+
+    if(!ic)
+    {
+        return value;
+    }
+
+    if(key)
+    {
+        if(av_dict_get(ic->metadata, key, NULL, AV_DICT_MATCH_CASE))
+        {
+            value=av_dict_get(ic->metadata, key, NULL, AV_DICT_MATCH_CASE)->value;
+        }
+        else if(audio_st && av_dict_get(audio_st->metadata, key, NULL, AV_DICT_MATCH_CASE))
+        {
+            value=av_dict_get(audio_st->metadata, key, NULL, AV_DICT_MATCH_CASE)->value;
+        }
+        else if(video_st&& av_dict_get(video_st->metadata, key, NULL, AV_DICT_MATCH_CASE))
+        {
+            value=av_dict_get(video_st->metadata, key, NULL, AV_DICT_MATCH_CASE)->value;
+        }
+    }
+
+    return value;
+}
+
+int get_metadata_internal(AVFormatContext *ic, AVDictionary **metadata)
+{
+    if(!ic)
+    {
+        return FAILURE;
+    }
+
+    set_shoutcast_metadata(ic);
+    av_dict_copy(metadata, ic->metadata, 0);
+
+    return SUCCESS;
+}
+
+const char* extract_metadata_from_chapter_internal(AVFormatContext *ic, AVStream *audio_st, AVStream video_st, const char* key, int chapter)
+{
+    char *value=NULL;
+
+    if(!ic||ic->nb_chapters)
+    {
+        return value;
+    }
+
+    if(chapter<0||chapter>=ic->nb_chapters)
+    {
+        return value;
+    }
+
+    AVChapter *ch=ic->chapters[chapter];
+
+    printf("Found metadata\n");
+    AVDictionaryEntry *tag=NULL;
+    while((tag=av_dict_get(ch->metadata, "", tag, AV_DICT_MATCH_CASE)))
+    {
+        printf("key %s: \n", tag->key);
+        printf("Value %s: \n", tag->value);
+    }
+
+    if(strcmp(key, CHAPTER_START_TIME)==0)
+    {
+        char time[30];
+        int start_time=ch->start*av_q2d(ch->time_base)*1000;
+        sprintf(time, "%d", start_time);
+        value=malloc(strlen(time));
+        sprintf(value, "%s", time);
+    }
+    else if(strcmp(key, CHAPTER_END_TIME)==0)
+    {
+        char time[30];
+        int end_time=ch->end*av_q2d(ch->time_base)*1000;
+        sprintf(time, "%d", end_time);
+        value=malloc(strlen(time));
+        sprintf(value, "%s", time);
+    }
+    else if(av_dict_get(ch->metadata, key, NULL, AV_DICT_MATCH_CASE))
+    {
+        value=av_dict_get(ch->metadata, key, NULL, AV_DICT_MATCH_CASE)->value;
+    }
+
+    return value;
 }

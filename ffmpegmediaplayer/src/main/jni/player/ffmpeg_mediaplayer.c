@@ -1003,6 +1003,17 @@ void stream_seek(VideoState *is, int64_t pos, int64_t rel, int seek_by_bytes)
     }
 }
 
+VideoState *create()
+{
+    VideoState *is;
+
+    is=av_mallocz(sizeof(VideoState));
+    is->last_paused=-1;
+    is->stream_type=3;
+
+    return is;
+}
+
 VideoState *getNextMediaPlayer(VideoState **ps)
 {
     return NULL;
@@ -1749,7 +1760,7 @@ int setMetadataFilter(VideoState **ps, char *allow[], char *block[])
     return 0;
 }
 
-int getMetadataFilter(VideoState **ps, AVDictionary **metadata)
+int getMetadata(VideoState **ps, AVDictionary **metadata)
 {
     printf("get_metadata\n");
 
