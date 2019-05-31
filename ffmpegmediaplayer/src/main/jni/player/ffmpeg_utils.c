@@ -109,7 +109,7 @@ void set_filesize(AVFormatContext *ic)
 {
     char value[30]="0";
 
-    int64_t size=ic->pb?avio_size(ic->pb);
+    int64_t size=ic->pb?avio_size(ic->pb):-1;
     sprintf(value, "%"PRId64, size);
     av_dict_set(&ic->metadata, FILESIZE, value, 0);
 }
