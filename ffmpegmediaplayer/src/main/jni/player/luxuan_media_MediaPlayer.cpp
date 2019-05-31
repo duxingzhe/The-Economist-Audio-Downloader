@@ -608,7 +608,7 @@ static void luxuan_media_FFmpegMediaPlayer_native_init(JNIEnv *env)
     }
 
     fields.surface_texture=env->GetFieldID(clazz, "mNativeSurfaceTexture","I");
-    if(fileds.surface_texture==NULL)
+    if(fields.surface_texture==NULL)
     {
         return;
     }
