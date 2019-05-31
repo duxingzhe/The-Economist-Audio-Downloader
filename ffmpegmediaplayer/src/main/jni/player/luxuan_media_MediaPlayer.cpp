@@ -685,6 +685,18 @@ static jint luxuan_media_FFmpegMediaPlayer_get_audio_session_id(JNIEnv *env, job
     return mp->getAudioSessionId();
 }
 
+static void luxuan_media_FFmpegMediaPlayer_setAuxEffectSendLevel(JNIEnv *env, jobject thiz, jfloat level)
+{
+    __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, "setAuxEffectSendLevel: level %f", level);
+    MediaPlayer *mp=getMediaPlayer(env, thiz);
+    if(mp==NULL)
+    {
+        jniThrowException(env, "java/lang/IllegalStateException", NULL);
+        return;
+    }
+    process_media_player_call(env, thiz, mp->setAuxEffectSendLevel(level), NULL, NULL);
+}
+
 static void luxuan_media_FFmpegMediaPlayer_attachAuxEffect(JNIEnv *env, jobject thiz, jint effectId)
 {
     __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, "attachAuxEffect(): %d", effectId);
@@ -739,3 +751,50 @@ static JNINativeMethod gMethods[] = {
         {"attachAuxEffect",     "(I)V",                             (void *)luxuan_media_FFmpegMediaPlayer_attachAuxEffect},
         {"setNextMediaPlayer", "(Lluxuan/media/FFmpegMediaPlayer;)V", (void *)luxuan_media_FFmpegMediaPlayer_setNextMediaPlayer},
 };
+
+static const char *const kClassPathName="luxuan/media/FFmpegMediaPlayer";
+
+static int register_luxuan_media_FFmpegMediaPlayer(JNIEnv *env)
+{
+    int numMethods=(sizeof(gMethods)/sizeof(gMethods[0]));
+    jclass clazz=env->FindClass("luxuan/media/FFmpegMediaPlayer");
+    if(clazz==NULL)
+    {
+        __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "Native registration unable to find class 'luxuan/media/FFmpegMediaPlayer'");
+        return JNI_ERR;
+    }
+    if(env->RegisterNatives(clazz, gMethods, numMethods)<0)
+    {
+        __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "RegisterNatives failed for 'luxuan/media/FFmpegMediaPlayer'");
+        return JNI_ERR;
+    }
+    env->DeleteLocalRef(clazz);
+
+    return JNI_OK;
+}
+
+jint JNI_OnLoad(JavaVM* vm, void *reserved)
+{
+    m_vm=vm;
+    JNIEnv* env=NULL;
+    jint result=-1;
+
+    if(vm->GetEnv((void **)&env, JNI_VERSION_1_6)!=JNI_OK)
+    {
+        __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "ERROR: Get Env failed\n");
+        goto OnLoadFail;
+    }
+
+    assert(env!=NULL);
+
+    if(register_luxuan_media_FFmpegMediaPlayer(env)<0)
+    {
+        __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "ERROR: FFmpegMediaPlayer native registration failed\n");
+        goto OnLoadFail;
+    }
+
+    result=JNI_VERSION_1_6;
+
+OnLoadFail:
+    return result;
+}
