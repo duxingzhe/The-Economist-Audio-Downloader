@@ -312,7 +312,7 @@ static void luxuan_media_FFmpegMediaPlayer_prepare(JNIEnv *env, jobject thiz)
     process_media_player_call(env, thiz, mp->prepare(), "java/io/IOException", "Prepare failed.");
 }
 
-static void luxuan_meida_FFmpegMediaPlayer_prepareAsync(JNIEnv *env, jobject thiz)
+static void luxuan_media_FFmpegMediaPlayer_prepareAsync(JNIEnv *env, jobject thiz)
 {
     MediaPlayer* mp=getMediaPlayer(env, thiz);
     if(mp==NULL)
@@ -543,7 +543,7 @@ static jint luxuan_media_FFmpegMediaPlayer_setMetadataFilter(JNIEnv *env, jobjec
     return 0;
 }
 
-static jobject luxuan_media_FFmpegMediaPalyer_getMetadata(JNIEnv *env, jobject thiz, jboolean update_only, jboolean apply_filter, jobject reply)
+static jobject luxuan_media_FFmpegMediaPlayer_getMetadata(JNIEnv *env, jobject thiz, jboolean update_only, jboolean apply_filter, jobject reply)
 {
     MediaPlayer* media_player=getMediaPlayer(env, thiz);
     if(media_player==NULL)
@@ -648,3 +648,94 @@ static void luxuan_media_FFmpegMediaPlayer_release(JNIEnv *env, jobject thiz)
         setMediaPlayer(env, thiz, 0);
     }
 }
+
+static void luxuan_media_FFmpegMediaPlayer_native_finalize(JNIEnv *env, jobject thiz)
+{
+    __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, "native_finalize");
+    MediaPlayer* mp=getMediaPlayer(env, thiz);
+    if(mp!=NULL)
+    {
+        __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, "MediaPlayer finalized.");
+    }
+    luxuan_media_FFmpegMediaPlayer_release(env,thiz);
+}
+
+static void luxuan_media_FFmpegMediaPlayer_set_audio_session_id(JNIEnv *env, jobject thiz, jint sessionId)
+{
+    __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, "set_session_id(): %d", sessionId);
+    MediaPlayer* mp=getMediaPlayer(env,thiz);
+    if(mp==NULL)
+    {
+        jniThrowException(env, "java/lang/IllegalStateException", NULL);
+        return;
+    }
+    process_media_player_call(env, thiz, mp->setAudioSessionId(sessionId), NULL, NULL);
+}
+
+static jint luxuan_media_FFmpegMediaPlayer_get_audio_session_id(JNIEnv *env, jobject thiz)
+{
+    __android_log_write(ANDROID_LOG_VERBOSE, LOG_TAG, "get_session_id()");
+    MediaPlayer* mp=getMediaPlayer(env, thiz);
+    if(mp==NULL)
+    {
+        jniThrowException(env, "java/lang/IllegalStateException", NULL);
+        return 0;
+    }
+
+    return mp->getAudioSessionId();
+}
+
+static void luxuan_media_FFmpegMediaPlayer_attachAuxEffect(JNIEnv *env, jobject thiz, jint effectId)
+{
+    __android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, "attachAuxEffect(): %d", effectId);
+    MediaPlayer *mp=getMediaPlayer(env,thiz);
+    if(mp==NULL)
+    {
+        jniThrowException(env, "java/lang/IllegalStateException", NULL);
+        return;
+    }
+    process_media_player_call(env, thiz, mp->attachAuxEffect(effectId),NULL, NULL);
+}
+
+static void luxuan_media_FFmpegMediaPlayer_setNextMediaPlayer(JNIEnv *env, jobject thiz, jobject java_player)
+{
+
+}
+
+static JNINativeMethod gMethods[] = {
+        {
+                "_setDataSource",
+                                     "(Ljava/lang/String;[Ljava/lang/String;[Ljava/lang/String;)V",
+                                                                                  (void *)luxuan_media_FFmpegMediaPlayer_setDataSourceAndHeaders
+        },
+
+        {"_setDataSource",       "(Ljava/io/FileDescriptor;JJ)V",    (void *)luxuan_media_FFmpegMediaPlayer_setDataSourceFD},
+        {"_setVideoSurface",    "(Landroid/view/Surface;)V",        (void *)luxuan_media_FFmpegMediaPlayer_setVideoSurface},
+        {"prepare",             "()V",                              (void *)luxuan_media_FFmpegMediaPlayer_prepare},
+        {"prepareAsync",        "()V",                              (void *)luxuan_media_FFmpegMediaPlayer_prepareAsync},
+        {"_start",              "()V",                              (void *)luxuan_media_FFmpegMediaPlayer_start},
+        {"_stop",               "()V",                              (void *)luxuan_media_FFmpegMediaPlayer_stop},
+        {"getVideoWidth",       "()I",                              (void *)luxuan_media_FFmpegMediaPlayer_getVideoWidth},
+        {"getVideoHeight",      "()I",                              (void *)luxuan_media_FFmpegMediaPlayer_getVideoHeight},
+        {"seekTo",              "(I)V",                             (void *)luxuan_media_FFmpegMediaPlayer_seekTo},
+        {"_pause",              "()V",                              (void *)luxuan_media_FFmpegMediaPlayer_pause},
+        {"isPlaying",           "()Z",                              (void *)luxuan_media_FFmpegMediaPlayer_isPlaying},
+        {"getCurrentPosition",  "()I",                              (void *)luxuan_media_FFmpegMediaPlayer_getCurrentPosition},
+        {"getDuration",         "()I",                              (void *)luxuan_media_FFmpegMediaPlayer_getDuration},
+        {"_release",            "()V",                              (void *)luxuan_media_FFmpegMediaPlayer_release},
+        {"_reset",              "()V",                              (void *)luxuan_media_FFmpegMediaPlayer_reset},
+        {"setAudioStreamType",  "(I)V",                             (void *)luxuan_media_FFmpegMediaPlayer_setAudioStreamType},
+        {"setLooping",          "(Z)V",                             (void *)luxuan_media_FFmpegMediaPlayer_setLooping},
+        {"isLooping",           "()Z",                              (void *)luxuan_media_FFmpegMediaPlayer_isLooping},
+        {"setVolume",           "(FF)V",                            (void *)luxuan_media_FFmpegMediaPlayer_setVolume},
+        {"native_setMetadataFilter", "([Ljava/lang/String;[Ljava/lang/String;)I", (void *)luxuan_media_FFmpegMediaPlayer_setMetadataFilter},
+        {"native_getMetadata", "(ZZLjava/util/HashMap;)Ljava/util/HashMap;", (void *)luxuan_media_FFmpegMediaPlayer_getMetadata},
+        {"native_init",         "()V",                              (void *)luxuan_media_FFmpegMediaPlayer_native_init},
+        {"native_setup",        "(Ljava/lang/Object;)V",          (void *)luxuan_media_FFmpegMediaPlayer_native_setup},
+        {"native_finalize",     "()V",                              (void *)luxuan_media_FFmpegMediaPlayer_native_finalize},
+        {"getAudioSessionId",   "()I",                              (void *)luxuan_media_FFmpegMediaPlayer_get_audio_session_id},
+        {"setAudioSessionId",   "(I)V",                             (void *)luxuan_media_FFmpegMediaPlayer_set_audio_session_id},
+        {"setAuxEffectSendLevel", "(F)V",                           (void *)luxuan_media_FFmpegMediaPlayer_setAuxEffectSendLevel},
+        {"attachAuxEffect",     "(I)V",                             (void *)luxuan_media_FFmpegMediaPlayer_attachAuxEffect},
+        {"setNextMediaPlayer", "(Lluxuan/media/FFmpegMediaPlayer;)V", (void *)luxuan_media_FFmpegMediaPlayer_setNextMediaPlayer},
+};
