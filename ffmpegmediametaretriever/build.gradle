@@ -1,6 +1,8 @@
 apply plugin: 'com.android.library'
 
 android {
+    android.packageBuildConfig = false
+
     compileSdkVersion 28
     buildToolsVersion "28.0.3"
 
