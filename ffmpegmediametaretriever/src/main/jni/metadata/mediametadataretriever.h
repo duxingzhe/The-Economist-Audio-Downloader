@@ -1,0 +1,8 @@
+//
+// Created by Administrator on 2019/6/1.
+//
+
+#ifndef NDK_MEDIAMETADATARETRIEVER_H
+#define NDK_MEDIAMETADATARETRIEVER_H
+
+#endif //NDK_MEDIAMETADATARETRIEVER_H
