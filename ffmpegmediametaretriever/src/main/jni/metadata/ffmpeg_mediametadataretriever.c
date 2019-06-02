@@ -141,3 +141,108 @@ int stream_component_open(State *s, int stream_index)
 
     return SUCCESS;
 }
+
+int set_data_source_l(State **ps, const char* path)
+{
+    printf("set_data_source\n");
+    int audio_index=-1;
+    int video_index=-1;
+    int i;
+
+    State *state=*ps;
+
+    printf("Path: %s\n", path);
+
+    AVDictionary *options=NULL;
+    av_dict_set(&options, "icy", "1", 0);
+    av_dict_set(&options, "user-agent", "FFmpegMediaMetadataRetriever", 0);
+
+    if(state->headers)
+    {
+        av_dict_set(&options, "headers", state->headers, 0);
+    }
+
+    if(state->offset>0)
+    {
+        state->pFormatCtx=avformat_alloc_context(void);
+        state->pFormatCtx->skip_initial_bytes=state->offset;
+    }
+
+    if(avformat_open_input(&state->pFormatCtx, path, NULL, &options)!=0)
+    {
+        printf("Metadata could not be retrieved\n");
+        *ps=NULL;
+        return FAILURE;
+    }
+
+    if(avformat_find_stream_info(state->pFormatCtx, NULL)<0)
+    {
+        printf("Metadata could not be retrieved\n");
+        *ps=NULL;
+        return FAILURE;
+    }
+
+    set_duration(state->pFormatCtx);
+
+    set_shoutcast_metadata(state->pFormatCtx);
+
+    for(i=0;i<state->pFormatCtx->nb_streams;i++)
+    {
+        if(state->pFormatCtx->streams[i]->codec->codec_type==AVMEDIA_TYPE_VIDEO && video_index<0)
+        {
+            video_index=i;
+        }
+
+        if(state->pFormatCtx->streams[i]->codec->codec_type==AVMEDIA_TYPE_AUDIO && video_index<0)
+        {
+            audio_index=i;
+        }
+
+        set_codec(state->pFormatCtx, i);
+    }
+
+    if(audio_index>=0)
+    {
+        stream_component_open(state, audio_index);
+    }
+
+    if(video_index>=0)
+    {
+        stream_component_open(state, video_index);
+    }
+
+    *ps=state;
+
+    return SUCCESS;
+}
+
+void init(State **ps)
+{
+    State *state=*ps;
+
+    if(state&&state->pFormatCtx)
+    {
+        avformat_close_input(&state->pFormatCtx);
+    }
+
+    if(state&&state->fd!=-1)
+    {
+        close(state->fd);
+    }
+
+    if(!state)
+    {
+        state=av_malloc(sizeof(State));
+    }
+
+    state->pFormatCtx=NULL;
+    state->audio_stream=-1;
+    state->video_stream=-1;
+    state->audio_st=NULL;
+    state->video_st=NULL;
+    state->fd=-1;
+    state->offset=0;
+    state->headers=NULL;
+
+    *ps=state;
+}
