@@ -164,7 +164,7 @@ int set_data_source_l(State **ps, const char* path)
 
     if(state->offset>0)
     {
-        state->pFormatCtx=avformat_alloc_context(void);
+        state->pFormatCtx=avformat_alloc_context();
         state->pFormatCtx->skip_initial_bytes=state->offset;
     }
 
