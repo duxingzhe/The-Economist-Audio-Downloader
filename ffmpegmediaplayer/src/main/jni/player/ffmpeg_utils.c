@@ -186,7 +186,7 @@ int get_metadata_internal(AVFormatContext *ic, AVDictionary **metadata)
     return SUCCESS;
 }
 
-const char* extract_metadata_from_chapter_internal(AVFormatContext *ic, AVStream *audio_st, AVStream video_st, const char* key, int chapter)
+const char* extract_metadata_from_chapter_internal(AVFormatContext *ic, AVStream *audio_st, AVStream *video_st, const char* key, int chapter)
 {
     char *value=NULL;
 

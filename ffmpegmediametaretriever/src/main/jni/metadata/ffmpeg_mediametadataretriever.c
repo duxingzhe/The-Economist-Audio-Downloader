@@ -246,3 +246,104 @@ void init(State **ps)
 
     *ps=state;
 }
+
+int set_data_source_uri(State **ps, const char* path, const char* headers)
+{
+    State *state=*ps;
+    ANativeWindow *native_window=NULL;
+
+    if(state&& state->native_window)
+    {
+        native_window=state->native_window;
+    }
+
+    init(&state);
+
+    state->native_window=native_window;
+    state->headers=headers;
+
+    *ps=state;
+
+    return set_data_source_l(ps, path);
+}
+
+int set_data_source_fd(State **ps, int fd, int64_t offset, int64_t length)
+{
+    char path[256]="";
+
+    State *state=*ps;
+
+    ANativeWindow *native_window=NULL;
+
+    if(state&&state->native_window)
+    {
+        native_window=state->native_window;
+    }
+
+    init(&state);
+
+    state->native_window=native_window;
+
+    int myfd=dup(fd);
+    char str[20];
+
+    sprintf(str, "pipe:%d", myfd);
+    strcat(path, str);
+
+    state->fd=myfd;
+    state->offset=offset;
+
+    *ps=state;
+
+    return set_data_source_l(ps, path);
+}
+
+const char* extract_metadata(State **ps, const char* key)
+{
+    printf("extract_metadata\n");
+    char* value=NULL;
+
+    State *state=*ps;
+
+    if(!state||!state->pFormatCtx)
+    {
+        return value;
+    }
+
+    return extract_metadata_internal(state->pFormatCtx, state->audio_st, state->video_st, key);
+}
+
+const char* extract_metadata_from_chapter(State **ps, const char *key, int chapter)
+{
+    printf("extract_metadata_from_chapter\n");
+    char* value=NULL;
+    State *state=*ps;
+
+    if(!state||!state->pFormatCtx||state->pFormatCtx->nb_chapters<=0)
+    {
+        return value;
+    }
+
+    if(chapter<0||chapter>=state->pFormatCtx->nb_chapters)
+    {
+        return value;
+    }
+
+    return extract_metadata_from_chapter_internal(state->pFormatCtx, state->audio_st, state->video_st, key, chapter);
+}
+
+int get_metadata(State **ps, AVDictionary **metadata)
+{
+    printf("et_metadata\n");
+
+    State *state= *ps;
+
+    if(!state||!state->pFormatCtx)
+    {
+        return FAILURE;
+    }
+
+    get_metadata_internal(state->pFormatCtx, metadata);
+
+    return SUCCESS;
+}
