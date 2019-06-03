@@ -348,7 +348,7 @@ int get_metadata(State **ps, AVDictionary **metadata)
     return SUCCESS;
 }
 
-int get_embeded_picture(State **ps, AVPacket *pkt)
+int get_embedded_picture(State **ps, AVPacket *pkt)
 {
     printf("get_embedded_picture\n");
     int i=0;
