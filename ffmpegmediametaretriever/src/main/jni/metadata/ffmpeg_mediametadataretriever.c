@@ -347,3 +347,95 @@ int get_metadata(State **ps, AVDictionary **metadata)
 
     return SUCCESS;
 }
+
+int get_embeded_picture(State **ps, AVPacket *pkt)
+{
+    printf("get_embedded_picture\n");
+    int i=0;
+    int got_packet=0;
+    AVFrame *frame=NULL;
+
+    State *state=*ps;
+
+    if(!state|| !state->pFormatCtx)
+    {
+        return FAILURE;
+    }
+
+    for(i=0;i<state->pFormatCtx->nb_streams;i++)
+    {
+        if(state->pFormatCtx->streams[i]->disposition& AV_DISPOSITION_ATTACHED_PIC)
+        {
+            printf("Found album art\n");
+            if(pkt)
+            {
+                av_packet_unref(pkt);
+                av_init_packet(pkt);
+            }
+            av_copy_packet(pkt, &state->pFormatCtx->streams[i]->attached_pic);
+
+            got_packet=1;
+
+            if(pkt->stream_index==state->video_stream)
+            {
+                int codec_id=state->video_st->codec->codec_id;
+                int pix_fmt=state->video_st->codec->pix_fmt;
+
+                if(!is_supported_format(codec_id, pix_fmt))
+                {
+                    int got_frame=0;
+
+                    frame=av_frame_alloc();
+
+                    if(!frame)
+                    {
+                        break;
+                    }
+
+                    if(avcodec_decode_video2(state->video_st->codec, frame, &got_frame, pkt)<=0)
+                    {
+                        break;
+                    }
+
+                    if(got_frame)
+                    {
+                        AVPacket convertedPkt;
+                        av_init_packet(&convertedPkt);
+                        convertedPkt.size=0;
+                        convertedPkt.data=NULL;
+
+                        convert_image(state, state->video_st->codec, frame, &convertedPkt, &got_packet, -1, -1);
+
+                        av_packet_unref(pkt);
+                        av_init_packet(pkt);
+                        av_copy_packet(pkt, &convertedPkt);
+
+                        av_packet_unref(&convertedPkt);
+
+                        break;
+                    }
+                }
+                else
+                {
+                    av_packet_unref(pkt);
+                    av_init_packet(pkt);
+                    av_copy_packet(pkt, &state->pFormatCtx->streams[i]->attached_pic);
+
+                    got_packet=1;
+                    break;
+                }
+            }
+        }
+    }
+
+    av_frame_free(&frame);
+
+    if(got_packet)
+    {
+        return SUCCESS;
+    }
+    else
+    {
+        FAILURE;
+    }
+}
