@@ -439,3 +439,93 @@ int get_embedded_picture(State **ps, AVPacket *pkt)
         FAILURE;
     }
 }
+
+int set_native_window(State **ps, ANativeWindow *native_window)
+{
+    printf("set_native_window\n");
+
+    State *state= *ps;
+
+    if(native_window==NULL)
+    {
+        return FAILURE;
+    }
+
+    if(!state)
+    {
+        init(&state);
+    }
+
+    state->native_window=native_window;
+
+    *ps=state;
+
+    return SUCCESS;
+}
+
+void release(State **ps)
+{
+    printf("release\n");
+
+    State *state=*ps;
+
+    if(state)
+    {
+        if(state->audio_st&&state->audio_st->codec)
+        {
+            avcodec_close(state->audio_st->codec);
+        }
+
+        if(state->video_st&&state->video_st->codec)
+        {
+            avcodec_close(state->video_st->codec);
+        }
+
+        if(state->pFormatCtx)
+        {
+            avformat_close_input(&state->pFormatCtx);
+        }
+
+        if(state->fd!=-1)
+        {
+            close(state->fd);
+        }
+
+        if(state->sws_ctx)
+        {
+            sws_freeContext(state->sws_ctx);
+            state->sws_ctx=NULL;
+        }
+
+        if(state->codecCtx)
+        {
+            avcodec_close(state->codecCtx);
+            av_free(state->codecCtx);
+        }
+
+        if(state->sws_ctx)
+        {
+            sws_freeContext(state->sws_ctx);
+        }
+
+        if(state->scaled_codecCtx)
+        {
+            avcodec_close(state->scaled_codecCtx);
+            av_free(state->scaled_codecCtx);
+        }
+
+        if(state->scaled_sws_ctx)
+        {
+            sws_freeContext(state->scaled_sws_ctx);
+        }
+
+        if(state->native_window!=NULL)
+        {
+            ANativeWindow_release(state->native_window);
+            state->native_window=NULL;
+        }
+
+        av_freep(&state);
+        ps=NULL;
+    }
+}
