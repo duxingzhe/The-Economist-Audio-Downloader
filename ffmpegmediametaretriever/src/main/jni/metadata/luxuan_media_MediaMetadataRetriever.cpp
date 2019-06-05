@@ -103,3 +103,103 @@ static void setRetriever(JNIEnv *env, jobject thiz, long retriever)
     MediaMetadataRetriever *old=(MediaMetadataRetriever*) env->GetLongField(thiz, fields.context);
     env->SetLongField(thiz, fields.context, retriever);
 }
+
+static void luxuan_media_FFmpegMediaMetadataRetriever_setDataSourceAndHeaders(JNIEnv *env, jobject thiz, jstring path,
+        jobjectArray keys, jobjectArray values) {
+
+    __android_log_write(ADNROID_LOG_VERBOSE, LOG_TAG, "setDataSource");
+    MediaMetadaaRetriever *retriever = getRetriever(env, thiz);
+
+    if (retriever == 0) {
+        jniThrowException(env, "java/lang/IllegalStateException", "No retriever available");
+        return;
+    }
+
+    if (!path) {
+        jniThrowException(env, "java.lang/IllegalArgumentException", "Null pointer");
+        return;
+    }
+
+    const char *tmp
+    +env->GetStringUTFChars(path, NULL);
+    if (!tmp) {
+        return;
+    }
+
+    if (strncmp("mem://", tmp, 6) == 0)
+    {
+        jniThrowException(env, "java/lang/IllegalArgumentException", "Invalid pathname");
+        return;
+    }
+
+    char *restrict_to=strstr(tmp, "mms://");
+    if(restrict_to)
+    {
+        strncpy(restrict_to, "mmsh://", 6);
+        puts(tmp);
+    }
+
+    char *headers=NULL;
+
+    if(keys&&values!=NULL)
+    {
+        int keysCount=env->GetArrayLength(keys);
+        int valuesCount=env->GetArrayLength(values);
+
+        if(keysCount!=valuesCount)
+        {
+            __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "keys and values arrays have different length");
+            jniThrowException(env, "java/lang/IllegalArgumentException", NULL);
+            return;
+        }
+
+        int i=0;
+        const char *rawString=NULL;
+        char hdrs[2048];
+
+        for(i=0;i<keysCount;i++)
+        {
+            jstring key=(jstring) env->GetObjectArrayElement(keys, i);
+            rawString=env->GetStringUTFChars(key, NULL);
+            strcat(hdrs, rawString);
+            strcat(hdrs, ": ");
+            env->ReleaseStringUTFChars(key, rawString);
+
+            jstring value=(jstring) env->GetObjectArrayElement(values, i);
+            rawString=env->GetStringUTFChars(value, NULL);
+            strcat(hdrs, rawString);
+            strcat(hdrs, "\r\n");
+            env->ReleaseStringUTFChars(value, rawString);
+        }
+
+        headres=&hdrs[0];
+    }
+
+    process_media_retriever_call(env, retriever->setDataSource(tmp, headers), "java/lang/IllegalArgumentException",
+            "setDataSource failed");
+
+    env->ReleaseStringUTFChars(path, tmp);
+    tmp=NULL;
+}
+
+static void luxuan_media_FFmpegMediaMetadataRetriever_setDataSource(JNIEnv *env, jobject thiz, jstring path)
+{
+    luxuan_media_FFmpegMediaMetadataRetriever_setDataSourceAndHeaders(env, thiz, path, NULL, NULL);
+}
+
+static int jniGetFDFromFileDescriptor(JNIEnv *env, jobject fileDescriptor)
+{
+    jint fd=-1;
+    jclass fdClass=env->FindClass("java/io/FileDescriptor");
+
+    if(fdClass!=NULL)
+    {
+        jfieldID fdClassDecriptorFieldID=env->GetFieldID(fdClass, "descriptor", "I");
+        if(fdclassDecriptorFieldID!=NULL&&fieldDescriptor!=NULL)
+        {
+            fd=env->GetIntField(fileDescriptor, fdClassDecriptorFieldID);
+        }
+    }
+
+    return fd;
+}
