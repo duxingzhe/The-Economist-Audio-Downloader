@@ -107,8 +107,8 @@ static void setRetriever(JNIEnv *env, jobject thiz, long retriever)
 static void luxuan_media_FFmpegMediaMetadataRetriever_setDataSourceAndHeaders(JNIEnv *env, jobject thiz, jstring path,
         jobjectArray keys, jobjectArray values) {
 
-    __android_log_write(ADNROID_LOG_VERBOSE, LOG_TAG, "setDataSource");
-    MediaMetadaaRetriever *retriever = getRetriever(env, thiz);
+    __android_log_write(ANDROID_LOG_VERBOSE, LOG_TAG, "setDataSource");
+    MediaMetadataRetriever *retriever = getRetriever(env, thiz);
 
     if (retriever == 0) {
         jniThrowException(env, "java/lang/IllegalStateException", "No retriever available");
@@ -172,7 +172,7 @@ static void luxuan_media_FFmpegMediaMetadataRetriever_setDataSourceAndHeaders(JN
             env->ReleaseStringUTFChars(value, rawString);
         }
 
-        headres=&hdrs[0];
+        headers=&hdrs[0];
     }
 
     process_media_retriever_call(env, retriever->setDataSource(tmp, headers), "java/lang/IllegalArgumentException",
@@ -235,9 +235,119 @@ static void luxuan_media_FFmpegMediaMetadataRetriever_setDataSourceFD(JNIEnv *en
             __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "invalid file descriptor");
         }
 
-        jniThrowExeption(env, "java/lang/IllegalArgumentException", NULL);
+        jniThrowException(env, "java/lang/IllegalArgumentException", NULL);
         return;
     }
 
-    process_media_retriever_call(env, retriever->setDataSource(fd, offset length), "java/lang/RuntimeException", "setDataSource failed");
+    process_media_retriever_call(env, retriever->setDataSource(fd, offset, length), "java/lang/RuntimeException", "setDataSource failed");
+}
+
+static jbyteArray luxuan_media_FFmpegMediaMetadataTime(JNIEnv *env, jobject thiz, jlong timeUs, jint option)
+{
+    MediaMetadataRetriever* retriever=getRetriever(env, thiz);
+
+    if(retriever==0)
+    {
+        jniThrowException(env, "java/lang/IllegalStateExcetion ", "No retriever available");
+        return NULL;
+    }
+
+    AVPacket packet;
+    av_init_packet(&packet);
+    jbyteArray array=NULL;
+
+    if(retriever->getFrameAtTime(timeUs, option, &packet)==0)
+    {
+        int size=packet.size;
+        uint8_t *data=packet.data;
+        array=env->NewByteArray(size);
+        if(!array)
+        {
+            __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "getFrameAtTime: OutOfMemoryError is thrown.");
+        }
+        else
+        {
+            jbyte* bytes=env->GetByteArrayElements(array, NULL);
+            if(bytes!=NULL)
+            {
+                memcpy(bytes,data,size);
+                env->ReleaseByteArrayElements(array, bytes, 0);
+            }
+        }
+    }
+
+    av_packet_unref(&packet);
+
+    return array;
+}
+
+static jbyteArray luxuan_media_FFmpegMediaMetadataRetriever_getScaledFrameAtTime(JNIEnv*env, jobject thiz, jlong timeUs, jint option, jint width, jint height) {
+    MediaMetadataRetriever *retriever = getRetriever(env, thiz);
+
+    if (retriever == 0)
+    {
+        jniThrowException(env, "java/lang/IllegalStateExcetion ", "No retriever available");
+        return NULL;
+    }
+
+    AVPacket packet;
+    av_init_packet(&packet);
+    jbyteArray array = NULL;
+
+    if (retriever->getScaledFrameAtTime(timeUs, option, &packet, width, height) == 0) {
+        int size = packet.size;
+        uint8_t *data = packet.data;
+        array = env->NewByteArray(size);
+        if (!array) {
+            __android_log_print(ANDROID_LOG_ERROR, LOG_TAG,
+                                "getFrameAtTime: OutOfMemoryError is thrown.");
+        } else {
+            jbyte *bytes = env->GetByteArrayElements(array, NULL);
+            if (bytes != NULL) {
+                memcpy(bytes, data, size);
+                env->ReleaseByteArrayElements(array, bytes, 0);
+            }
+        }
+    }
+
+    av_packet_unref(&packet);
+
+    return array;
+}
+
+static jbyteArray luxuan_media_FFmpegMediaMetadataRetriever_getEmbeddedPicture(JNIEnv *env, jobject thiz)
+{
+    MediaMetadataRetriever* retriever = getRetriever(env, thiz);
+    if (retriever == 0) {
+        jniThrowException(env, "java/lang/IllegalStateException", "No retriever available");
+        return NULL;
+    }
+
+    AVPacket packet;
+    av_init_packet(&packet);
+    jbyteArray array=NULL;
+
+    if(retriever->extractAlbumArt(&packet)==0)
+    {
+        int size=packet.size;
+        uint8_t* data=packet.data;
+        array=env->NewByteArray(size);
+        if(!array)
+        {
+
+        }
+        else
+        {
+            jbyte* bytes=env->GetByteArrayElements(array, NULL);
+            if(bytes!=NULL)
+            {
+                memcpy(bytes, data, size);
+                env->ReleaseByteArrayElements(array, bytes, 0);
+            }
+        }
+    }
+
+    av_packet_unref(&packet);
+
+    return array;
 }
