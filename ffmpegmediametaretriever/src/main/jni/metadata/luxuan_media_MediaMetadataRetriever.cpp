@@ -31,7 +31,7 @@ static JavaVM *m_vm;
 
 static ANativeWindow* theNativeWindow;
 
-static jstring NewSTringUTF(JNIEnv *env, const char* data)
+static jstring NewStringUTF(JNIEnv *env, const char* data)
 {
     jstring str=NULL;
 
@@ -317,7 +317,7 @@ static jbyteArray luxuan_media_FFmpegMediaMetadataRetriever_getScaledFrameAtTime
 
 static jbyteArray luxuan_media_FFmpegMediaMetadataRetriever_getEmbeddedPicture(JNIEnv *env, jobject thiz)
 {
-    MediaMetadataRetriever* retriever = getRetriever(env, thiz);
+    MediaMetadataRetriever *retriever = getRetriever(env, thiz);
     if (retriever == 0) {
         jniThrowException(env, "java/lang/IllegalStateException", "No retriever available");
         return NULL;
@@ -325,21 +325,21 @@ static jbyteArray luxuan_media_FFmpegMediaMetadataRetriever_getEmbeddedPicture(J
 
     AVPacket packet;
     av_init_packet(&packet);
-    jbyteArray array=NULL;
+    jbyteArray array = NULL;
 
-    if(retriever->extractAlbumArt(&packet)==0)
+    if (retriever->extractAlbumArt(&packet) == 0)
     {
-        int size=packet.size;
-        uint8_t* data=packet.data;
-        array=env->NewByteArray(size);
-        if(!array)
+        int size = packet.size;
+        uint8_t *data = packet.data;
+        array = env->NewByteArray(size);
+        if (!array)
         {
 
         }
         else
         {
-            jbyte* bytes=env->GetByteArrayElements(array, NULL);
-            if(bytes!=NULL)
+            jbyte *bytes = env->GetByteArrayElements(array, NULL);
+            if (bytes != NULL)
             {
                 memcpy(bytes, data, size);
                 env->ReleaseByteArrayElements(array, bytes, 0);
@@ -350,4 +350,106 @@ static jbyteArray luxuan_media_FFmpegMediaMetadataRetriever_getEmbeddedPicture(J
     av_packet_unref(&packet);
 
     return array;
+}
+
+static jobject luxuan_media_FFmpegMediaMetadataRetriever_extractMetadata(JNIEnv *env, jobject thiz, jstring jkey)
+{
+    MediaMetadataRetriever* retriever = getRetriever(env, thiz);
+    if (retriever == 0)
+    {
+        jniThrowException(env, "java/lang/IllegalStateException", "No retriever available");
+        return NULL;
+    }
+
+    if(!jkey)
+    {
+        jniThrowException(env, "java/lang/IllegalArgumentException", "Null pointer)");
+        return NULL;
+    }
+
+    const char *key=env->GetStringUTFChars(jkey, NULL);
+    if(!key)
+    {
+        return NULL;
+    }
+
+    const char* value=retriever->extractMetadata(key);
+    if(!value)
+    {
+        return NULL;
+    }
+
+    env->ReleaseStringUTFChars(jkey, key);
+    return NewStringUTF(env, value);
+}
+
+static jobject luxuan_media_FFmpegMediaMetadataRetriever_extractMetadataFromChapter(JNIEnv *env, jobject thiz, jstring jkey, jint chapter)
+{
+    MediaMetadataRetriever* retriever = getRetriever(env, thiz);
+    if (retriever == 0)
+    {
+        jniThrowException(env, "java/lang/IllegalStateException", "No retriever available");
+        return NULL;
+    }
+
+    const char *key=env->GetStringUTFChars(jkey, NULL);
+    if(!key)
+    {
+        return NULL;
+    }
+
+    if(chapter<0)
+    {
+        return NULL;
+    }
+
+    const char* value=retriever->extractMetadataFromChapter(key, chapter);
+    if(!value)
+    {
+        return NULL;
+    }
+
+    env->ReleaseStringUTFChars(jkey, key);
+    return env->NewStringUTF(value);
+}
+
+static jobject luxuan_media_FFmpegMediaMetadataRetriever_getMetadata(JNIEnv *env, jobject thiz, jboolean update_only, jboolean apply_filter, jobject reply)
+{
+    MediaMetadataRetriever* retriever = getRetriever(env, thiz);
+    if (retriever == 0) {
+        jniThrowException(env, "java/lang/IllegalStateException", "No retriever available");
+        return JNI_FALSE;
+    }
+
+    AVDictionary *metadata=NULL;
+
+    if(retriever->getMetadata(update_only, apply_filter, &metadata)==0)
+    {
+        jclass hashMap_Clazz=env->FindClass("java/util/HashMap");
+        jmethodID gHashMap_initMethodID=env->GetMethodID(hashMap_Clazz, "<init>", "()V");
+        jobject map=env->NewObject(hashMap_Clazz, gHashMap_initMethodID);
+        jmethodID gHashMap_putMethodID=env->GetMethodID(hashMap_Clazz, "put", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
+
+        int i=0;
+
+        for(i=0;i<metadata->count;i++)
+        {
+            jstring jKey=NewStringUTF(env, metadata->elems[i].key);
+            jstring jValue=NewStringUTF(env, metadata->elems[i].value);
+            (jobject)env->CallObjectMethod(map, gHashMap_putMethodID, jKey, jValue);
+            env->DeleteLocalRef(jKey);
+            env->DeleteLocalRef(jValue);
+        }
+
+        if(metadata)
+        {
+            av_dict_free(&metadata);
+        }
+
+        return map;
+    }
+    else
+    {
+        return reply;
+    }
 }
