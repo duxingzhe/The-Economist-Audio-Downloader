@@ -120,7 +120,7 @@ static void luxuan_media_FFmpegMediaMetadataRetriever_setDataSourceAndHeaders(JN
         return;
     }
 
-    const char *tmp
+    const char *tmp;
     +env->GetStringUTFChars(path, NULL);
     if (!tmp) {
         return;
@@ -132,7 +132,7 @@ static void luxuan_media_FFmpegMediaMetadataRetriever_setDataSourceAndHeaders(JN
         return;
     }
 
-    char *restrict_to=strstr(tmp, "mms://");
+    char *restrict_to=(char *)strstr(tmp, "mms://");
     if(restrict_to)
     {
         strncpy(restrict_to, "mmsh://", 6);
@@ -242,13 +242,13 @@ static void luxuan_media_FFmpegMediaMetadataRetriever_setDataSourceFD(JNIEnv *en
     process_media_retriever_call(env, retriever->setDataSource(fd, offset, length), "java/lang/RuntimeException", "setDataSource failed");
 }
 
-static jbyteArray luxuan_media_FFmpegMediaMetadataTime(JNIEnv *env, jobject thiz, jlong timeUs, jint option)
+static jbyteArray luxuan_media_FFmpegMediaMetadataRetriever_getFrameAtTime(JNIEnv *env, jobject thiz, jlong timeUs, jint option)
 {
     MediaMetadataRetriever* retriever=getRetriever(env, thiz);
 
     if(retriever==0)
     {
-        jniThrowException(env, "java/lang/IllegalStateExcetion ", "No retriever available");
+        jniThrowException(env, "java/lang/IllegalStateException ", "No retriever available");
         return NULL;
     }
 
@@ -453,3 +453,87 @@ static jobject luxuan_media_FFmpegMediaMetadataRetriever_getMetadata(JNIEnv *env
         return reply;
     }
 }
+
+static void luxuan_media_FFmpegMediaMetadataRetriever_release(JNIEnv *env, jobject thiz)
+{
+    __android_log_write(ANDROID_LOG_INFO, LOG_TAG, "release");
+    MediaMetadataRetriever* retriever=getRetriever(env, thiz);
+    delete retriever;
+    setRetriever(env, thiz, 0);
+}
+
+static void luxuan_media_FFmpegMediaMetadataRetriever_setSurface(JNIEnv *env, jclass thiz, jobject surface)
+{
+    MediaMetadataRetriever* retriever=getRetriever(env, thiz);
+    if (retriever == 0) {
+        jniThrowException(env, "java/lang/IllegalStateException", "No retriever available");
+        return;
+    }
+
+    theNativeWindow=ANativeWindow_fromSurface(env, surface);
+
+    if(theNativeWindow!=NULL)
+    {
+        retriever->setNativeWindow(theNativeWindow);
+    }
+}
+
+static void luxuan_media_FFmpegMediaMetadataRetriever_native_finalize(JNIEnv *env, jobject thiz)
+{
+    luxuan_media_FFmpegMediaMetadataRetriever_release(env, thiz);
+}
+
+static void luxuan_media_FFmpegMediaMetadataRetriever_native_init(JNIEnv *env, jobject thiz)
+{
+    __android_log_write(ANDROID_LOG_INFO, LOG_TAG, "naitve_init");
+    jclass clazz=env->FindClass(kClassPathName);
+    if(clazz==NULL)
+    {
+        return;
+    }
+
+    fields.context=env->GetFieldID(clazz, "mNativeContext", "J");
+    if(fields.context==NULL)
+    {
+        return;
+    }
+
+    av_register_all();
+    avformat_network_init();
+}
+
+static void luxuan_media_FFmpegMediaMetadataRetriever_native_setup(JNIEnv *env, jobject thiz)
+{
+    __android_log_write(ANDROID_LOG_INFO, LOG_TAG, "native_setup");
+    MediaMetadataRetriever* retriever=new MediaMetadataRetriever();
+    if(retriever==0)
+    {
+        jniThrowException(env, "java/lang/RuntimeException", "Out of memory");
+        return;
+    }
+    setRetriever(env, thiz, (long)retriever);
+}
+
+// JNI mapping between Java methods and native methods
+static JNINativeMethod nativeMethods[] = {
+        {"setDataSource", "(Ljava/lang/String;)V", (void *)luxuan_media_FFmpegMediaMetadataRetriever_setDataSource},
+
+        {
+         "_setDataSource",
+                          "(Ljava/lang/String;[Ljava/lang/String;[Ljava/lang/String;)V",
+                                                   (void *)luxuan_media_FFmpegMediaMetadataRetriever_setDataSourceAndHeaders
+        },
+
+        {"setDataSource", "(Ljava/io/FileDescriptor;JJ)V", (void *)luxuan_media_FFmpegMediaMetadataRetriever_setDataSourceFD},
+        {"_getFrameAtTime", "(JI)[B", (void *)luxuan_media_FFmpegMediaMetadataRetriever_getFrameAtTime},
+        {"_getScaledFrameAtTime", "(JIII)[B", (void *)luxuan_media_FFmpegMediaMetadataRetriever_getScaledFrameAtTime},
+        {"extractMetadata", "(Ljava/lang/String;)Ljava/lang/String;", (void *)luxuan_media_FFmpegMediaMetadataRetriever_extractMetadata},
+        {"extractMetadataFromChapter", "(Ljava/lang/String;I)Ljava/lang/String;", (void *)luxuan_media_FFmpegMediaMetadataRetriever_extractMetadataFromChapter},
+        {"native_getMetadata", "(ZZLjava/util/HashMap;)Ljava/util/HashMap;", (void *)luxuan_media_FFmpegMediaMetadataRetriever_getMetadata},
+        {"getEmbeddedPicture", "()[B", (void *)luxuan_media_FFmpegMediaMetadataRetriever_getEmbeddedPicture},
+        {"release", "()V", (void *)luxuan_media_FFmpegMediaMetadataRetriever_release},
+        {"setSurface", "(Ljava/lang/Object;)V", (void *)luxuan_media_FFmpegMediaMetadataRetriever_setSurface},
+        {"native_finalize", "()V", (void *)luxuan_media_FFmpegMediaMetadataRetriever_native_finalize},
+        {"native_setup", "()V", (void *)luxuan_media_FFmpegMediaMetadataRetriever_native_setup},
+        {"native_init", "()V", (void *)luxuan_media_FFmpegMediaMetadataRetriever_native_init},
+};
