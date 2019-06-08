@@ -537,3 +537,37 @@ static JNINativeMethod nativeMethods[] = {
         {"native_setup", "()V", (void *)luxuan_media_FFmpegMediaMetadataRetriever_native_setup},
         {"native_init", "()V", (void *)luxuan_media_FFmpegMediaMetadataRetriever_native_init},
 };
+
+int register_wseeman_media_FFmpegMediaMetadataRetriever(JNIEnv *env)
+{
+    int numMethods=(sizeof(nativeMethods)/sizeof((nativeMethods)[0]));
+    jclass clazz=env->FindClass("luxuan/media/FFmpegMediaMetadataRetriever");
+    jint ret=env->RegisterNatives(clazz, nativeMethods, numMethods);
+    env->DeleteLocalRef(clazz);
+    return ret;
+}
+
+jint JNI_OnLoad(JavaVM* vm, void* reserved)
+{
+    m_vm=vm;
+    JNIEnv* env=NULL;
+    jint result=-1;
+
+    if(vm->GetEnv((void**)&env, JNI_VERSION_1_6)!=JNI_OK)
+    {
+        __android_log_print(ANDROID_LOG_ERROR,LOG_TAG, "ERROR: GetEnv failed\n");
+        goto OnLoadFailed;
+    }
+    assert(env!=NULL);
+
+    if(register_wseeman_media_FFmpegMediaMetadataRetriever(env)<0)
+    {
+        __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "ERROR: FFmpegMediaMetadataRetriever native registration failed\n");
+        goto OnLoadFailed;
+    }
+
+    result=JNI_VERSION_1_6;
+
+OnLoadFailed:
+    return result;
+}
