@@ -138,27 +138,114 @@ public class FFmpegMediaMetadataRetriever {
 
     private static native void native_init();
 
-    /**
-     * Check a parcel containing metadata is well formed. The header
-     * is checked as well as the individual records format. However, the
-     * data inside the record is not checked because we do lazy access
-     * (we check/unmarshall only data the user asks for.)
-     *
-     * Format of a metadata parcel:
-     <pre>
-     1                   2                   3
-     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-     |                     metadata total size                       |
-     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-     |     'M'       |     'E'       |     'T'       |     'A'       |
-     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-     |                                                               |
-     |                .... metadata records ....                     |
-     |                                                               |
-     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-     </pre>
-     *
-     * {@hide}
-     */
+    public class Metadata {
+
+        /**
+         * {@hide}
+         */
+        public static final int STRING_VAL=1;
+
+        /**
+         * {@hide}
+         */
+        public static final int INTEGER_VAL=2;
+
+        /**
+         * {@hide}
+         */
+        public static final int BOOLEAN_VAL=3;
+
+        /**
+         * {@hide}
+         */
+        public static final int LONG_VAL=4;
+
+        /**
+         * {@hide}
+         */
+        public static final int DOUBLE_VAL=5;
+
+        /**
+         * {@hide}
+         */
+        public static final int DATE_VAL=6;
+
+        /**
+         * {@hide}
+         */
+        public static final int BYTE_ARRAY_VAL=7;
+
+        private HashMap<String, String> mParcel;
+        /**
+         * Check a parcel containing metadata is well formed. The header
+         * is checked as well as the individual records format. However, the
+         * data inside the record is not checked because we do lazy access
+         * (we check/unmarshall only data the user asks for.)
+         *
+         * Format of a metadata parcel:
+         <pre>
+         1                   2                   3
+         0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+         +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+         |                     metadata total size                       |
+         +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+         |     'M'       |     'E'       |     'T'       |     'A'       |
+         +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+         |                                                               |
+         |                .... metadata records ....                     |
+         |                                                               |
+         +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+         </pre>
+         *
+         * {@hide}
+         */
+        public boolean parse(HashMap<String, String> metadata){
+            if(metadata==null){
+                return false;
+            }else{
+                mParcel=metadata;
+                return true;
+            }
+        }
+
+        public boolean has(final String metadataId){
+            if(!checkMetadataId(metadataId)){
+                throw new IllegalArgumentException("Invalid key: "+ metadataId);
+            }
+            return mParcel.containsKey(metadataId);
+        }
+
+        public HashMap<String, String> getAll(){
+            return mParcel;
+        }
+
+        /**
+         * {@hide}
+         */
+        public String getString(final String key){
+            checkType(key, STRING_VAL);
+            return String.valueOf(mParcel.get(key));
+        }
+
+        /**
+         * {@hide}
+         */
+        public int getInt(final String key){
+            checkType(key, INTEGER_VAL);
+            return Integer.valueOf(mParcel.get(key));
+        }
+
+        private boolean checkMetadataId(String val){
+            return true;
+        }
+
+        private void checkType(final String key, final int expectedType){
+            String type=mParcel.get(key);
+
+            if(type==null){
+                throw new IllegalStateException("Wrong type "+ expectedType + " but got "+ type);
+            }
+        }
+    }
+
 }
