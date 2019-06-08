@@ -440,6 +440,239 @@ int get_embedded_picture(State **ps, AVPacket *pkt)
     }
 }
 
+void convert_image(State *state, AVCodecContext *pCodecCtx, AVFrame *pFrame, AVPacket *avpkt, int *got_packet_ptr, int width, int height)
+{
+    AVCodecContext *codecCtx;
+    struct SwsContext *scalerCtx;
+    AVFrame *frame;
+
+    *got_packet_ptr=0;
+
+    if(width!=-1&&height!=-1)
+    {
+        if(state->scaled_codecCtx==NULL || state->scaled_sws_ctx==NULL)
+        {
+            get_scaled_context(state, pCodecCtx, width, height);
+        }
+
+        codecCtx=state->scaled_codecCtx;
+        scalerCtx=state->scaled_sws_ctx;
+    }
+    else
+    {
+        codecCtx=state->codecCtx;
+        scalerCtx=state->sws_ctx;
+    }
+
+    if(width==-1)
+    {
+        width=pCodecCtx->width;
+    }
+
+    if(height==-1)
+    {
+        height=pCodecCtx->height;
+    }
+
+    frame=av_frame_alloc();
+
+    int numBytes=avpicture_get_size(TARGET_IMAGE_FORMAT, codecCtx->width, codecCtx->height);
+    void* buffer=(uint8_t *)av_malloc(numBytes*sizeof(uint8_t));
+
+    frame->format=TARGET_IMAGE_FORMAT;
+    frame->width=codecCtx->width;
+    frame->height=codecCtx->height;
+
+    avpicture_fill(((AVPicture *)frame), buffer, TARGET_IMAGE_FORMAT, codecCtx->width, codecCtx->height);
+
+    sws_scale(scalerCtx, (const uint8_t* const *)pFrame->data, pFrame->linesize, 0, pFrame->height, frame->data,
+            frame->linesize);
+
+    int ret=avcodec_encode_video2(codecCtx, avpkt, frame, got_packet_ptr);
+
+    if(ret>=0&& state->native_window)
+    {
+        ANativeWindow_setBuffersGeometry(state->native_window, width, height, WINDOW_FORMAT_RGBA_8888);
+
+        ANativeWindow_Buffer windowBuffer;
+
+        if(ANativeWindow_lock(state->native_window, &windowBuffer, NULL)==0)
+        {
+            int h=0;
+
+            for(h=0;h<height;h++)
+            {
+                memcpy(windowBuffer.bits+h*windowBuffer.stride*4, buffer+h*frame->linesize[0], width*4);
+            }
+
+            ANativeWindow_unlockAndPost(state->native_window);
+        }
+    }
+
+    if(ret<0)
+    {
+        *got_packet_ptr=0;
+    }
+
+    av_frame_free(&frame);
+
+    if(buffer)
+    {
+        free(buffer);
+    }
+
+    if(ret<0||!*got_packet_ptr)
+    {
+        av_packet_unref(avpkt);
+    }
+}
+
+void decode_frame(State *state, AVPacket *pkt, int *got_frame, int64_t desired_frame_number, int width, int height)
+{
+    AVFrame *frame=av_frame_alloc();
+
+    *got_frame=0;
+
+    if(!frame)
+    {
+        return;
+    }
+
+    while(av_read_frame(state->pFormatCtx, pkt)>=0)
+    {
+        if(pkt->stream_index==state->video_stream)
+        {
+            int codec_id=state->video_st->codec->codec_id;
+            int pix_fmt=state->video_st->codec->pix_fmt;
+
+            if(!is_supported_format(codec_id, pix_fmt))
+            {
+                *got_frame=0;
+
+                if(avcodec_decode_video2(state->video_st->codec, frame, got_frame, pkt)<=0)
+                {
+                    *got_frame=0;
+                    break;
+                }
+
+                if(*got_frame)
+                {
+                    if(desired_frame_number==-1|| (desired_frame_number!=-1&&frame->pkt_pts>=desired_frame_number))
+                    {
+                        if(pkt->data)
+                        {
+                            av_packet_unref(pkt);
+                        }
+                        av_init_packet(pkt);
+                        convert_image(state, state->video_st->codec, frame, pkt, got_frame, width, height);
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                *got_frame=1;
+                break;
+            }
+        }
+    }
+
+    av_frame_free(&frame);
+}
+
+int get_frame_at_time(State **ps, int64_t timeUs, int option, AVPacket *pkt)
+{
+    return get_scaled_frame_at_time(ps, timeUs, option, pkt, -1, -1);
+}
+
+int get_scaled_frame_at_time(State **ps, int64_t timeUs, int option, AVPacket *pkt, int width, int height)
+{
+    printf("get_frame_at_time\n");
+    int got_packet=0;
+    int64_t desired_frame_number=-1;
+
+    State *state=*ps;
+    Options opt=option;
+
+    if(!state||!state->pFormatCtx||state->video_stream<0)
+    {
+        return FAILURE;
+    }
+
+    if(timeUs>-1)
+    {
+        int stream_index=state->video_stream;
+        int64_t seek_time=av_rescale_q(timeUs, AV_TIME_BASE_Q, state->pFormatCtx->streams[stream_index]->time_base);
+        int64_t seek_stream_duration=state->pFormatCtx->streams[stream_index]->duration;
+
+        int flags=0;
+        int ret=-1;
+
+        if(seek_stream_duration>0&&seek_time>seek_stream_duration)
+        {
+            seek_time=seek_stream_duration;
+        }
+
+        if(seek_time<0)
+        {
+            return FAILURE;
+        }
+
+        if(opt==OPTION_CLOSET)
+        {
+            desired_frame_number=seek_time;
+            flags=AVSEEK_FLAG_BACKWARD;
+        }
+        else if(opt==OPTION_CLOSET_SYNC)
+        {
+            flags=0;
+        }
+        else if(opt==OPTION_NEXT_SYNC)
+        {
+            flags=0;
+        }
+        else if(opt==OPTION_PREVIOUS_SYNC)
+        {
+            flags=AVSEEK_FLAG_BACKWARD;
+        }
+
+        ret=av_seek_frame(state->pFormatCtx, stream_index, seek_time, flags);
+
+        if(ret<0)
+        {
+            return FAILURE;
+        }
+        else
+        {
+            if(state->audio_stream>=0)
+            {
+                avcodec_flush_buffers(state->audio_st->codec);
+            }
+
+            if(state->video_stream>=0)
+            {
+                avcodec_flush_buffers(state->video_st->codec);
+            }
+        }
+    }
+
+    decode_frame(state, pkt, &got_packet, desired_frame_number, width, height);
+
+    if(got_packet)
+    {
+
+    }
+
+    if(got_packet)
+    {
+        return SUCCESS;
+    }
+    else
+    {
+        return FAILURE;
+    }
+}
+
 int set_native_window(State **ps, ANativeWindow *native_window)
 {
     printf("set_native_window\n");

@@ -17,7 +17,7 @@ typedef enum
     OPTION_NEXT_SYNC=1,
     OPTION_CLOSET_SYNC=2,
     OPTION_CLOSET=3,
-} Optios;
+} Options;
 
 typedef struct State
 {
