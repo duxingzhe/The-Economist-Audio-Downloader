@@ -16,6 +16,7 @@ public class FFmpegMediaMetadataRetriever {
             "avformart-58",
             "postproc-55",
             "ssl",
+            "crypto",
             "ffmpeg_mediametadataretriever_jni"
     };
 
