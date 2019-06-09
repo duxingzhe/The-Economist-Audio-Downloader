@@ -137,6 +137,8 @@ public class FFmpegMediaMetadataRetriever {
 
     private native final HashMap<String, String> native_getMetadata(boolean update_only, boolean apply_filter, HashMap<String, String> reply);
 
+    private native byte[] _getFrameAtTime(long timeUs, int option);
+
     public Bitmap getFrameAtTime(long timeUs, int option){
         if(option<OPTION_PREVIOUS_SYNC || option>OPTION_CLOSEST){
             throw new IllegalArgumentException("unsupported option: "+ option);
@@ -173,11 +175,48 @@ public class FFmpegMediaMetadataRetriever {
         return b;
     }
 
-    public Bitmap getFrameAt(){
+    public Bitmap getFrameAtTime(){
         return getFrameAtTime(-1, OPTION_CLOSEST_SYNC);
     }
 
-    private native byte[] _getFrameAtTime(long timeUs, int option);
+    public Bitmap getScaledFrameAtTime(long timeUs, int option, int width, int height){
+        if(option<OPTION_PREVIOUS_SYNC || option>OPTION_CLOSEST){
+            throw new IllegalArgumentException("Unsupported option: "+ option);
+        }
+
+        Bitmap b=null;
+
+        BitmapFactory.Options bitmapOptionsCache=new BitmapFactory.Options();
+
+        bitmapOptionsCache.inDither=false;
+
+        byte[] picture=_getScaledFrameAtTime(timeUs, option, widht, height);
+
+        if(picture!=null){
+            b=BitmapFactory.decodeByteArray(picture, 0, picture.length, bitmapOptionsCache);
+        }
+
+        return b;
+    }
+
+    public Bitmap getScaledFrameAtTime(long timeUs, int width, int height){
+        Bitmap b=null;
+
+        BitmapFactory.Options bitmapOptionsCache=new BitmapFactory.Options();
+
+        bitmapOptionsCache.inDither=false;
+
+        byte[] picture=_getScaledFrameAtTime(timeUs, OPTION_CLOSEST_SYNC, width, height);
+
+        if(picture!=null){
+            b=BitmapFactory.decodeByteArray(picture, 0, picture.length, bitmapOptionsCache);
+        }
+
+        return b;
+    }
+
+    private native byte[] _getScaledFrameAtTime(long timeUs, int option, int widht, int height);
+    public native byte[] getEmbededPicture();
 
     public native void release();
     private native void native_setup();
@@ -204,6 +243,33 @@ public class FFmpegMediaMetadataRetriever {
 
     public static final int OPTION_CLOSEST= 0x03;
 
+    public static final String METADATA_KEY_ALBUM="album";
+
+    public static final String METADATA_KEY_ALBUM_ARTIST="album_artist";
+
+    public static final String METADATA_KEY_COMMENT="comment";
+
+    public static final String METADATA_KEY_COMPOSER="composer";
+
+    public static final String METADATA_KEY_COPYRIGHT="copyright";
+
+    public static final String METADATA_KEY_CREATION_TIME="creation_time";
+
+    public static final String METADATA_KEY_DATE="date";
+
+    public static final String METADATA_KEY_DISC="disc";
+
+    public static final String METADATA_KEY_ENCODER="encoder";
+
+    public static final String METADATA_KEY_ENCODED_BY="encoded_by";
+
+    public static final String METADATA_KEY_FILENAME="failename";
+
+    public static final String METADATA_KEY_GENRE="genre";
+
+    public static final String METADATA_KEY_LANGUAGE="language";
+
+    public static final String METADATA_KEY_PERFORMER="performer";
 
     public class Metadata {
 
