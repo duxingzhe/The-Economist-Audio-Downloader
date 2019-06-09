@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 
 import java.io.FileDescriptor;
@@ -68,44 +69,44 @@ public class FFmpegMediaMetadataRetriever {
     }
 
     public void setDataSource(Context context, Uri uri) throws IllegalArgumentException, SecurityException {
-        if(uri==null){
+        if (uri == null) {
             throw new IllegalArgumentException();
         }
 
-        String scheme=uri.getScheme();
-        if(scheme==null||scheme.equals("file")){
+        String scheme = uri.getScheme();
+        if (scheme == null || scheme.equals("file")) {
             setDataSource(uri.getPath());
             return;
         }
 
-        AssetFileDescriptor fd=null;
-        try{
-            ContentResolver resolver=context.getContentResolver();
-            try{
-                fd=resolver.openAssetFileDescriptor(uri, "r");
-            }catch(FileNotFoundException e) {
+        AssetFileDescriptor fd = null;
+        try {
+            ContentResolver resolver = context.getContentResolver();
+            try {
+                fd = resolver.openAssetFileDescriptor(uri, "r");
+            } catch (FileNotFoundException e) {
                 throw new IllegalArgumentException();
             }
 
-            FileDescriptor descriptor=fd.getFileDescriptor();
-            if(!descriptor.valid()){
+            FileDescriptor descriptor = fd.getFileDescriptor();
+            if (!descriptor.valid()) {
                 throw new IllegalArgumentException();
             }
 
-            if(fd.getDeclaredLength()<0){
+            if (fd.getDeclaredLength() < 0) {
                 setDataSource(descriptor);
-            }else{
+            } else {
                 setDataSource(descriptor, fd.getStartOffset(), fd.getDeclaredLength());
             }
             return;
-        }catch(SecurityException ex){
+        } catch (SecurityException ex) {
 
-        }finally{
-            try{
-                if(fd!=null) {
+        } finally {
+            try {
+                if (fd != null) {
                     fd.close();
                 }
-            }catch(IOException ioException){
+            } catch (IOException ioException) {
 
             }
         }
@@ -136,7 +137,73 @@ public class FFmpegMediaMetadataRetriever {
 
     private native final HashMap<String, String> native_getMetadata(boolean update_only, boolean apply_filter, HashMap<String, String> reply);
 
+    public Bitmap getFrameAtTime(long timeUs, int option){
+        if(option<OPTION_PREVIOUS_SYNC || option>OPTION_CLOSEST){
+            throw new IllegalArgumentException("unsupported option: "+ option);
+        }
+
+        Bitmap b=null;
+
+        BitmapFactory.Options bitmapOptionsCache=new BitmapFactory.Options();
+
+        bitmapOptionsCache.inDither=false;
+
+        byte[] picture=_getFrameAtTime(timeUs, option);
+
+        if(picture!=null){
+            b=BitmapFactory.decodeByteArray(picture, 0, picture.length, bitmapOptionsCache);
+        }
+
+        return b;
+    }
+
+    public Bitmap getFrameAtTime(long timeUs){
+        Bitmap b= null;
+
+        BitmapFactory.Options bitmapOptionsCache=new BitmapFactory.Options();
+
+        bitmapOptionsCache.inDither=false;
+
+        byte[] picture=_getFrameAtTime(timeUs, OPTION_CLOSEST_SYNC);
+
+        if(picture!=null){
+            b=BitmapFactory.decodeByteArray(picture, 0, picture.length, bitmapOptionsCache);
+        }
+
+        return b;
+    }
+
+    public Bitmap getFrameAt(){
+        return getFrameAtTime(-1, OPTION_CLOSEST_SYNC);
+    }
+
+    private native byte[] _getFrameAtTime(long timeUs, int option);
+
+    public native void release();
+    private native void native_setup();
     private static native void native_init();
+
+    private native final void native_finalize();
+
+    @Override
+    protected void finalize() throws Throwable{
+        try{
+            native_finalize();
+        }finally{
+            super.finalize();
+        }
+    }
+
+    public native void setSurface(Object surface);
+
+    public static final int OPTION_PREVIOUS_SYNC=0x00;
+
+    public static final int OPTION_NEXT_SYNC=0x01;
+
+    public static final int OPTION_CLOSEST_SYNC=0x02;
+
+    public static final int OPTION_CLOSEST= 0x03;
+
 
     public class Metadata {
 
