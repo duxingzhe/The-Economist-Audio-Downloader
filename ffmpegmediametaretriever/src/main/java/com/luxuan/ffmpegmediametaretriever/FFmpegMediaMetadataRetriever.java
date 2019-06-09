@@ -10,8 +10,11 @@ import android.net.Uri;
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 public class FFmpegMediaMetadataRetriever {
 
@@ -45,7 +48,7 @@ public class FFmpegMediaMetadataRetriever {
         native_setup();
     }
 
-    public native void setDataSource(String path)throws IllegalStateException;
+    public native void setDataSource(String path) throws IllegalStateException;
 
     public void setDataSource(String uri, Map<String, String> headers) throws IllegalArgumentException{
         int i=0;
@@ -190,7 +193,7 @@ public class FFmpegMediaMetadataRetriever {
 
         bitmapOptionsCache.inDither=false;
 
-        byte[] picture=_getScaledFrameAtTime(timeUs, option, widht, height);
+        byte[] picture=_getScaledFrameAtTime(timeUs, option, width, height);
 
         if(picture!=null){
             b=BitmapFactory.decodeByteArray(picture, 0, picture.length, bitmapOptionsCache);
@@ -215,7 +218,7 @@ public class FFmpegMediaMetadataRetriever {
         return b;
     }
 
-    private native byte[] _getScaledFrameAtTime(long timeUs, int option, int widht, int height);
+    private native byte[] _getScaledFrameAtTime(long timeUs, int option, int width, int height);
     public native byte[] getEmbededPicture();
 
     public native void release();
@@ -270,6 +273,42 @@ public class FFmpegMediaMetadataRetriever {
     public static final String METADATA_KEY_LANGUAGE="language";
 
     public static final String METADATA_KEY_PERFORMER="performer";
+
+    public static final String METADATA_KEY_PUBLISHER="publisher";
+
+    public static final String METADATA_KEY_SERVICE_NAME="service_name";
+
+    public static final String METADATA_KEY_SERVICE_PROVIDER="service_provider";
+
+    public static final String METADATA_KEY_TITLE="title";
+
+    public static final String METADATA_KEY_TRACK="track";
+
+    public static final String METADATA_KEY_VARIANT_BITRATE="bitrate";
+
+    public static final String METADATA_KEY_DURATION="duration";
+
+    public static final String METADATA_KEY_AUDIO_CODEC="audio_codec";
+
+    public static final String METADATA_KEY_VIDEO_CODEC="audio_codec";
+
+    public static final String METADATA_KEY_VIDEO_ROTATION="rotate";
+
+    public static final String METADATA_KEY_ICY_METADATA="icy_metadata";
+
+    public static final String METADATA_KEY_FRAMERATE="framerate";
+
+    public static final String METADATA_KEY_CHAPTER_START_TIME="chapter_start_time";
+
+    public static final String METADATA_KEY_CHAPTER_END_TIME="chapter_end_time";
+
+    public static final String METADATA_CHAPTER_COUNT="chapter_count";
+
+    public static final String METADATA_KEY_FILESIZE="filesize";
+
+    public static final String METADATA_KEY_VIDEO_WIDTH="video_width";
+
+    public static final String METADATA_KEY_VIDEO_HEIGHT="video_height";
 
     public class Metadata {
 
@@ -366,6 +405,57 @@ public class FFmpegMediaMetadataRetriever {
         public int getInt(final String key){
             checkType(key, INTEGER_VAL);
             return Integer.valueOf(mParcel.get(key));
+        }
+
+        /**
+         * {@hide}
+         */
+        public boolean getBoolean(final String key){
+            checkType(key, BOOLEAN_VAL);
+            return Integer.valueOf(mParcel.get(key))==1;
+        }
+
+        /**
+         * {@hide}
+         */
+        public long getLong(final String key){
+            checkType(key, LONG_VAL);
+            return Long.valueOf(mParcel.get(key));
+        }
+
+        /**
+         * {@hide}
+         */
+        public double getDouble(final String key){
+            checkType(key, DOUBLE_VAL);
+            return Double.valueOf(mParcel.get(key));
+        }
+
+        /**
+         * {@hide}
+         */
+        public byte[] getByteArray(final String key){
+            checkType(key, BYTE_ARRAY_VAL);
+            return mParcel.get(key).getBytes();
+        }
+
+        /**
+         * {@hide}
+         */
+        public Date getDate(final String key){
+            checkType(key, DATE_VAL);
+            final long timeSinceEpoch=Long.valueOf(mParcel.get(key));
+            final String timeZone=mParcel.get(key);
+
+            if(timeZone.length()==0){
+                return new Date(timeSinceEpoch);
+            }else{
+                TimeZone tz= TimeZone.getTimeZone(timeZone);
+                Calendar cal= Calendar.getInstance(tz);
+
+                cal.setTimeInMillis(timeSinceEpoch);
+                return cal.getTime();
+            }
         }
 
         private boolean checkMetadataId(String val){
