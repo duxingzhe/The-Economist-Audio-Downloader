@@ -42,6 +42,7 @@ public class FFmpegMediaPlayer {
             "avcodec-58",
             "avformart-58",
             "postproc-55",
+            "hidapi",
             "ssl",
             "crypto",
             "ffmpeg_mediaplayer_jni"

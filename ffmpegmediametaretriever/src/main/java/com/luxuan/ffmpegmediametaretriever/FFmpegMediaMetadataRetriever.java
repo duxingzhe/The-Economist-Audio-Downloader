@@ -190,7 +190,7 @@ public class FFmpegMediaMetadataRetriever {
 
         bitmapOptionsCache.inDither=false;
 
-        byte[] picture=_getScaledFrameAtTime(timeUs, option, widht, height);
+        byte[] picture=_getScaledFrameAtTime(timeUs, option, width, height);
 
         if(picture!=null){
             b=BitmapFactory.decodeByteArray(picture, 0, picture.length, bitmapOptionsCache);
