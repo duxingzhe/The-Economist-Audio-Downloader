@@ -188,7 +188,7 @@ public class MainActivity extends BaseMusicActivity {
             }
         }.start();
 
-        mAdapter=new FileAdapter(mContext, mFiles);
+        mAdapter=new FileAdapter(mContext, mFiles, getPlayBean());
         recyclerView=(RecyclerView)findViewById(R.id.recyclerview);
         bottomPlayStatusLayout=(LinearLayout)findViewById(R.id.ly_mini_player);
         deleteButton=(Button)findViewById(R.id.delete);
