@@ -407,9 +407,6 @@ public class FFmpegMediaMetadataRetriever {
             return Integer.valueOf(mParcel.get(key));
         }
 
-        /**
-         * {@hide}
-         */
         public boolean getBoolean(final String key){
             checkType(key, BOOLEAN_VAL);
             return Integer.valueOf(mParcel.get(key))==1;
