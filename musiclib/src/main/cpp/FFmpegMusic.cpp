@@ -90,7 +90,7 @@ int getPcm(void **pcm, size_t *pcm_size)
             LOGE("解码");
 
             swr_convert(swrContext, &out_buffer, 44100*2, (const uint8_t **)frame->data, frame->nb_samples);
-            int size=av_samples_get_buffer_size(NULL, out_channer_nb, frame->nb_samples, AV_SAMPLE_FMT_S16, 1);
+            int size=av_samples_get_buffer_size(NULL, out_channel_nb, frame->nb_samples, AV_SAMPLE_FMT_S16, 1);
 
             *pcm=out_buffer;
             *pcm_size=size;

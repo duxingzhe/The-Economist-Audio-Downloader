@@ -15,7 +15,7 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:gravity="center"
-            android:textColor="#FFFFF"
+            android:textColor="#FFFFFF"
             android:textSize="18sp"/>
 
         <View
