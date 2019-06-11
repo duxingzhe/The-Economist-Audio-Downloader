@@ -63,10 +63,9 @@
 
         <ImageView
             android:id="@+id/play_status"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
             android:background="@mipmap/play_status"
-            android:visibility="gone"
             />
     </LinearLayout>
 </LinearLayout>

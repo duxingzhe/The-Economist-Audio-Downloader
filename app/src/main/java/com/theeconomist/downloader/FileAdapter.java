@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.theeconomist.downloader.bean.Mp3FileBean;
+import com.theeconomist.downloader.bean.PlayBean;
 import com.theeconomist.downloader.utils.FileUtil;
 
 import java.util.List;
@@ -22,6 +23,7 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
     private View mRootView;
     private Context mContext;
     private List<Mp3FileBean> mDataList;
+    private PlayBean mPlayBean;
 
     private OnItemClickListener onItemClickListener;
     private OnItemLongClickListener onItemLongClickListener;
@@ -34,9 +36,10 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
         this.onItemLongClickListener = onItemLongClickListener;
     }
 
-    public FileAdapter (Context context, List<Mp3FileBean> mData){
+    public FileAdapter (Context context, List<Mp3FileBean> mData, PlayBean playBean){
         mContext=context;
         mDataList=mData;
+        mPlayBean=playBean;
     }
 
     @Override
@@ -53,6 +56,15 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
         viewHolder.mp3FileTitle.setText(mp3File.name);
         viewHolder.mp3FileDuration.setText(FileUtil.getLongTime(mp3File.duration));
         viewHolder.mp3FileSize.setText(FileUtil.getFileSize(mp3File.fileSize));
+
+        if(mPlayBean!=null){
+            if(mPlayBean.getIndex()==position){
+                viewHolder.mp3FilePlayStatus.setVisibility(View.VISIBLE);
+            }else{
+                viewHolder.mp3FilePlayStatus.setVisibility(View.GONE);
+            }
+        }
+
         if(onItemClickListener != null) {
             ((FileViewHolder) viewHolder).itemLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -76,6 +88,11 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder
     @Override
     public int getItemCount(){
         return mDataList.size();
+    }
+
+    public void setPlayBean(PlayBean playBean){
+        mPlayBean=playBean;
+        notifyDataSetChanged();
     }
 
     public class FileViewHolder extends RecyclerView.ViewHolder{

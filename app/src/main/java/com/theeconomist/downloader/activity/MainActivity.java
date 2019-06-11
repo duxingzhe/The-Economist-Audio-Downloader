@@ -237,6 +237,7 @@ public class MainActivity extends BaseMusicActivity {
                 getPlayBean().setIndex(mp3FileBean.index);
                 getPlayBean().setDuration((int)mp3FileBean.duration);
                 getPlayBean().setAblumName(mp3FileBean.albumName);
+                mAdapter.setPlayBean(getPlayBean());
                 startActivity(MainActivity.this, PlayerActivity.class);
             }
         });
@@ -539,6 +540,7 @@ public class MainActivity extends BaseMusicActivity {
 
     @Override
     public void playMusic(){
+        mAdapter.setPlayBean(getPlayBean());
         if(!TextUtils.isEmpty(getPlayBean().getUrl())) {
             if (!getPlayBean().getUrl().equals(playUrl)) {
                 setCdRadio(0f);
