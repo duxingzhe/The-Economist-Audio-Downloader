@@ -68,6 +68,16 @@
                 android:text="取消"
                 android:textColor="#FFFFFF"
                 android:textSize="15sp"/>
+            <TextView
+                android:id="@+id/ok"
+                android:visibility="gone"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="确认"
+                android:textColor="#FFFFF"
+                android:textSize="15sp"/>
         </LinearLayout>
     </LinearLayout>
 
