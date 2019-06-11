@@ -7,7 +7,7 @@ AVPacket *packet;
 AVFrame *frame;
 SwrContext *swrContext;
 uint8_t *out_buffer;
-int out_channer_nb;
+int out_channel_nb;
 int audio_stream_index=-1;
 
 int createFFmpeg(int *rate, int *channel)
@@ -71,7 +71,7 @@ int createFFmpeg(int *rate, int *channel)
             codecContext->channel_layout, codecContext->sample_fmt, codecContext->sample_rate, 0, NULL);
 
     swr_init(swrContext);
-    out_channer_nb=av_get_channel_layout_nb_channels(AV_CH_LAYOUT_STEREO);
+    out_channel_nb=av_get_channel_layout_nb_channels(AV_CH_LAYOUT_STEREO);
     *rate=codecContext->sample_rate;
     *channel=codecContext->channels;
     return 0;
