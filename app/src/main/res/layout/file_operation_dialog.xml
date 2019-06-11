@@ -15,7 +15,7 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:gravity="center"
-            android:textColor="#666666"
+            android:textColor="#FFFFF"
             android:textSize="18sp"/>
 
         <View
@@ -29,7 +29,7 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:paddingLeft="20dp"
-            android:textColor="#666666"
+            android:textColor="#FFFFFF"
             android:gravity="center"
             android:textSize="18sp"/>
 
@@ -66,17 +66,7 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="取消"
-                android:textColor="#666666"
-                android:textSize="15sp"/>
-            <TextView
-                android:id="@+id/ok"
-                android:visibility="gone"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="确认"
-                android:textColor="#fe6000"
+                android:textColor="#FFFFFF"
                 android:textSize="15sp"/>
         </LinearLayout>
     </LinearLayout>
