@@ -147,11 +147,7 @@ public class MainActivity extends BaseMusicActivity {
                     break;
                 case DISMISS_DOWNLOAD_DIALOG:
                     downloadDialog.dismiss();
-                    if(FileUtil.isNeededUnzip){
-                        handler.sendEmptyMessageDelayed(START_UNZIPPING_FILE,500);
-                    }else{
-                        handler.sendEmptyMessageDelayed(START_SCANNING_FILE, 500);
-                    }
+                    handler.sendEmptyMessageDelayed(START_UNZIPPING_FILE,500);
                     break;
                 case UPDATE_DELETE_PROGRESS:
                     deleteDialog.setText("已删除" + (msg.arg1 + 1) + "个文件，共" + totalNum + "个");

@@ -38,8 +38,6 @@ public class FileUtil {
 
     public static ArrayList<Mp3FileBean> fileList;
 
-    public static boolean isNeededUnzip=true;
-
     private static int BUFFER_SIZE=4096;
 
     public static void unZip(File srcFile, String destDirPath, Handler handler) {
