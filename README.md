@@ -10,23 +10,23 @@ The target users are CATTI, Unified National Graduate Entrance Examination in Ch
 
 ### Splash
 
-![Splash](./img/Screenshot_20190207-210759.png)
+<img src="./img/Screenshot_20190207-210759.png" width="200">
 
 ### Input
 
-![Input](./img/screenshot-1549538982399.jpg)
+<img src="./img/screenshot-1549538982399.jpg" width="200">
 
 ### Download
 
-![Download](./img/screenshot-1549539248491.jpg)
+<img src="./img/screenshot-1549539248491.jpg" width="200">
 
 ### Add Files
 
-![Add Files](./img/screenshot-1549541198033.jpg)
+<img src="./img/screenshot-1549541198033.jpg" width="200">
 
 ### Listening
 
-![Listening](./img/screenshot-1549541278642.jpg)
+<img src="./img/screenshot-1549541278642.jpg" width="200">
 
 
 #### 本项目自确认完成开发起，提供3年底层so文件更新的维护功能。
