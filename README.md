@@ -33,5 +33,4 @@ The target users are CATTI, Unified National Graduate Entrance Examination in Ch
 
 如果这个项目帮助到了你，或对你的技术开发有帮助，欢迎赏一份茶水钱。
 
-![](./qr/alipay_qr.jpg)
-![](./qr/weixin_qr.png)
+<img src="./qr/alipay_qr.jpg" width="300"> <img src="./qr/weixin_qr.png" width="300">
