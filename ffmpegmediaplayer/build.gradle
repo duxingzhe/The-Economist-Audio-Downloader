@@ -3,14 +3,13 @@ apply plugin: 'com.android.library'
 android {
 
     compileSdkVersion 29
-    buildToolsVersion "29.0.0"
 
     def mkfile = "NDK_APPLICATION_MK=Application.mk"
     def aarname = "all-fmp"
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
 
@@ -26,7 +25,7 @@ android {
 
     task buildNative(type: Exec, description: 'Compile JNI source via NDK') {
         def ndkDir = android.ndkDirectory
-        commandLine "$ndkDir/ndk-build.cmd",
+        commandLine "$ndkDir/ndk-build",
                 mkfile,
                 '-C', file('src/main/jni').absolutePath, // Change src/main/jni the relative path to your jni source
                 '-j', Runtime.runtime.availableProcessors(),
