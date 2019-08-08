@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.4.1)
 
 set(CURRENT_DIR ${CMAKE_SOURCE_DIR})
-set(distribution_DIR ${CURRENT_DIR}/../musiclib/libs)
+set(distribution_DIR ${CURRENT_DIR}/../commonlib/src/main/jni)
 
 add_library( native-lib
         SHARED
         src/main/cpp/native-lib.cpp
-        ../musiclib/src/main/cpp/FFmpegMusic.cpp
+        src/main/cpp/FFmpegMusic.cpp
         )
 add_library( ssl
         SHARED
