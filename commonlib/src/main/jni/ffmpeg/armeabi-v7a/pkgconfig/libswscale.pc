@@ -1,0 +1,14 @@
+prefix=/home/luxuan/Project/CompileFFmpegWithOpenSSLOnAndroid/src/../jni/ffmpeg/ffmpeg/armeabi-v7a
+exec_prefix=${prefix}
+libdir=/home/luxuan/Project/CompileFFmpegWithOpenSSLOnAndroid/libs/ffmpeg/binaries/armeabi-v7a
+includedir=/home/luxuan/Project/CompileFFmpegWithOpenSSLOnAndroid/libs/ffmpeg/include/armeabi-v7a
+
+Name: libswscale
+Description: FFmpeg image rescaling library
+Version: 5.5.100
+Requires: 
+Requires.private: libavutil >= 56.31.100
+Conflicts:
+Libs: -L${libdir}  -lswscale 
+Libs.private: -lm
+Cflags: -I${includedir}
