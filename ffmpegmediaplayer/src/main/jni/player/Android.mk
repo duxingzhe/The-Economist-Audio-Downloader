@@ -14,7 +14,7 @@ LOCAL_SRC_FILES := luxuan_media_MediaPlayer.cpp \
                audioplayer.c \
                videoplayer.c \
                ffmpeg_utils.c
-LOCAL_SHARED_LIBRARIES := SDL2 libswresample-3 libswscale-5 libavcodec-58 libavformat-58 libavutil-56 libavfilter-7 libssl libcrypto
+LOCAL_SHARED_LIBRARIES := SDL2 libswresample libswscale libavcodec libavformat libavutil libavfilter libssl libcrypto
 LOCAL_C_INCLUDES := $(LOCAL_LIB_FFMPEG_FILE_PATH_PREFIX)/include
 # for native audio
 LOCAL_LDLIBS += -lOpenSLES -lGLESv1_CM -lGLESv2

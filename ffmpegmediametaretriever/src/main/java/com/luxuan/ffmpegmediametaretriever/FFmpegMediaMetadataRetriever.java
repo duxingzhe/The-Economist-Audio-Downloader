@@ -23,12 +23,12 @@ public class FFmpegMediaMetadataRetriever {
     public static Bitmap.Config IN_PREFERRED_CONFIG;
 
     private static final String[] JNI_LIBRARIES={
-            "avutil-56",
-            "swscale-5",
-            "swresample-3",
-            "avcodec-58",
-            "avformart-58",
-            "postproc-55",
+            "avutil",
+            "swscale",
+            "swresample",
+            "avcodec",
+            "avformart",
+            "postproc",
             "ssl",
             "crypto",
             "ffmpeg_mediametadataretriever_jni"

@@ -36,12 +36,12 @@ public class FFmpegMediaPlayer {
 
     private static final String[] JNI_LIBRARIES={
             "SDL2",
-            "avutil-56",
-            "swscale-5",
-            "swresample-3",
-            "avcodec-58",
-            "avformart-58",
-            "postproc-55",
+            "avutil",
+            "swscale",
+            "swresample",
+            "avcodec",
+            "avformart",
+            "postproc",
             "hidapi",
             "ssl",
             "crypto",
