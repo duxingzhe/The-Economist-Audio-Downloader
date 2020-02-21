@@ -1,3 +1,0 @@
-/home/luxuan/Project/The-Economist-Audio-Downloader/musicapp/.cxx/cmake/release/arm64-v8a/CMakeFiles/rebuild_cache.dir
-/home/luxuan/Project/The-Economist-Audio-Downloader/musicapp/.cxx/cmake/release/arm64-v8a/CMakeFiles/edit_cache.dir
-/home/luxuan/Project/The-Economist-Audio-Downloader/musicapp/.cxx/cmake/release/arm64-v8a/CMakeFiles/native-lib.dir

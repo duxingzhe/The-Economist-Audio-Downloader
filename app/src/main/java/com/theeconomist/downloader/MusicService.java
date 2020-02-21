@@ -15,7 +15,6 @@ import com.ywl5320.wlmedia.enums.WlPlayModel;
 import com.ywl5320.wlmedia.listener.WlOnCompleteListener;
 import com.ywl5320.wlmedia.listener.WlOnErrorListener;
 import com.ywl5320.wlmedia.listener.WlOnLoadListener;
-import com.ywl5320.wlmedia.listener.WlOnPauseListener;
 import com.ywl5320.wlmedia.listener.WlOnPreparedListener;
 import com.ywl5320.wlmedia.listener.WlOnTimeInfoListener;
 
@@ -136,19 +135,6 @@ public class MusicService extends Service {
                 }
                 EventBus.getDefault().post(completeEventBean);
                 url = "";
-            }
-        });
-
-        wlMedia.setOnPauseListener(new WlOnPauseListener() {
-            @Override
-            public void onPause(boolean pause) {
-                if(pauseResumeEventBean == null) {
-                    pauseResumeEventBean = new EventBusBean(EventType.MUSIC_PAUSE_RESUME_RESULT, pause);
-                } else {
-                    pauseResumeEventBean.setType(EventType.MUSIC_PAUSE_RESUME_RESULT);
-                    pauseResumeEventBean.setObject(pause);
-                }
-                EventBus.getDefault().post(pauseResumeEventBean);
             }
         });
 
