@@ -31,7 +31,6 @@ public class MusicService extends Service {
     private EventBusBean errorEventBean;
     private EventBusBean loadEventBean;
     private EventBusBean completeEventBean;
-    private EventBusBean pauseResumeEventBean;
 
     public MusicService() {
 
