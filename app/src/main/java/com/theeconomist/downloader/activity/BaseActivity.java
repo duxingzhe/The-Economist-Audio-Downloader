@@ -6,14 +6,15 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.LayoutRes;
-import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.LayoutRes;
+import androidx.annotation.Nullable;
 
 import com.theeconomist.downloader.R;
 import com.theeconomist.downloader.utils.CommonUtil;

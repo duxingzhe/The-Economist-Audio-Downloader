@@ -1,15 +1,12 @@
 package com.theeconomist.downloader.activity;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.text.TextUtils;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
+
+import android.view.View;
+
+import androidx.annotation.Nullable;
+
 import com.theeconomist.downloader.R;
 import com.theeconomist.downloader.bean.EventBusBean;
 import com.theeconomist.downloader.bean.Mp3FileBean;
