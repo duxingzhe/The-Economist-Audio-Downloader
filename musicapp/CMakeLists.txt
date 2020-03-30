@@ -20,44 +20,44 @@ add_library( crypto
 set_target_properties( crypto
         PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/openssl/${ANDROID_ABI}/libcrypto.so)
-add_library( avcodec-58
+add_library( avcodec
         SHARED
         IMPORTED)
-set_target_properties( avcodec-58
+set_target_properties( avcodec
         PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/ffmpeg/${ANDROID_ABI}/libavcodec.so)
-add_library( avfilter-7
+add_library( avfilter
         SHARED
         IMPORTED)
-set_target_properties( avfilter-7
+set_target_properties( avfilter
         PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/ffmpeg/${ANDROID_ABI}/libavfilter.so)
 
-add_library( avformat-58
+add_library( avformat
         SHARED
         IMPORTED)
-set_target_properties( avformat-58
+set_target_properties( avformat
         PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/ffmpeg/${ANDROID_ABI}/libavformat.so)
 
-add_library( avutil-56
+add_library( avutil
         SHARED
         IMPORTED)
-set_target_properties( avutil-56
+set_target_properties( avutil
         PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/ffmpeg/${ANDROID_ABI}/libavutil.so)
 
-add_library( swresample-3
+add_library( swresample
         SHARED
         IMPORTED)
-set_target_properties( swresample-3
+set_target_properties( swresample
         PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/ffmpeg/${ANDROID_ABI}/libswresample.so)
 
-add_library( swscale-5
+add_library( swscale
         SHARED
         IMPORTED)
-set_target_properties( swscale-5
+set_target_properties( swscale
         PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/ffmpeg/${ANDROID_ABI}/libswscale.so)
 include_directories(../musiclib/src/main/cpp
@@ -66,15 +66,15 @@ include_directories(../musiclib/src/main/cpp
         src/main/cpp
         )
 target_link_libraries( native-lib
-                       avcodec
-                       avfilter
-                       avformat
-                       avutil
-                       swresample
-                       swscale
+                        avcodec
+                        avfilter
+                        avformat
+                        avutil
+                        swresample
+                        swscale
                         ssl
                         crypto
-                       log
-                       android
-                       OpenSLES
-                       )
+                        log
+                        android
+                        OpenSLES
+                        )

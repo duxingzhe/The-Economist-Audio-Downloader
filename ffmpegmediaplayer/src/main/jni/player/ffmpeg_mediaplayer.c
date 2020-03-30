@@ -286,7 +286,7 @@ int decode_frame_from_packet(VideoState *is, AVFrame decoded_frame)
         return -1;
     }
 
-    memcpy(is->audio_buf, dst_data[0], dst_buffsize);
+    memcpy(is->audio_buf, (const void *) dst_data[0], (size_t) dst_buffsize);
 
     if(src_data)
     {
