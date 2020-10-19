@@ -24,7 +24,7 @@
         </activity>
 
         <provider
-            android:name="android.support.v4.content.FileProvider"
+            android:name="androidx.core.content.FileProvider"
             android:authorities="com.theeconomist.downloader.fileprovider"
             android:grantUriPermissions="true"
             android:exported="false">

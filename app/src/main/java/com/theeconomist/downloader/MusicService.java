@@ -12,6 +12,7 @@ import com.theeconomist.downloader.bean.TimeBean;
 import com.theeconomist.downloader.log.MyLog;
 import com.theeconomist.downloader.utils.EventType;
 import com.ywl5320.wlmedia.WlMedia;
+import com.ywl5320.wlmedia.enums.WlComplete;
 import com.ywl5320.wlmedia.enums.WlPlayModel;
 import com.ywl5320.wlmedia.listener.WlOnCompleteListener;
 import com.ywl5320.wlmedia.listener.WlOnErrorListener;
@@ -77,7 +78,7 @@ public class MusicService extends Service {
 
         wlMedia.setOnTimeInfoListener(new WlOnTimeInfoListener() {
             @Override
-            public void onTimeInfo(double time) {
+            public void onTimeInfo(double time, double bufferTime) {
                 TimeBean timeBean=new TimeBean();
 
                 if(Math.floor(time)>duration){
@@ -126,7 +127,7 @@ public class MusicService extends Service {
 
         wlMedia.setOnCompleteListener(new WlOnCompleteListener() {
             @Override
-            public void onComplete() {
+            public void onComplete(WlComplete type) {
                 if(completeEventBean == null) {
                     completeEventBean = new EventBusBean(EventType.MUSIC_COMPLETE, true);
                 } else {
