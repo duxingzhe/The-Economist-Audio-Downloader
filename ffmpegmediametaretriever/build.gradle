@@ -3,9 +3,6 @@ apply plugin: 'com.android.library'
 android {
     compileSdkVersion 29
 
-    def mkfile = "NDK_APPLICATION_MK=Application.mk"
-    def aarname = "all-fmmr"
-
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 29
@@ -22,26 +19,14 @@ android {
         }
     }
 
-    task buildNative(type: Exec, description: 'Compile JNI source via NDK') {
-        def ndkDir = android.ndkDirectory
-        commandLine "$ndkDir/ndk-build",
-                mkfile,
-                '-C', file('src/main/jni').absolutePath, // Change src/main/jni the relative path to your jni source
-                '-j', Runtime.runtime.availableProcessors(),
-                'all',
-                'NDK_DEBUG=1'
-    }
-
-    tasks.withType(JavaCompile) {
-        compileTask -> compileTask.dependsOn buildNative
-    }
-
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    ndkVersion '21.3.6528147'
 
 }
 
