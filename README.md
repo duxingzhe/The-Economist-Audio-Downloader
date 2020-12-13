@@ -12,6 +12,8 @@ The target users are CATTI, Unified National Graduate Entrance Examination in Ch
 
 #### 本项目自确认完成开发起，提供3年底层so文件更新的维护功能。
 
+已完成3年开发，谢谢大家的关注。
+
 如果这个项目帮助到了你，或对你的技术开发有帮助，欢迎赏一份茶水钱。
 
 <img src="./qr/alipay_qr.jpg" width="300"> <img src="./qr/weixin_qr.png" width="300">
