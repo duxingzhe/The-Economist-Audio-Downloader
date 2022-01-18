@@ -1,0 +1,14 @@
+prefix=/home/luxuan/Project/CompileFFmpegWithOpenSSLOnAndroid/src/../jni/ffmpeg/ffmpeg/x86_64
+exec_prefix=${prefix}
+libdir=/home/luxuan/Project/CompileFFmpegWithOpenSSLOnAndroid/libs/ffmpeg/binaries/x86_64
+includedir=/home/luxuan/Project/CompileFFmpegWithOpenSSLOnAndroid/libs/ffmpeg/include/x86_64
+
+Name: libpostproc
+Description: FFmpeg postprocessing library
+Version: 56.3.100
+Requires: 
+Requires.private: libavutil >= 57.17.100
+Conflicts:
+Libs: -L${libdir}  -lpostproc 
+Libs.private: -lm
+Cflags: -I${includedir}

@@ -1,0 +1,14 @@
+prefix=/home/luxuan/Project/CompileFFmpegWithOpenSSLOnAndroid/src/../jni/ffmpeg/ffmpeg/armeabi-v7a
+exec_prefix=${prefix}
+libdir=/home/luxuan/Project/CompileFFmpegWithOpenSSLOnAndroid/libs/ffmpeg/binaries/armeabi-v7a
+includedir=/home/luxuan/Project/CompileFFmpegWithOpenSSLOnAndroid/libs/ffmpeg/include/armeabi-v7a
+
+Name: libavdevice
+Description: FFmpeg device handling library
+Version: 59.4.100
+Requires: 
+Requires.private: libavformat >= 59.16.100, libavcodec >= 59.18.100, libswresample >= 4.3.100, libavutil >= 57.17.100
+Conflicts:
+Libs: -L${libdir}  -lavdevice 
+Libs.private: -lm
+Cflags: -I${includedir}

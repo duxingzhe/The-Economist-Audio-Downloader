@@ -1,0 +1,14 @@
+prefix=/home/luxuan/Project/CompileFFmpegWithOpenSSLOnAndroid/src/../jni/ffmpeg/ffmpeg/arm64-v8a
+exec_prefix=${prefix}
+libdir=/home/luxuan/Project/CompileFFmpegWithOpenSSLOnAndroid/libs/ffmpeg/binaries/arm64-v8a
+includedir=/home/luxuan/Project/CompileFFmpegWithOpenSSLOnAndroid/libs/ffmpeg/include/arm64-v8a
+
+Name: libavutil
+Description: FFmpeg utility library
+Version: 57.17.100
+Requires: 
+Requires.private: 
+Conflicts:
+Libs: -L${libdir}  -lavutil 
+Libs.private: -pthread -lm
+Cflags: -I${includedir}

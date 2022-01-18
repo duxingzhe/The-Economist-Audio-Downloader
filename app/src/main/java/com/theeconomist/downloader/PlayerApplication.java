@@ -2,7 +2,6 @@ package com.theeconomist.downloader;
 
 import android.app.Application;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.os.Handler;
 
 import com.theeconomist.downloader.utils.CoverLoader;
