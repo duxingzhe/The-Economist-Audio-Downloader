@@ -18,7 +18,7 @@ void packet_queue_init(PacketQueue *q)
 int packet_queue_put(VideoState *is, PacketQueue *q, AVPacket *pkt)
 {
     AVPacketList *pkt1;
-    if(pkt!=&is->flush_pkt && av_dup_packet(pkt)<0)
+    if(pkt!=&is->flush_pkt)
     {
         return -1;
     }
@@ -111,10 +111,10 @@ double get_audio_clock(VideoState *is)
     pts=is->audio_clock;
     hw_buf_size=is->audio_buf_size-is->audio_buf_index;
     bytes_per_sec=0;
-    n=is->audio_st->codec->channels*2;
+    n=is->audio_st->codecpar->channels*2;
     if(is->audio_st)
     {
-        bytes_per_sec=is->audio_st->codec->sample_rate*n;
+        bytes_per_sec=is->audio_st->codecpar->sample_rate*n;
     }
     if(bytes_per_sec)
     {
@@ -157,7 +157,7 @@ int synchronize_audio(VideoState *is, short *samples, int samples_size, double p
     int n;
     double ref_clock;
 
-    n=2*is->audio_st->codec->channels;
+    n=2*is->audio_st->codecpar->channels;
 
     if(is->av_sync_type!=AV_SYNC_AUDIO_MASTER)
     {
@@ -179,7 +179,7 @@ int synchronize_audio(VideoState *is, short *samples, int samples_size, double p
                 avg_diff=is->audio_diff_cum*(1.0-is->audio_diff_avg_coef);
                 if(fabs(avg_diff)>=is->audio_diff_threshold)
                 {
-                    wanted_size=samples_size+((int)(diff*is->audio_st->codec->sample_rate)*n);
+                    wanted_size=samples_size+((int)(diff*is->audio_st->codecpar->sample_rate)*n);
                     min_size=samples_size*((100-SAMPLE_CORRECTION_PERCENT_MAX)/100);
                     max_size=samples_size*((100+SAMPLE_CORRECTION_PERCENT_MAX)/100);
                     if(wanted_size<min_size)
@@ -314,12 +314,13 @@ int audio_decode_frame(VideoState *is, double *pts_ptr)
         while(is->audio_pkt_size>0)
         {
             int got_frame=0;
-            len1=avcodec_decode_audio4(is->audio_st->codec, &is->audio_frame, &got_frame, pkt);
-            if(len1<0)
-            {
+            int re = avcodec_send_packet(is->audio_st->codecpar, pkt);
+
+            if (re != 0){
                 is->audio_pkt_size=0;
                 break;
             }
+            got_frame = avcodec_receive_frame(is->audio_st->codecpar, &is->audio_frame);
 
             if(got_frame)
             {
@@ -329,8 +330,8 @@ int audio_decode_frame(VideoState *is, double *pts_ptr)
                 }
                 else
                 {
-                    data_size=av_samples_get_buffer_size(NULL, is->audio_st->codec->channels,is->audio_frame.nb_samples,
-                                is->audio_st->codec->sample_fmt,1);
+                    data_size=av_samples_get_buffer_size(NULL, is->audio_st->codecpar->channels,is->audio_frame.nb_samples,
+                                is->audio_st->codecpar->format,1);
                     memcpy(is->audio_buf, is->audio_frame.data[0], data_size);
                 }
             }
@@ -343,8 +344,8 @@ int audio_decode_frame(VideoState *is, double *pts_ptr)
             }
             pts=is->audio_clock;
             *pts_ptr=pts;
-            n=2*is->audio_st->codec->channels;
-            is->audio_clock+=(double)data_size/(double)(n*is->audio_st->codec->sample_rate);
+            n=2*is->audio_st->codecpar->channels;
+            is->audio_clock+=(double)data_size/(double)(n*is->audio_st->codecpar->sample_rate);
             return data_size;
         }
 
@@ -356,7 +357,7 @@ int audio_decode_frame(VideoState *is, double *pts_ptr)
 
         if(packet_queue_get(is, &is->audioq, pkt, 1)<0)
         {
-            avcodec_flush_buffers(is->audio_st->codec);
+            avcodec_flush_buffers(is->audio_st->codecpar);
             continue;
         }
         is->audio_pkt_data=pkt->data;
@@ -428,21 +429,21 @@ void video_display(VideoState *is)
     vp=&is->pictq[is->pictq_rindex];
     if(vp->bmp)
     {
-        if(is->video_st->codec->sample_aspect_ratio.num==0)
+        if(is->video_st->codecpar->sample_aspect_ratio.num==0)
         {
             aspect_ratio=0;
         }
         else
         {
-            aspect_ratio=av_q2d(is->video_st->codec->sample_aspect_ratio)* is->video_st->codec->width/is->video_st->codec->height;
+            aspect_ratio=av_q2d(is->video_st->codecpar->sample_aspect_ratio)* is->video_st->codecpar->width/is->video_st->codecpar->height;
         }
 
         if(aspect_ratio<=0.0)
         {
-            aspect_ratio = (float) is->video_st->codec->width / (float) is->video_st->codec->height;
+            aspect_ratio = (float) is->video_st->codecpar->width / (float) is->video_st->codecpar->height;
         }
 
-        displayBmp(&is->video_player, vp->bmp, is->video_st->codec, is->video_st->codec->width, is->video_st->codec->height);
+        displayBmp(&is->video_player, vp->bmp, is->video_st->codecpar, is->video_st->codecpar->width, is->video_st->codecpar->height);
         free(vp->bmp->buffer);
     }
 }
@@ -540,10 +541,10 @@ void alloc_picture(void *userdata)
         destroyBmp(&is->video_player, vp->bmp);
     }
 
-    vp->bmp=createBmp(&is->video_player, is->video_st->codec->width, is->video_st->codec->height);
+    vp->bmp=createBmp(&is->video_player, is->video_st->codecpar->width, is->video_st->codecpar->height);
 
-    vp->width=is->video_st->codec->width;
-    vp->height=is->video_st->codec->height;
+    vp->width=is->video_st->codecpar->width;
+    vp->height=is->video_st->codecpar->height;
 
     SDL_LockMutex(is->pictq_mutex);
     vp->allocated=1;
@@ -554,7 +555,7 @@ void alloc_picture(void *userdata)
 int queue_picture(VideoState *is, AVFrame *pFrame, double pts)
 {
     VideoPicture *vp;
-    AVPicture pict;
+    Picture pict;
 
     SDL_LockMutex(is->pictq_mutex);
     while(is->pictq_size>=VIDEO_PICTURE_QUEUE_SIZE&&!is->quit)
@@ -568,7 +569,7 @@ int queue_picture(VideoState *is, AVFrame *pFrame, double pts)
 
     vp=&is->pictq[is->pictq_windex];
 
-    if(!vp->bmp|| vp->width!=is->video_st->codec->width || vp->height!=is->video_st->codec->height)
+    if(!vp->bmp|| vp->width!=is->video_st->codecpar->width || vp->height!=is->video_st->codecpar->height)
     {
         vp->allocated=0;
 
@@ -587,7 +588,7 @@ int queue_picture(VideoState *is, AVFrame *pFrame, double pts)
 
     if(vp->bmp)
     {
-        updateBmp(&is->video_player, is->sws_ctx, is->video_st->codec, vp->bmp, pFrame, is->video_st->codec->width, is->video_st->codec->height);
+        updateBmp(&is->video_player, is->sws_ctx, is->video_st->codecpar, vp->bmp, pFrame, is->video_st->codecpar->width, is->video_st->codecpar->height);
         vp->pts=pts;
 
         if(++is->pictq_windex==VIDEO_PICTURE_QUEUE_SIZE)
@@ -614,7 +615,7 @@ double synchronize_video(VideoState *is, AVFrame *src_frame, double pts)
         pts=is->video_clock;
     }
 
-    frame_delay=av_q2d(is->video_st->codec->time_base);
+    frame_delay=av_q2d(is->video_st->codecpar->sample_aspect_ratio);
     frame_delay+=src_frame->repeat_pict*(frame_delay * 0.5);
     is->video_clock+=frame_delay;
 
@@ -650,7 +651,7 @@ int video_thread(void *arg)
         }
         if(packet->data==is->flush_pkt.data)
         {
-            avcodec_flush_buffers(is->video_st->codec);
+            avcodec_flush_buffers(is->video_st->codecpar);
             continue;
         }
 
@@ -658,7 +659,7 @@ int video_thread(void *arg)
 
         global_video_pkt_pts=packet->pts;
 
-        avcodec_decode_video2(is->video_st->codec, pFrame, &frameFinished, packet);
+        avcodec_decode_video2(is->video_st->codecpar, pFrame, &frameFinished, packet);
 
         if(packet->dts==AV_NOPTS_VALUE&&pFrame->opaque&&*(uint64_t*)pFrame->opaque!=AV_NOPTS_VALUE)
         {
@@ -694,7 +695,7 @@ int stream_component_open(VideoState *is, int stream_index)
 {
     AVFormatContext *pFormatCtx=is->pFormatCtx;
     AVCodecContext *codecCtx=NULL;
-    AVCodec *codec=NULL;
+    const AVCodec *codec=NULL;
     AVDictionary *optionsDict=NULL;
 
     if(stream_index<0||stream_index>=pFormatCtx->nb_streams)
@@ -702,7 +703,7 @@ int stream_component_open(VideoState *is, int stream_index)
         return -1;
     }
 
-    codecCtx=pFormatCtx->streams[stream_index]->codec;
+    codecCtx = pFormatCtx->streams[stream_index]->codecpar;
 
     if(codecCtx->codec_type==AVMEDIA_TYPE_AUDIO)
     {
@@ -745,18 +746,18 @@ int stream_component_open(VideoState *is, int stream_index)
                 return -1;
             }
 
-            uint64_t channel_layout=is->audio_st->codec->channel_layout;
+            uint64_t channel_layout=is->audio_st->codecpar->channel_layout;
 
             if(channel_layout==0)
             {
-                channel_layout=av_get_default_channel_layout(is->audio_st->codec->channels);
+                channel_layout=av_get_default_channel_layout(is->audio_st->codecpar->channels);
             }
 
             av_opt_set_int(is->sws_ctx_audio, "in_channel_layout", channel_layout, 0);
             av_opt_set_int(is->sws_ctx_audio, "out_channel_layout", channel_layout, 0);
-            av_opt_set_int(is->sws_ctx_audio, "in_sample_rate", is->audio_st->codec->sample_rate, 0);
-            av_opt_set_int(is->sws_ctx_audio, "out_sample_rate", is->audio_st->codec->sample_rate, 0);
-            av_opt_set_sample_fmt(is->sws_ctx_audio,"in_sample_fmt", is->audio_st->codec->sample_fmt, 0);
+            av_opt_set_int(is->sws_ctx_audio, "in_sample_rate", is->audio_st->codecpar->sample_rate, 0);
+            av_opt_set_int(is->sws_ctx_audio, "out_sample_rate", is->audio_st->codecpar->sample_rate, 0);
+            av_opt_set_sample_fmt(is->sws_ctx_audio,"in_sample_fmt", is->audio_st->codecpar->format, 0);
             av_opt_set_sample_fmt(is->sws_ctx_audio, "out_sample_fmt", AV_SAMPLE_FMT_S16, 0);
 
             if((swr_init(is->sws_ctx_audio))<0)
@@ -777,12 +778,12 @@ int stream_component_open(VideoState *is, int stream_index)
 
             packet_queue_init(&is->videoq);
 
-            createScreen(&is->video_player, is->native_window, is->video_st->codec->width, is->video_st->codec->height);
+            createScreen(&is->video_player, is->native_window, is->video_st->codecpar->width, is->video_st->codecpar->height);
 
             is->video_tid=malloc(sizeof(*(is->video_tid)));
 
             pthread_create(is->video_tid, NULL, (void *)&video_thread, is);
-            is->sws_ctx=createScaler(&is->video_player, is->video_st->codec);
+            is->sws_ctx=createScaler(&is->video_player, is->video_st->codecpar);
 
             codecCtx->get_buffer2=our_get_buffer;
 
@@ -860,12 +861,12 @@ int decode_thread(void *arg)
 
     for(i=0;i<is->pFormatCtx->nb_streams;i++)
     {
-        if(is->pFormatCtx->streams[i]->codec->codec_type==AVMEDIA_TYPE_VIDEO&&
+        if(is->pFormatCtx->streams[i]->codecpar->codec_type==AVMEDIA_TYPE_VIDEO&&
             video_index<0)
         {
             video_index=i;
         }
-        if(is->pFormatCtx->streams[i]->codec->codec_type==AVMEDIA_TYPE_AUDIO&&
+        if(is->pFormatCtx->streams[i]->codecpar->codec_type==AVMEDIA_TYPE_AUDIO&&
            audio_index<0) {
             audio_index = i;
         }
@@ -914,7 +915,7 @@ int decode_thread(void *arg)
             int ret=avformat_seek_file(is->pFormatCtx, -1, seek_min, seek_target, seek_max, is->seek_flags);
             if(ret<0)
             {
-                fprintf(stderr, "%s: error while seeking\n", is->pFormatCtx->filename);
+                fprintf(stderr, "%s: error while seeking\n", is->pFormatCtx->url);
             }
             else
             {
@@ -1345,7 +1346,7 @@ int getVideoWidth(VideoState **ps, int *w)
         return INVALID_OPERATION;
     }
 
-    *w=is->video_st->codec->width;
+    *w=is->video_st->codecpar->width;
 
     return NO_ERROR;
 }
@@ -1359,7 +1360,7 @@ int getVideoHeight(VideoState **ps, int *h)
         return INVALID_OPERATION;
     }
 
-    *h=is->video_st->codec->height;
+    *h=is->video_st->codecpar->height;
 
     return NO_ERROR;
 }

@@ -1,4 +1,5 @@
 #include <videoplayer.h>
+#include <libavutil/imgutils.h>
 
 const int TARGET_IMAGE_FORMAT=AV_PIX_FMT_RGBA;
 const int TARGET_IMAGE_CODEC=AV_CODEC_ID_PNG;
@@ -73,14 +74,14 @@ void updateBmp(VideoPlayer **ps, struct SwsContext *sws_ctx, AVCodecContext *pCo
         goto fail;
     }
 
-    int numBytes= avpicture_get_size(TARGET_IMAGE_FORMAT, width, height);
+    int numBytes= av_image_get_buffer_size(TARGET_IMAGE_FORMAT, width, height, 1);
     picture->buffer=(uint8_t *)av_malloc(numBytes * sizeof(uint8_t));
 
     frame->format=TARGET_IMAGE_FORMAT;
     frame->width=width;
     frame->height=height;
 
-    avpicture_fill(((AVPicture *)frame), picture->buffer, TARGET_IMAGE_FORMAT, width, height);
+    av_image_fill_arrays(frame->data, frame->linesize, picture->buffer, TARGET_IMAGE_FORMAT, width, width, 1);
 
     sws_scale(sws_ctx, (const uint8_t *const *)pFrame->data, pFrame->linesize, 0, height, frame->data, frame->linesize);
 

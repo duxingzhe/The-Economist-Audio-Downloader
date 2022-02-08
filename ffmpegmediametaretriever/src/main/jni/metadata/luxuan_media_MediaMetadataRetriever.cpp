@@ -498,7 +498,6 @@ static void luxuan_media_FFmpegMediaMetadataRetriever_native_init(JNIEnv *env, j
         return;
     }
 
-    av_register_all();
     avformat_network_init();
 }
 

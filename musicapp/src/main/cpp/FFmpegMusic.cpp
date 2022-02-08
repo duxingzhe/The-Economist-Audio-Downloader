@@ -2,7 +2,7 @@
 
 AVFormatContext *formatContext;
 AVCodecContext *codecContext;
-AVCodec *codex;
+const AVCodec *codex;
 AVPacket *packet;
 AVFrame *frame;
 SwrContext *swrContext;
@@ -12,7 +12,6 @@ int audio_stream_index=-1;
 
 int createFFmpeg(int *rate, int *channel)
 {
-    av_register_all();
     char *input="/sdcard/input.mp3";
     formatContext=avformat_alloc_context();
     LOGE("Lujng %s", input);
@@ -34,15 +33,16 @@ int createFFmpeg(int *rate, int *channel)
     int i=0;
     for(int i=0;i<formatContext->nb_streams;i++)
     {
-        if(formatContext->streams[i]->codec->codec_type==AVMEDIA_TYPE_AUDIO)
+        if(formatContext->streams[i]->codecpar->codec_type==AVMEDIA_TYPE_AUDIO)
         {
-            LOGE("找到音频id %d", formatContext->streams[i]->codec->codec_type);
+            LOGE("找到音频id %d", formatContext->streams[i]->codecpar->codec_type);
             audio_stream_index=1;
             break;
         }
     }
 
-    codecContext=formatContext->streams[audio_stream_index]->codec;
+    codecContext=avcodec_alloc_context3(
+            reinterpret_cast<const AVCodec *>(formatContext->streams[audio_stream_index]->codecpar));
     LOGE("获取视频编码上下文 %p", codecContext);
 
     codex=avcodec_find_decoder(codecContext->codec_id);
@@ -74,6 +74,7 @@ int createFFmpeg(int *rate, int *channel)
     out_channel_nb=av_get_channel_layout_nb_channels(AV_CH_LAYOUT_STEREO);
     *rate=codecContext->sample_rate;
     *channel=codecContext->channels;
+    avcodec_free_context(&codecContext);
     return 0;
 }
 
@@ -84,7 +85,13 @@ int getPcm(void **pcm, size_t *pcm_size)
 
     while(av_read_frame(formatContext, packet)>=0)
     {
-        avcodec_decode_audio4(codecContext, frame, &got_frame, packet);
+
+        int ret = avcodec_send_packet(codecContext, packet);
+        if (ret != 0){
+            return -1;
+        }
+        got_frame = avcodec_receive_frame(codecContext, frame);
+
         if(got_frame)
         {
             LOGE("解码");
@@ -102,7 +109,7 @@ int getPcm(void **pcm, size_t *pcm_size)
 
 void realseFFmpeg()
 {
-    av_free_packet(packet);
+    av_packet_unref(packet);
     av_free(out_buffer);
     av_frame_free(&frame);
     swr_free(&swrContext);

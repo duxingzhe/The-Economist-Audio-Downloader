@@ -44,14 +44,14 @@ void set_duration(AVFormatContext *ic)
 
 void set_codec(AVFormatContext *ic, int i)
 {
-    const char *codec_type=av_get_media_type_string(ic->streams[i]->codec->codec_type);
+    const char *codec_type=av_get_media_type_string(ic->streams[i]->codecpar->codec_type);
 
     if(!codec_type)
     {
         return;
     }
 
-    const char *codec_name=avcodec_get_name(ic->streams[i]->codec->codec_id);
+    const char *codec_name=avcodec_get_name(ic->streams[i]->codecpar->codec_id);
 
     if(strcmp(codec_type, "audio")==0)
     {
@@ -137,10 +137,10 @@ void set_video_dimensions(AVFormatContext *ic, AVStream *video_st)
 
     if(video_st)
     {
-        sprintf(value, "%d", video_st->codec->width);
+        sprintf(value, "%d", video_st->codecpar->width);
         av_dict_set(&ic->metadata, VIDEO_WIDTH, value, 0);
 
-        sprintf(value, "%d", video_st->codec->height);
+        sprintf(value, "%d", video_st->codecpar->height);
         av_dict_set(&ic->metadata, VIDEO_HEIGHT, value, 0);
     }
 }

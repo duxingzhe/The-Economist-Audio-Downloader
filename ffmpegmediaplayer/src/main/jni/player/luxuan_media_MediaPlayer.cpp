@@ -622,7 +622,6 @@ static void luxuan_media_FFmpegMediaPlayer_native_init(JNIEnv *env)
         return;
     }
 
-    av_register_all();
     avformat_network_init();
 }
 
