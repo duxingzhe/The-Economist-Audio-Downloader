@@ -659,7 +659,17 @@ int video_thread(void *arg)
 
         global_video_pkt_pts=packet->pts;
 
-        avcodec_decode_video2(is->video_st->codecpar, pFrame, &frameFinished, packet);
+        int ret = avcodec_send_packet(is->video_st->codecpar, packet);
+        int got_picture = avcodec_receive_frame(is->video_st->codecpar, pFrame);
+
+        if (ret != 0)
+        {
+            return -1;
+        }
+
+        if(got_picture!=0){
+            return -1;
+        }
 
         if(packet->dts==AV_NOPTS_VALUE&&pFrame->opaque&&*(uint64_t*)pFrame->opaque!=AV_NOPTS_VALUE)
         {

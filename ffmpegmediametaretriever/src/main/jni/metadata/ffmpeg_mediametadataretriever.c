@@ -411,7 +411,7 @@ int get_embedded_picture(State **ps, AVPacket *pkt)
 
                         av_packet_unref(pkt);
                         av_init_packet(pkt);
-                        av_copy_packet(pkt, &convertedPkt);
+                        av_packet_ref(pkt, &convertedPkt);
 
                         av_packet_unref(&convertedPkt);
 
@@ -422,7 +422,7 @@ int get_embedded_picture(State **ps, AVPacket *pkt)
                 {
                     av_packet_unref(pkt);
                     av_init_packet(pkt);
-                    av_copy_packet(pkt, &state->pFormatCtx->streams[i]->attached_pic);
+                    av_packet_ref(pkt, &state->pFormatCtx->streams[i]->attached_pic);
 
                     got_packet=1;
                     break;
