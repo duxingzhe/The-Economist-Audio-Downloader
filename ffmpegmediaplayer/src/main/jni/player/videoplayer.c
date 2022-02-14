@@ -96,7 +96,7 @@ void displayBmp(VideoPlayer **ps, void *bmp, AVCodecContext *pCodecCtx, int widt
     VideoPlayer *is=*ps;
     Picture *picture=(Picture *)bmp;
 
-    if(width=-1)
+    if(width==-1)
     {
         width=pCodecCtx->width;
     }
