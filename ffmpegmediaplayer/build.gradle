@@ -15,6 +15,9 @@ android {
         ndkBuild {
             path 'src/main/jni/Android.mk'
         }
+        cmake {
+            version "3.22.1"
+        }
     }
 
     buildTypes {
