@@ -6,7 +6,7 @@ android {
     defaultConfig {
         applicationId "com.luxuan.musicapp"
         minSdkVersion 21
-        targetSdkVersion 30
+        targetSdkVersion 31
         versionCode 1
         versionName "1.0"
 
@@ -33,7 +33,7 @@ android {
         }
     }
 
-    ndkVersion '24.0.8215888'
+    ndkVersion '25.0.8775105'
 }
 
 dependencies {
