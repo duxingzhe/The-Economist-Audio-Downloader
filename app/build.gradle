@@ -8,7 +8,7 @@ android {
     defaultConfig {
         applicationId "com.theeconomist.audio.downloader"
         minSdkVersion 21
-        targetSdkVersion 30
+        targetSdkVersion 31
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -42,7 +42,7 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
-    ndkVersion '24.0.8215888'
+    ndkVersion '25.0.8775105'
 }
 
 dependencies {

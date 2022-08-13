@@ -5,7 +5,7 @@ android {
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 30
+        targetSdkVersion 31
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -18,7 +18,7 @@ android {
         }
     }
 
-    ndkVersion '24.0.8215888'
+    ndkVersion '25.0.8775105'
 
     externalNativeBuild {
         cmake {
