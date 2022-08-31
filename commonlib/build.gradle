@@ -25,6 +25,7 @@ android {
             version "3.22.1"
         }
     }
+    namespace 'com.luxuan.commonlib'
 }
 
 dependencies {
