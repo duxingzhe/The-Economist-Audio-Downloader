@@ -5,10 +5,10 @@ includedir=/home/luxuan/Project/CompileFFmpegWithOpenSSLOnAndroid/libs/ffmpeg/in
 
 Name: libavformat
 Description: FFmpeg container format library
-Version: 59.16.100
+Version: 59.27.100
 Requires: 
-Requires.private: libavcodec >= 59.18.100, libswresample >= 4.3.100, libavutil >= 57.17.100
+Requires.private: libavcodec >= 59.37.100, libswresample >= 4.7.100, libavutil >= 57.28.100
 Conflicts:
 Libs: -L${libdir}  -lavformat 
-Libs.private: -lm -lz -lssl -lcrypto
+Libs.private: -lm -latomic -lz -lssl -lcrypto
 Cflags: -I${includedir}

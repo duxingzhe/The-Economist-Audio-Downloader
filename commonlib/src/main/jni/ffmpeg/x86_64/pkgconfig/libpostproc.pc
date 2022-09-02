@@ -5,10 +5,10 @@ includedir=/home/luxuan/Project/CompileFFmpegWithOpenSSLOnAndroid/libs/ffmpeg/in
 
 Name: libpostproc
 Description: FFmpeg postprocessing library
-Version: 56.3.100
+Version: 56.6.100
 Requires: 
-Requires.private: libavutil >= 57.17.100
+Requires.private: libavutil >= 57.28.100
 Conflicts:
 Libs: -L${libdir}  -lpostproc 
-Libs.private: -lm
+Libs.private: -lm -latomic
 Cflags: -I${includedir}

@@ -5,10 +5,10 @@ includedir=/home/luxuan/Project/CompileFFmpegWithOpenSSLOnAndroid/libs/ffmpeg/in
 
 Name: libavutil
 Description: FFmpeg utility library
-Version: 57.17.100
+Version: 57.28.100
 Requires: 
 Requires.private: 
 Conflicts:
 Libs: -L${libdir}  -lavutil 
-Libs.private: -pthread -lm
+Libs.private: -pthread -lm -latomic
 Cflags: -I${includedir}
