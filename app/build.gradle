@@ -42,7 +42,7 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
-    ndkVersion '25.1.8937393'
+    ndkVersion "25.2.9519653"
     namespace 'com.theeconomist.downloader'
 }
 
