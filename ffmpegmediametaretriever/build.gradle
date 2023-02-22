@@ -8,15 +8,11 @@ android {
         targetSdk 31
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
     }
 
     externalNativeBuild {
         ndkBuild {
             path 'src/main/jni/Android.mk'
-        }
-        cmake {
-            version "3.22.1"
         }
     }
 
