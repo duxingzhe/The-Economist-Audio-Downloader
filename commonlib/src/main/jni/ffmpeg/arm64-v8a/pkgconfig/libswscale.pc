@@ -5,9 +5,9 @@ includedir=/home/luxuan/Project/CompileFFmpegWithOpenSSLOnAndroid/libs/ffmpeg/in
 
 Name: libswscale
 Description: FFmpeg image rescaling library
-Version: 6.7.100
+Version: 7.1.100
 Requires: 
-Requires.private: libavutil >= 57.28.100
+Requires.private: libavutil >= 58.2.100
 Conflicts:
 Libs: -L${libdir}  -lswscale 
 Libs.private: -lm
