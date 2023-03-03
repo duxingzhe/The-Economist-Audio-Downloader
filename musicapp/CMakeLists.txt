@@ -8,24 +8,35 @@ add_library( native-lib
         src/main/cpp/native-lib.cpp
         src/main/cpp/FFmpegMusic.cpp
         )
+
 add_library( ssl
         SHARED
         IMPORTED)
 set_target_properties( ssl
         PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/openssl/${ANDROID_ABI}/libssl.so)
+
 add_library( crypto
         SHARED
         IMPORTED)
 set_target_properties( crypto
         PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/openssl/${ANDROID_ABI}/libcrypto.so)
+
 add_library( avcodec
         SHARED
         IMPORTED)
 set_target_properties( avcodec
         PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/ffmpeg/${ANDROID_ABI}/libavcodec.so)
+
+add_library( avdevice
+        SHARED
+        IMPORTED)
+set_target_properties( avdevice
+        PROPERTIES IMPORTED_LOCATION
+        ${distribution_DIR}/ffmpeg/${ANDROID_ABI}/libavdevice.so)
+
 add_library( avfilter
         SHARED
         IMPORTED)
@@ -47,6 +58,13 @@ set_target_properties( avutil
         PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/ffmpeg/${ANDROID_ABI}/libavutil.so)
 
+add_library( postproc
+        SHARED
+        IMPORTED)
+set_target_properties( postproc
+        PROPERTIES IMPORTED_LOCATION
+        ${distribution_DIR}/ffmpeg/${ANDROID_ABI}/libpostproc.so)
+
 add_library( swresample
         SHARED
         IMPORTED)
@@ -60,6 +78,7 @@ add_library( swscale
 set_target_properties( swscale
         PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/ffmpeg/${ANDROID_ABI}/libswscale.so)
+
 include_directories(../musiclib/src/main/cpp
         ${distribution_DIR}/ffmpeg/include
         ${distribution_DIR}/openssl/include
@@ -69,7 +88,9 @@ target_link_libraries( native-lib
                         avcodec
                         avfilter
                         avformat
+                        avdevice
                         avutil
+                        postproc
                         swresample
                         swscale
                         ssl
