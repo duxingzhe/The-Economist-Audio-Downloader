@@ -10,20 +10,14 @@ import android.widget.TextView;
 
 import com.theeconomist.downloader.R;
 
-import butterknife.BindView;
-import butterknife.OnClick;
-
 /**
  * Created by ywl on 2018/1/17.
  */
 
 public class NormalAskDialog extends BaseDialog {
 
-    @BindView(R.id.tv_msg)
     TextView tvMsg;
-    @BindView(R.id.tv_exit)
     TextView tvExit;
-    @BindView(R.id.tv_background)
     TextView tvBackground;
 
     private OnActionListener onActionListener;
@@ -61,23 +55,30 @@ public class NormalAskDialog extends BaseDialog {
                 }
             }
         });
-    }
 
-    @OnClick(R.id.tv_exit)
-    public void onClickExit(View view) {
-        if(onActionListener != null) {
-            onActionListener.onLeftAction();
-        }
-        dismiss();
-    }
+        tvMsg=findViewById(R.id.tv_msg);
+        tvExit=findViewById(R.id.tv_exit);
+        tvBackground=findViewById(R.id.tv_background);
 
-    @OnClick(R.id.tv_background)
-    public void onClickBackGround(View view)
-    {
-        if(onActionListener != null) {
-            onActionListener.onRightAction();
-        }
-        dismiss();
+        tvExit.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                if(onActionListener != null) {
+                    onActionListener.onLeftAction();
+                }
+                dismiss();
+            }
+        });
+
+        tvBackground.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                if(onActionListener != null) {
+                    onActionListener.onRightAction();
+                }
+                dismiss();
+            }
+        });
     }
 
     public void setData(String msg, String leftmsg, String rightmsg, boolean canback) {

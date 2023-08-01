@@ -2,12 +2,8 @@ package com.theeconomist.downloader.activity;
 
 import android.os.Bundle;
 
-
-import android.view.View;
-
 import androidx.annotation.Nullable;
 
-import com.theeconomist.downloader.R;
 import com.theeconomist.downloader.bean.EventBusBean;
 import com.theeconomist.downloader.bean.Mp3FileBean;
 import com.theeconomist.downloader.bean.PlayBean;
@@ -15,15 +11,9 @@ import com.theeconomist.downloader.bean.TimeBean;
 import com.theeconomist.downloader.log.MyLog;
 import com.theeconomist.downloader.utils.EventType;
 import com.theeconomist.downloader.utils.FileUtil;
-import com.theeconomist.downloader.view.PlayPauseView;
-
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-
-import butterknife.BindView;
-import butterknife.OnClick;
-import butterknife.Optional;
 
 /**
  * Created by ywl on 2018/1/12.
@@ -62,14 +52,6 @@ public abstract class BaseMusicActivity extends BaseActivity{
     protected void onResume() {
         super.onResume();
         onMusicStatus(musicStatus);
-    }
-
-    @Optional
-    @OnClick(R.id.rl_mini_bar)
-    public void onClickLive(View view) {
-        if(playBean != null ) {
-            startActivity(this, PlayerActivity.class);
-        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

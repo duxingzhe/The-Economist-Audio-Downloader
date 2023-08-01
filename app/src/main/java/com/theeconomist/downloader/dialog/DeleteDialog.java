@@ -2,22 +2,14 @@ package com.theeconomist.downloader.dialog;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.theeconomist.downloader.R;
-import com.theeconomist.downloader.utils.FileUtil;
-
-import java.io.File;
-
-import butterknife.BindView;
 
 public class DeleteDialog extends BaseDialog {
 
-    @BindView(R.id.file_operation_progress)
     public ProgressBar fileOperationProgressBar;
     private TextView dialogTitleTextView;
     private TextView progressInfoTextView;
@@ -39,6 +31,7 @@ public class DeleteDialog extends BaseDialog {
         setContentView(R.layout.file_operation_dialog);
 
         setCancelable(false);
+        fileOperationProgressBar=findViewById(R.id.file_operation_progress);
         cancelTextView=(TextView)findViewById(R.id.cancel);
         dialogTitleTextView=(TextView)findViewById(R.id.dialog_title);
         progressInfoTextView=(TextView)findViewById(R.id.progress_info);

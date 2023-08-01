@@ -1,73 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
-
-    <include
-        android:id="@+id/title"
-        layout="@layout/common_text_title"/>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <LinearLayout
-        android:id="@+id/downloadPanel"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/title"
-        android:paddingTop="10dp"
-        android:paddingBottom="5dp"
-        android:paddingLeft="20dp"
-        >
-
-        <Button
-            android:id="@+id/input"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/red_button_background"
-            android:textColor="@color/color_ec4c48"
-            android:text="输入"
-            />
-
-        <Button
-            android:id="@+id/delete"
-            android:layout_marginLeft="20dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/gray_button_background"
-            android:textColor="@color/color_222222"
-            android:text="删除"
-            />
-
-        <Button
-            android:id="@+id/exit"
-            android:layout_marginLeft="20dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/gray_button_background"
-            android:textColor="@color/color_222222"
-            android:text="退出"
-            />
-    </LinearLayout>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerview"
-        android:layout_below="@+id/downloadPanel"
-        android:layout_above="@+id/ly_mini_player"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="5dp"
-        />
-
-    <LinearLayout
-        android:id="@+id/ly_mini_player"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="5dp"
         >
+
         <include
-            layout="@layout/common_play_status_layout"/>
+            android:id="@+id/title"
+            layout="@layout/common_text_title"/>
+
+        <LinearLayout
+            android:id="@+id/downloadPanel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            >
+
+            <Button
+                android:id="@+id/input"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/red_button_background"
+                android:textColor="@color/color_ec4c48"
+                android:text="输入"
+                />
+
+            <Button
+                android:id="@+id/delete"
+                android:layout_marginLeft="20dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/gray_button_background"
+                android:textColor="@color/color_222222"
+                android:text="删除"
+                />
+
+            <Button
+                android:id="@+id/exit"
+                android:layout_marginLeft="20dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/gray_button_background"
+                android:textColor="@color/color_222222"
+                android:text="退出"
+                />
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerview"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="5dp"
+            />
+
+        <LinearLayout
+            android:id="@+id/mini_player_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="5dp"
+            >
+            <include
+                layout="@layout/common_play_status_layout"
+                android:id="@+id/mini_player"/>
+        </LinearLayout>
+
     </LinearLayout>
 
-</RelativeLayout>
+</layout>

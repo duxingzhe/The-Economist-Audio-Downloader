@@ -4,12 +4,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.SeekBar;
-import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
 
 import com.bumptech.glide.Glide;
 import com.theeconomist.downloader.MusicService;
@@ -17,39 +15,21 @@ import com.theeconomist.downloader.R;
 import com.theeconomist.downloader.bean.EventBusBean;
 import com.theeconomist.downloader.bean.SeekBean;
 import com.theeconomist.downloader.bean.TimeBean;
+import com.theeconomist.downloader.databinding.ActivityPlayBinding;
 import com.theeconomist.downloader.log.MyLog;
 import com.theeconomist.downloader.utils.CoverLoader;
 import com.theeconomist.downloader.utils.EventType;
-import com.theeconomist.downloader.view.AlbumCoverView;
 import com.ywl5320.wlmedia.util.WlTimeUtil;
 
 import org.greenrobot.eventbus.EventBus;
 
-import butterknife.BindView;
-import butterknife.OnClick;
 import jp.wasabeef.glide.transformations.BlurTransformation;
 
 import static com.bumptech.glide.request.RequestOptions.bitmapTransform;
 
 public class PlayerActivity extends BaseMusicActivity {
 
-    @BindView(R.id.tv_nowtime)
-    TextView tvNowTime;
-    @BindView(R.id.tv_totaltime)
-    TextView tvTotalTime;
-    @BindView(R.id.seek_bar)
-    SeekBar seekBar;
-    @BindView(R.id.iv_status)
-    ImageView ivStatus;
-    @BindView(R.id.iv_bg)
-    ImageView ivBg;
-    @BindView(R.id.pb_load)
-    ProgressBar pbLoad;
-    @BindView(R.id.tv_subtitle)
-    TextView tvSubTitle;
-    @BindView(R.id.tv_tip)
-    TextView tvTip;
-    private AlbumCoverView mAlbumCoverView;
+    private ActivityPlayBinding viewBinding;
 
     private EventBusBean eventNextBean;
     private EventBusBean eventSeekBean;
@@ -62,32 +42,32 @@ public class PlayerActivity extends BaseMusicActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play);
 
-        mAlbumCoverView=(AlbumCoverView) findViewById(R.id.album_cover_view);
+        viewBinding=DataBindingUtil.setContentView(this, R.layout.activity_play);
         setTitleTrans(R.color.color_trans);
         setBackView();
         setTitleLine(R.color.color_trans);
         setTitle(getPlayBean().getName());
         if(TextUtils.isEmpty(getPlayBean().getAlbumName())) {
-            tvTip.setText("The Economist");
+            viewBinding.tvTip.setText("The Economist");
         }else{
-            tvTip.setText("The Economist - " + getPlayBean().getAlbumName());
+            viewBinding.tvTip.setText("The Economist - " + getPlayBean().getAlbumName());
         }
-        tvSubTitle.setText(getPlayBean().getName());
+        viewBinding.tvSubtitle.setText(getPlayBean().getName());
 
         Intent intent = new Intent(this, MusicService.class);
         intent.putExtra("url", getPlayBean().getUrl());
         startService(intent);
-        mAlbumCoverView.setCoverBitmap(CoverLoader.get().loadBitmapFromByteArray(getPlayBean().getImgByte()));
-        mAlbumCoverView.initNeedle(false);
+        viewBinding.albumCoverView.setCoverBitmap(CoverLoader.get().loadBitmapFromByteArray(getPlayBean().getImgByte()));
+        viewBinding.albumCoverView.initNeedle(false);
         Glide.with(this).load(R.mipmap.icon_gray_bg)
                 .apply(bitmapTransform(new BlurTransformation(25, 3)).placeholder(R.mipmap.icon_gray_bg))
-                .into(ivBg);
+                .into(viewBinding.ivBg);
 
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        viewBinding.seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 position = getTimeBean().getTotalSecs() * progress / 100;
-                tvNowTime.setText(WlTimeUtil.secdsToDateFormat(getTimeBean().getTotalSecs()));
+                viewBinding.tvNowtime.setText(WlTimeUtil.secdsToDateFormat(getTimeBean().getTotalSecs()));
             }
 
             @Override
@@ -140,6 +120,38 @@ public class PlayerActivity extends BaseMusicActivity {
                 EventBus.getDefault().post(eventSeekBean);
             }
         });
+
+        viewBinding.ivStatus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(musicStatus == PLAY_STATUS_PLAYING) {
+                    pauseMusic(true);
+                    viewBinding.ivStatus.setImageResource(R.drawable.play_selector);
+                } else if(musicStatus == PLAY_STATUS_PAUSE) {
+                    pauseMusic(false);
+                    viewBinding.ivStatus.setImageResource(R.drawable.pause_selector);
+
+                } else if(musicStatus == PLAY_STATUS_ERROR || musicStatus == PLAY_STATUS_COMPLETE) {
+                    playUrl = "";
+                    playMusic();
+                }
+            }
+        });
+
+        viewBinding.ivPre.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                playNext(false);
+            }
+        });
+
+        viewBinding.ivNext.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                playNext(true);
+            }
+        });
+
         playMusic();
     }
 
@@ -168,32 +180,32 @@ public class PlayerActivity extends BaseMusicActivity {
         super.onMusicStatus(status);
         switch (status) {
             case PLAY_STATUS_ERROR:
-                mAlbumCoverView.pause();
-                ivStatus.setImageResource(R.drawable.play_selector);
+                viewBinding.albumCoverView.pause();
+                viewBinding.ivStatus.setImageResource(R.drawable.play_selector);
                 break;
             case PLAY_STATUS_LOADING:
-                pbLoad.setVisibility(View.VISIBLE);
-                ivStatus.setVisibility(View.GONE);
-                mAlbumCoverView.pause();
-                ivStatus.setImageResource(R.drawable.pause_selector);
+                viewBinding.pbLoad.setVisibility(View.VISIBLE);
+                viewBinding.ivStatus.setVisibility(View.GONE);
+                viewBinding.albumCoverView.pause();
+                viewBinding.ivStatus.setImageResource(R.drawable.pause_selector);
                 break;
             case PLAY_STATUS_UNLOADING:
-                pbLoad.setVisibility(View.GONE);
-                ivStatus.setVisibility(View.VISIBLE);
+                viewBinding.pbLoad.setVisibility(View.GONE);
+                viewBinding.ivStatus.setVisibility(View.VISIBLE);
                 break;
             case PLAY_STATUS_PLAYING:
-                mAlbumCoverView.play();
-                ivStatus.setImageResource(R.drawable.pause_selector);
+                viewBinding.albumCoverView.play();
+                viewBinding.ivStatus.setImageResource(R.drawable.pause_selector);
                 break;
             case PLAY_STATUS_PAUSE:
-                mAlbumCoverView.pause();
-                ivStatus.setImageResource(R.drawable.play_selector);
+                viewBinding.albumCoverView.pause();
+                viewBinding.ivStatus.setImageResource(R.drawable.play_selector);
                 break;
             case PLAY_STATUS_RESUME:
                 break;
             case PLAY_STATUS_COMPLETE:
-                mAlbumCoverView.pause();
-                ivStatus.setImageResource(R.drawable.pause_selector);
+                viewBinding.albumCoverView.pause();
+                viewBinding.ivStatus.setImageResource(R.drawable.pause_selector);
                 playNextMusic();
                 break;
             default:
@@ -212,12 +224,12 @@ public class PlayerActivity extends BaseMusicActivity {
     public void onPlayHistoryChange() {
         super.onPlayHistoryChange();
         if(TextUtils.isEmpty(getPlayBean().getAlbumName())) {
-            tvTip.setText("The Economist");
+            viewBinding.tvTip.setText("The Economist");
         }else{
-            tvTip.setText("The Economist - " + getPlayBean().getAlbumName());
+            viewBinding.tvTip.setText("The Economist - " + getPlayBean().getAlbumName());
         }
         setTitle(getPlayBean().getName());
-        tvSubTitle.setText(getPlayBean().getName());
+        viewBinding.tvSubtitle.setText(getPlayBean().getName());
         initTime();
         updateTime(getTimeBean());
     }
@@ -233,59 +245,34 @@ public class PlayerActivity extends BaseMusicActivity {
         updateTime(getTimeBean());
     }
 
-    @OnClick(R.id.iv_status)
-    public void onClickStatus(View view) {
-        if(musicStatus == PLAY_STATUS_PLAYING) {
-            pauseMusic(true);
-            ivStatus.setImageResource(R.drawable.play_selector);
-        } else if(musicStatus == PLAY_STATUS_PAUSE) {
-            pauseMusic(false);
-            ivStatus.setImageResource(R.drawable.pause_selector);
-
-        } else if(musicStatus == PLAY_STATUS_ERROR || musicStatus == PLAY_STATUS_COMPLETE) {
-            playUrl = "";
-            playMusic();
-        }
-    }
-
-    @OnClick(R.id.iv_pre)
-    public void onClickPre(View view) {
-        playNext(false);
-    }
-
-    @OnClick(R.id.iv_next)
-    public void onClickNext(View view) {
-        playNext(true);
-    }
-
     private void updateTime(TimeBean timeBean) {
         if(timeBean != null) {
             if(timeBean.getTotalSecs() <= 0) {
-                if(seekBar.getVisibility() == View.VISIBLE) {
-                    seekBar.setVisibility(View.GONE);
-                    tvTotalTime.setVisibility(View.GONE);
+                if(viewBinding.seekBar.getVisibility() == View.VISIBLE) {
+                    viewBinding.seekBar.setVisibility(View.GONE);
+                    viewBinding.tvTotaltime.setVisibility(View.GONE);
                 }
-                tvNowTime.setText(WlTimeUtil.secdsToDateFormat(timeBean.getTotalSecs()));
+                viewBinding.tvNowtime.setText(WlTimeUtil.secdsToDateFormat(timeBean.getTotalSecs()));
             } else {
-                if(seekBar.getVisibility() == View.GONE) {
-                    seekBar.setVisibility(View.VISIBLE);
-                    tvTotalTime.setVisibility(View.VISIBLE);
+                if(viewBinding.seekBar.getVisibility() == View.GONE) {
+                    viewBinding.seekBar.setVisibility(View.VISIBLE);
+                    viewBinding.tvTotaltime.setVisibility(View.VISIBLE);
                 }
-                tvTotalTime.setText(WlTimeUtil.secdsToDateFormat(timeBean.getTotalSecs()));
-                tvNowTime.setText(WlTimeUtil.secdsToDateFormat(timeBean.getTotalSecs()));
-                seekBar.setProgress(getProgress());
+                viewBinding.tvTotaltime.setText(WlTimeUtil.secdsToDateFormat(timeBean.getTotalSecs()));
+                viewBinding.tvNowtime.setText(WlTimeUtil.secdsToDateFormat(timeBean.getTotalSecs()));
+                viewBinding.seekBar.setProgress(getProgress());
             }
         }
     }
 
     private void initTime() {
         if(getTimeBean().getTotalSecs() > 0) {
-            seekBar.setVisibility(View.VISIBLE);
-            tvTotalTime.setVisibility(View.VISIBLE);
-            seekBar.setProgress(getProgress());
+            viewBinding.seekBar.setVisibility(View.VISIBLE);
+            viewBinding.tvTotaltime.setVisibility(View.VISIBLE);
+            viewBinding.seekBar.setProgress(getProgress());
         } else {
-            seekBar.setVisibility(View.GONE);
-            tvTotalTime.setVisibility(View.GONE);
+            viewBinding.seekBar.setVisibility(View.GONE);
+            viewBinding.tvTotaltime.setVisibility(View.GONE);
         }
     }
 

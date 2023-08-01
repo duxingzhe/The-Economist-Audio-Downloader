@@ -21,37 +21,20 @@ import com.theeconomist.downloader.utils.CommonUtil;
 
 import org.greenrobot.eventbus.EventBus;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class BaseActivity extends Activity {
 
-    @Nullable
-    @BindView(R.id.ly_system_parent)
     LinearLayout lySystemParent;
 
-    @Nullable
-    @BindView(R.id.iv_line)
     ImageView ivLine;
 
-    @Nullable
-    @BindView(R.id.ly_system_bar)
     LinearLayout lySystemBar;
 
-    @Nullable
-    @BindView(R.id.tv_title)
     TextView mtvTitle;
 
-    @Nullable
-    @BindView(R.id.iv_back)
     ImageView mivBack;
 
-    @Nullable
-    @BindView(R.id.iv_right)
     ImageView mivRight;
 
-    @Nullable
-    @BindView(R.id.tv_right)
     TextView tvRight;
 
     @Override
@@ -73,7 +56,16 @@ public class BaseActivity extends Activity {
     @Override
     public void setContentView(@LayoutRes int layoutResID) {
         super.setContentView(layoutResID);
-        ButterKnife.bind(this);
+
+        lySystemParent=findViewById(R.id.ly_system_parent);
+
+        ivLine=findViewById(R.id.iv_line);
+
+        lySystemBar=findViewById(R.id.ly_system_bar);
+        mtvTitle=findViewById(R.id.tv_title);
+        mivBack=findViewById(R.id.iv_back);
+        mivRight=findViewById(R.id.iv_right);
+        tvRight=findViewById(R.id.tv_right);
         lySystemBar = (LinearLayout) findViewById(R.id.ly_system_bar);
         if(lySystemBar != null) {
             initSystembar(lySystemBar);

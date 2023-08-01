@@ -1,138 +1,142 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <ImageView
-        android:id="@+id/iv_bg"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        android:src="@mipmap/icon_gray_bg"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+    <FrameLayout
         android:orientation="vertical"
-        >
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-        <include
-            android:id="@+id/title"
-            layout="@layout/common_text_title"/>
+        <ImageView
+            android:id="@+id/iv_bg"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@mipmap/icon_gray_bg"/>
 
         <LinearLayout
-            android:orientation="vertical"
-            android:gravity="center"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
             >
 
-            <com.theeconomist.downloader.view.AlbumCoverView
-                android:id="@+id/album_cover_view"
+            <include
+                android:id="@+id/title"
+                layout="@layout/common_text_title"/>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:gravity="center"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin" />
-        </LinearLayout>
+                >
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center">
-            <TextView
-                android:id="@+id/tv_subtitle"
-                android:layout_width="wrap_content"
+                <com.theeconomist.downloader.view.AlbumCoverView
+                    android:id="@+id/album_cover_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:paddingRight="@dimen/activity_horizontal_margin" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:textSize="16sp"
-                android:textColor="@color/color_white"/>
-            <TextView
-                android:id="@+id/tv_tip"
-                android:layout_width="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center">
+                <TextView
+                    android:id="@+id/tv_subtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:textSize="16sp"
+                    android:textColor="@color/color_white"/>
+                <TextView
+                    android:id="@+id/tv_tip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="15dp"
+                    android:textSize="12sp"
+                    android:textColor="@color/color_white"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ly_seekbar"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:orientation="horizontal"
                 android:layout_marginBottom="15dp"
-                android:textSize="12sp"
-                android:textColor="@color/color_white"/>
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:gravity="center"
+                >
+                <TextView
+                    android:id="@+id/tv_nowtime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="00:00"
+                    android:textSize="12sp"
+                    android:textColor="@color/color_white"/>
+                <SeekBar
+                    android:id="@+id/seek_bar"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:progress="0"
+                    android:maxHeight="2.0dip"
+                    android:minHeight="2.0dip"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:progressDrawable="@drawable/seekbar_gray_drawable"
+                    android:thumb="@drawable/seekbar_thumb"/>
+                <TextView
+                    android:id="@+id/tv_totaltime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="00:00"
+                    android:textSize="12sp"
+                    android:textColor="@color/color_white"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ly_action"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="40dp"
+                android:gravity="center">
+                <ImageView
+                    android:id="@+id/iv_pre"
+                    android:layout_width="55dp"
+                    android:layout_height="55dp"
+                    android:src="@drawable/pre_selector"/>
+                <ImageView
+                    android:id="@+id/iv_status"
+                    android:layout_width="65dp"
+                    android:layout_height="65dp"
+                    android:layout_marginLeft="25dp"
+                    android:layout_marginRight="25dp"
+                    android:src="@drawable/play_selector"/>
+                <ProgressBar
+                    android:id="@+id/pb_load"
+                    android:layout_width="65dp"
+                    android:layout_height="65dp"
+                    android:indeterminateDrawable="@drawable/play_load_drawable"
+                    android:indeterminateOnly="true"
+                    android:visibility="gone"
+                    android:layout_marginLeft="25dp"
+                    android:layout_marginRight="25dp"
+                    android:padding="5dp"
+                    android:indeterminateBehavior="repeat"/>
+                <ImageView
+                    android:id="@+id/iv_next"
+                    android:layout_width="55dp"
+                    android:layout_height="55dp"
+                    android:src="@drawable/next_selector"/>
+            </LinearLayout>
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/ly_seekbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="15dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:gravity="center"
-            >
-            <TextView
-                android:id="@+id/tv_nowtime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="00:00"
-                android:textSize="12sp"
-                android:textColor="@color/color_white"/>
-            <SeekBar
-                android:id="@+id/seek_bar"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:progress="0"
-                android:maxHeight="2.0dip"
-                android:minHeight="2.0dip"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:progressDrawable="@drawable/seekbar_gray_drawable"
-                android:thumb="@drawable/seekbar_thumb"/>
-            <TextView
-                android:id="@+id/tv_totaltime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="00:00"
-                android:textSize="12sp"
-                android:textColor="@color/color_white"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/ly_action"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="40dp"
-            android:gravity="center">
-            <ImageView
-                android:id="@+id/iv_pre"
-                android:layout_width="55dp"
-                android:layout_height="55dp"
-                android:src="@drawable/pre_selector"/>
-            <ImageView
-                android:id="@+id/iv_status"
-                android:layout_width="65dp"
-                android:layout_height="65dp"
-                android:layout_marginLeft="25dp"
-                android:layout_marginRight="25dp"
-                android:src="@drawable/play_selector"/>
-            <ProgressBar
-                android:id="@+id/pb_load"
-                android:layout_width="65dp"
-                android:layout_height="65dp"
-                android:indeterminateDrawable="@drawable/play_load_drawable"
-                android:indeterminateOnly="true"
-                android:visibility="gone"
-                android:layout_marginLeft="25dp"
-                android:layout_marginRight="25dp"
-                android:padding="5dp"
-                android:indeterminateBehavior="repeat"/>
-            <ImageView
-                android:id="@+id/iv_next"
-                android:layout_width="55dp"
-                android:layout_height="55dp"
-                android:src="@drawable/next_selector"/>
-        </LinearLayout>
-    </LinearLayout>
-
-</FrameLayout>
+    </FrameLayout>
+</layout>

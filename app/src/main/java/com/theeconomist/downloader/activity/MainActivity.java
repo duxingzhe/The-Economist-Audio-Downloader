@@ -9,17 +9,10 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
-import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
+import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.theeconomist.downloader.FileAdapter;
@@ -27,6 +20,7 @@ import com.theeconomist.downloader.R;
 import com.theeconomist.downloader.bean.EventBusBean;
 import com.theeconomist.downloader.bean.Mp3FileBean;
 import com.theeconomist.downloader.bean.TimeBean;
+import com.theeconomist.downloader.databinding.ActivityMainBinding;
 import com.theeconomist.downloader.dialog.AddDialog;
 import com.theeconomist.downloader.dialog.DeleteDialog;
 import com.theeconomist.downloader.dialog.DownloadDialog;
@@ -36,42 +30,16 @@ import com.theeconomist.downloader.utils.DownloadUtil;
 import com.theeconomist.downloader.utils.EventType;
 import com.theeconomist.downloader.utils.FileUtil;
 import com.theeconomist.downloader.utils.MP3Filter;
-import com.theeconomist.downloader.view.PlayPauseView;
 
 import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
 import java.util.ArrayList;
 
-import butterknife.BindView;
-import butterknife.OnClick;
-
 public class MainActivity extends BaseMusicActivity {
 
-    @BindView(R.id.input)
-    public Button inputButton;
-    private Button deleteButton;
-    private Button exitButton;
-    private RecyclerView recyclerView;
+    private ActivityMainBinding viewBinding;
     private FileAdapter mAdapter;
-
-    @BindView(R.id.iv_mini_bg)
-    ImageView ivMiniBg;
-
-    @BindView(R.id.tv_mini_name)
-    TextView tvMiniName;
-
-    @BindView(R.id.tv_mini_subname)
-    TextView tvMiniSubName;
-
-    @BindView(R.id.iv_mini_playstatus)
-    PlayPauseView ivMiniPlayStatus;
-
-    @Nullable
-    @BindView(R.id.rl_mini_bar)
-    RelativeLayout rlMiniBar;
-
-    private LinearLayout bottomPlayStatusLayout;
     private Context mContext;
 
     private EventBusBean eventNextBean;
@@ -174,7 +142,7 @@ public class MainActivity extends BaseMusicActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        viewBinding=DataBindingUtil.setContentView(this, R.layout.activity_main);
         mContext=this;
 
         Glide.get(mContext).clearMemory();
@@ -186,12 +154,8 @@ public class MainActivity extends BaseMusicActivity {
         }.start();
 
         mAdapter=new FileAdapter(mContext, mFiles, getPlayBean());
-        recyclerView=(RecyclerView)findViewById(R.id.recyclerview);
-        bottomPlayStatusLayout=(LinearLayout)findViewById(R.id.ly_mini_player);
-        deleteButton=(Button)findViewById(R.id.delete);
-        exitButton=(Button)findViewById(R.id.exit);
 
-        inputButton.setOnClickListener(new View.OnClickListener(){
+        viewBinding.input.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
                 InputDialog inputDialog=new InputDialog(mContext, R.style.StyleDialog, new InputDialog.OnDownloadListener() {
@@ -207,7 +171,7 @@ public class MainActivity extends BaseMusicActivity {
             }
         });
 
-        deleteButton.setOnClickListener(new View.OnClickListener(){
+        viewBinding.delete.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
                 deleteFile();
@@ -216,9 +180,9 @@ public class MainActivity extends BaseMusicActivity {
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        recyclerView.setLayoutManager(layoutManager);
+        viewBinding.recyclerview.setLayoutManager(layoutManager);
 
-        bottomPlayStatusLayout.setOnClickListener(new View.OnClickListener(){
+        viewBinding.miniPlayerLayout.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
                 startActivity(MainActivity.this, PlayerActivity.class);
@@ -239,7 +203,26 @@ public class MainActivity extends BaseMusicActivity {
             }
         });
 
-        exitButton.setOnClickListener(new View.OnClickListener() {
+        viewBinding.miniPlayer.ivMiniPlaystatus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(musicStatus == PLAY_STATUS_PLAYING) {
+                    pauseMusic(true);
+                    if(viewBinding.miniPlayer.ivMiniPlaystatus != null) {
+                        viewBinding.miniPlayer.ivMiniPlaystatus.pause();
+                    }
+                } else if(musicStatus == PLAY_STATUS_PAUSE) {
+                    pauseMusic(false);
+                    if(viewBinding.miniPlayer.ivMiniPlaystatus != null) {
+                        viewBinding.miniPlayer.ivMiniPlaystatus.play();
+                    }
+                } else if(musicStatus == PLAY_STATUS_ERROR || musicStatus == PLAY_STATUS_COMPLETE) {
+                    playUrl = "";
+                }
+            }
+        });
+
+        viewBinding.exit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 setIsExiting(true);
@@ -263,14 +246,14 @@ public class MainActivity extends BaseMusicActivity {
     @Override
     public void onResume(){
         super.onResume();
-        Glide.with(this).load(getPlayBean().getImgByte()).apply(RequestOptions.errorOf(R.mipmap.file_mp3_icon)).into(ivMiniBg);
-        if(!tvMiniName.getText().toString().trim().equals(getPlayBean().getName())) {
-            tvMiniName.setText(getPlayBean().getName());
+        Glide.with(this).load(getPlayBean().getImgByte()).apply(RequestOptions.errorOf(R.mipmap.file_mp3_icon)).into(viewBinding.miniPlayer.ivMiniBg);
+        if(!viewBinding.miniPlayer.tvMiniName.getText().toString().trim().equals(getPlayBean().getName())) {
+            viewBinding.miniPlayer.tvMiniName.setText(getPlayBean().getName());
         }
         if(TextUtils.isEmpty(getPlayBean().getAlbumName())) {
-            tvMiniSubName.setText("The Economist");
+            viewBinding.miniPlayer.tvMiniSubname.setText("The Economist");
         }else{
-            tvMiniSubName.setText("The Economist - "+getPlayBean().getAlbumName());
+            viewBinding.miniPlayer.tvMiniSubname.setText("The Economist - "+getPlayBean().getAlbumName());
         }
 
         isFronted=true;
@@ -347,7 +330,7 @@ public class MainActivity extends BaseMusicActivity {
 
     private void notifyDataChanged(){
         FileUtil.fileList=mFiles;
-        recyclerView.setAdapter(mAdapter);
+        viewBinding.recyclerview.setAdapter(mAdapter);
         mAdapter.notifyDataSetChanged();
     }
 
@@ -361,40 +344,40 @@ public class MainActivity extends BaseMusicActivity {
     public void onMusicStatus(int status) {
         switch (status) {
             case PLAY_STATUS_ERROR:
-                if(ivMiniPlayStatus != null) {
-                    ivMiniPlayStatus.pause();
+                if(viewBinding.miniPlayer.ivMiniPlaystatus != null) {
+                    viewBinding.miniPlayer.ivMiniPlaystatus.pause();
                 }
                 break;
             case PLAY_STATUS_LOADING:
-                if(ivMiniPlayStatus != null) {
-                    ivMiniPlayStatus.setVisibility(View.GONE);
+                if(viewBinding.miniPlayer.ivMiniPlaystatus != null) {
+                    viewBinding.miniPlayer.ivMiniPlaystatus.setVisibility(View.GONE);
                 }
                 break;
             case PLAY_STATUS_UNLOADING:
-                if(ivMiniPlayStatus != null) {
-                    ivMiniPlayStatus.setVisibility(View.VISIBLE);
+                if(viewBinding.miniPlayer.ivMiniPlaystatus != null) {
+                    viewBinding.miniPlayer.ivMiniPlaystatus.setVisibility(View.VISIBLE);
                 }
                 break;
             case PLAY_STATUS_PLAYING:
-                if(ivMiniPlayStatus != null) {
-                    ivMiniPlayStatus.play();
-                    ivMiniPlayStatus.setVisibility(View.VISIBLE);
+                if(viewBinding.miniPlayer.ivMiniPlaystatus != null) {
+                    viewBinding.miniPlayer.ivMiniPlaystatus.play();
+                    viewBinding.miniPlayer.ivMiniPlaystatus.setVisibility(View.VISIBLE);
                 }
                 break;
             case PLAY_STATUS_PAUSE:
-                if(ivMiniPlayStatus != null) {
-                    ivMiniPlayStatus.pause();
-                    ivMiniPlayStatus.setVisibility(View.VISIBLE);
+                if(viewBinding.miniPlayer.ivMiniPlaystatus != null) {
+                    viewBinding.miniPlayer.ivMiniPlaystatus.pause();
+                    viewBinding.miniPlayer.ivMiniPlaystatus.setVisibility(View.VISIBLE);
                 }
                 break;
             case PLAY_STATUS_RESUME:
-                if(ivMiniPlayStatus != null) {
-                    ivMiniPlayStatus.pause();
+                if(viewBinding.miniPlayer.ivMiniPlaystatus != null) {
+                    viewBinding.miniPlayer.ivMiniPlaystatus.pause();
                 }
                 break;
             case PLAY_STATUS_COMPLETE:
-                if(ivMiniPlayStatus != null) {
-                    ivMiniPlayStatus.pause();
+                if(viewBinding.miniPlayer.ivMiniPlaystatus != null) {
+                    viewBinding.miniPlayer.ivMiniPlaystatus.pause();
                 }
                 if((isPlaying()||!isExiting()) && isFronted) {
                     playNextMusic();
@@ -557,14 +540,14 @@ public class MainActivity extends BaseMusicActivity {
     }
 
     private void initMiniBar() {
-        Glide.with(this).load(getPlayBean().getImgByte()).apply(RequestOptions.errorOf(R.mipmap.file_mp3_icon)).into(ivMiniBg);
-        if(!tvMiniName.getText().toString().trim().equals(getPlayBean().getName())) {
-                tvMiniName.setText(getPlayBean().getName());
+        Glide.with(this).load(getPlayBean().getImgByte()).apply(RequestOptions.errorOf(R.mipmap.file_mp3_icon)).into(viewBinding.miniPlayer.ivMiniBg);
+        if(!viewBinding.miniPlayer.tvMiniName.getText().toString().trim().equals(getPlayBean().getName())) {
+            viewBinding.miniPlayer.tvMiniName.setText(getPlayBean().getName());
         }
         if(TextUtils.isEmpty(getPlayBean().getAlbumName())) {
-            tvMiniSubName.setText("The Economist");
+            viewBinding.miniPlayer.tvMiniSubname.setText("The Economist");
         }else{
-            tvMiniSubName.setText("The Economist - "+getPlayBean().getAlbumName());
+            viewBinding.miniPlayer.tvMiniSubname.setText("The Economist - "+getPlayBean().getAlbumName());
         }
     }
 
@@ -575,24 +558,7 @@ public class MainActivity extends BaseMusicActivity {
     }
 
     private void updateTime(TimeBean timeBean) {
-        ivMiniPlayStatus.setProgress(getProgress());
-    }
-
-    @OnClick(R.id.iv_mini_playstatus)
-    public void onClickPlayStatus(View view) {
-        if(musicStatus == PLAY_STATUS_PLAYING) {
-            pauseMusic(true);
-            if(ivMiniPlayStatus != null) {
-                ivMiniPlayStatus.pause();
-            }
-        } else if(musicStatus == PLAY_STATUS_PAUSE) {
-            pauseMusic(false);
-            if(ivMiniPlayStatus != null) {
-                ivMiniPlayStatus.play();
-            }
-        } else if(musicStatus == PLAY_STATUS_ERROR || musicStatus == PLAY_STATUS_COMPLETE) {
-            playUrl = "";
-        }
+        viewBinding.miniPlayer.ivMiniPlaystatus.setProgress(getProgress());
     }
 
     @Override

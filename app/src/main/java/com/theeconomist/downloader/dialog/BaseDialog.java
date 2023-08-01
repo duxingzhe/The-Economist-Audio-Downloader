@@ -9,9 +9,6 @@ import android.view.WindowManager;
 
 import com.theeconomist.downloader.R;
 
-import butterknife.ButterKnife;
-
-
 /**
  * Created by ywl on 2016/3/18.
  */
@@ -50,6 +47,5 @@ public class BaseDialog extends Dialog {
     @Override
     public void setContentView(int layoutResID) {
         super.setContentView(layoutResID);
-        ButterKnife.bind(this);
     }
 }
