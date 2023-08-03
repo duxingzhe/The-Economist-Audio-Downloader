@@ -344,41 +344,27 @@ public class MainActivity extends BaseMusicActivity {
     public void onMusicStatus(int status) {
         switch (status) {
             case PLAY_STATUS_ERROR:
-                if(viewBinding.miniPlayer.ivMiniPlaystatus != null) {
-                    viewBinding.miniPlayer.ivMiniPlaystatus.pause();
-                }
+                viewBinding.miniPlayer.ivMiniPlaystatus.pause();
                 break;
             case PLAY_STATUS_LOADING:
-                if(viewBinding.miniPlayer.ivMiniPlaystatus != null) {
-                    viewBinding.miniPlayer.ivMiniPlaystatus.setVisibility(View.GONE);
-                }
+                viewBinding.miniPlayer.ivMiniPlaystatus.setVisibility(View.GONE);
                 break;
             case PLAY_STATUS_UNLOADING:
-                if(viewBinding.miniPlayer.ivMiniPlaystatus != null) {
-                    viewBinding.miniPlayer.ivMiniPlaystatus.setVisibility(View.VISIBLE);
-                }
+                viewBinding.miniPlayer.ivMiniPlaystatus.setVisibility(View.VISIBLE);
                 break;
             case PLAY_STATUS_PLAYING:
-                if(viewBinding.miniPlayer.ivMiniPlaystatus != null) {
-                    viewBinding.miniPlayer.ivMiniPlaystatus.play();
-                    viewBinding.miniPlayer.ivMiniPlaystatus.setVisibility(View.VISIBLE);
-                }
+                viewBinding.miniPlayer.ivMiniPlaystatus.play();
+                viewBinding.miniPlayer.ivMiniPlaystatus.setVisibility(View.VISIBLE);
                 break;
             case PLAY_STATUS_PAUSE:
-                if(viewBinding.miniPlayer.ivMiniPlaystatus != null) {
-                    viewBinding.miniPlayer.ivMiniPlaystatus.pause();
-                    viewBinding.miniPlayer.ivMiniPlaystatus.setVisibility(View.VISIBLE);
-                }
+                viewBinding.miniPlayer.ivMiniPlaystatus.pause();
+                viewBinding.miniPlayer.ivMiniPlaystatus.setVisibility(View.VISIBLE);
                 break;
             case PLAY_STATUS_RESUME:
-                if(viewBinding.miniPlayer.ivMiniPlaystatus != null) {
-                    viewBinding.miniPlayer.ivMiniPlaystatus.pause();
-                }
+                viewBinding.miniPlayer.ivMiniPlaystatus.pause();
                 break;
             case PLAY_STATUS_COMPLETE:
-                if(viewBinding.miniPlayer.ivMiniPlaystatus != null) {
-                    viewBinding.miniPlayer.ivMiniPlaystatus.pause();
-                }
+                viewBinding.miniPlayer.ivMiniPlaystatus.pause();
                 if((isPlaying()||!isExiting()) && isFronted) {
                     playNextMusic();
                 }

@@ -8,17 +8,17 @@
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingTop="20dp"
-        android:paddingBottom="20dp"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp"
         android:background="@drawable/dialog_background"
         >
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="10dp"
+            android:layout_marginBottom="10dp"
             android:weightSum="2"
             >
 
@@ -26,7 +26,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textColor="@color/color_222222"
+                android:textColor="@color/primary_text"
                 android:text="期刊号"
                 android:gravity="center"
                 />
@@ -43,7 +43,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="10dp"
+            android:layout_marginBottom="10dp"
             android:weightSum="2"
             >
 
@@ -51,7 +51,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textColor="@color/color_222222"
+                android:textColor="@color/primary_text"
                 android:gravity="center"
                 android:text="年"
                 />
@@ -68,7 +68,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingBottom="10dp"
+            android:layout_marginBottom="10dp"
             android:weightSum="2"
             >
 
@@ -76,7 +76,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textColor="@color/color_222222"
+                android:textColor="@color/primary_text"
                 android:gravity="center"
                 android:text="月"
                 />
@@ -94,14 +94,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:weightSum="2"
-            android:paddingBottom="10dp"
+            android:layout_marginBottom="10dp"
             >
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textColor="@color/color_222222"
+                android:textColor="@color/primary_text"
                 android:gravity="center"
                 android:text="日"
                 />
@@ -127,7 +127,7 @@
                 android:text="取消"
                 android:gravity="center"
                 android:textSize="14sp"
-                android:textColor="@color/color_222222"
+                android:textColor="@color/primary_text"
                 />
 
             <TextView
@@ -138,7 +138,7 @@
                 android:text="确定"
                 android:gravity="center"
                 android:textSize="14sp"
-                android:textColor="@color/color_222222"
+                android:textColor="@color/primary"
                 />
         </LinearLayout>
 
