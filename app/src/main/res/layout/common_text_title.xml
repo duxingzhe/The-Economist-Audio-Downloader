@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="@color/color_ec4c48">
+        android:background="@color/primary">
 
         <LinearLayout
             android:id="@+id/ly_system_bar"
@@ -41,7 +41,7 @@
                 android:layout_centerInParent="true"
                 android:textSize="20dp"
                 android:singleLine="true"
-                android:textColor="@color/color_white"
+                android:textColor="@color/white"
                 android:text="The Economist"
                 android:layout_toRightOf="@+id/iv_back"
                 android:layout_toLeftOf="@+id/iv_right"/>
@@ -67,7 +67,7 @@
                 android:paddingLeft="1dp"
                 android:layout_centerVertical="true"
                 android:layout_alignParentRight="true"
-                android:textColor="@color/color_white"
+                android:textColor="@color/white"
                 android:visibility="invisible"/>
 
             <ImageView
@@ -84,5 +84,5 @@
         android:id="@+id/iv_line"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/color_ec4c48"/>
+        android:background="@color/primary"/>
 </LinearLayout>

@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:background="@color/color_white">
+    android:background="@color/white">
     <ProgressBar
         android:layout_width="30dp"
         android:layout_height="30dp"

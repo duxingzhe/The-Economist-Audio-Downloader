@@ -11,7 +11,7 @@
         android:text="The Economist Audio Edition"
         android:layout_marginBottom="30dp"
         android:gravity="center"
-        android:textColor="@color/color_white"
+        android:textColor="@color/white"
         android:textSize="20sp"/>
 
     <TextView
@@ -20,7 +20,7 @@
         android:text="CATTI, TOFEL/GRE, IELTS, Unified Postgraduate Examination in China, etc"
         android:layout_marginBottom="50dp"
         android:gravity="center"
-        android:textColor="@color/color_white"
+        android:textColor="@color/white"
         android:textSize="16sp"/>
 
     <TextView
@@ -28,6 +28,6 @@
         android:layout_height="wrap_content"
         android:text="@string/version"
         android:layout_marginBottom="80dp"
-        android:textColor="@color/color_white"
+        android:textColor="@color/white"
         android:textSize="14sp"/>
 </LinearLayout>

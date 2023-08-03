@@ -24,7 +24,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/red_button_background"
-                android:textColor="@color/color_ec4c48"
+                android:textColor="@color/primary"
                 android:text="输入"
                 />
 
@@ -34,7 +34,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/gray_button_background"
-                android:textColor="@color/color_222222"
+                android:textColor="@color/primary_text"
                 android:text="删除"
                 />
 
@@ -44,7 +44,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/gray_button_background"
-                android:textColor="@color/color_222222"
+                android:textColor="@color/primary_text"
                 android:text="退出"
                 />
         </LinearLayout>

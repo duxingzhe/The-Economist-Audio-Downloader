@@ -82,7 +82,7 @@ public class PlayPauseView extends View{
         mRect = new Rect();
         TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.PlayPauseView);
         mBgColor = ta.getColor(R.styleable.PlayPauseView_bg_color, Color.WHITE);
-        mBtnColor = ta.getColor(R.styleable.PlayPauseView_btn_color, getResources().getColor(R.color.color_ec4c48));
+        mBtnColor = ta.getColor(R.styleable.PlayPauseView_btn_color, getResources().getColor(R.color.primary));
         mGapWidth = ta.getDimensionPixelSize(R.styleable.PlayPauseView_gap_width, dp2px(context, 0));
         mPadding = ta.getDimensionPixelSize(R.styleable.PlayPauseView_space_padding, dp2px(context, 0));
         ta.recycle();

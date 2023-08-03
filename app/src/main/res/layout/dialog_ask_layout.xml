@@ -19,13 +19,13 @@
             android:text="需要您的授权"
             android:textSize="16dp"
             android:gravity="center"
-            android:textColor="@color/color_222222"
+            android:textColor="@color/primary_text"
             />
 
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/color_ededed"/>
+            android:background="@color/white"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -42,7 +42,7 @@
                 android:text="退出"
                 android:gravity="center"
                 android:textSize="14dp"
-                android:textColor="@color/color_222222"
+                android:textColor="@color/primary_text"
                 />
 
             <TextView
@@ -53,7 +53,7 @@
                 android:text="授权"
                 android:gravity="center"
                 android:textSize="14dp"
-                android:textColor="@color/color_ec4c48"
+                android:textColor="@color/primary"
                 />
         </LinearLayout>
     </LinearLayout>
