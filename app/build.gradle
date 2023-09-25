@@ -47,7 +47,7 @@ android {
         jvmToolchain(17)
     }
 
-    ndkVersion "25.2.9519653"
+    ndkVersion "26.0.10792818"
     namespace 'com.theeconomist.downloader'
 }
 
@@ -55,7 +55,7 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'androidx.recyclerview:recyclerview:1.3.0'
+    implementation 'androidx.recyclerview:recyclerview:1.3.1'
     implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.11'
     implementation 'com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.11'
     implementation 'ywl.ywl5320:wlmedia:1.1.5'
