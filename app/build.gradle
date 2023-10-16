@@ -47,7 +47,7 @@ android {
         jvmToolchain(17)
     }
 
-    ndkVersion "26.0.10792818"
+    ndkVersion "26.1.10909125"
     namespace 'com.theeconomist.downloader'
 }
 
