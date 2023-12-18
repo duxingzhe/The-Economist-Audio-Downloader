@@ -12,14 +12,14 @@ void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 
     if(player->buffer!=NULL)
     {
-        free(player->buffer);
-        player->buffer=NULL;
+        free(&player->buffer);
+        player->buffer= (uint8_t) NULL;
     }
 
     int len=4096;
-    player->buffer=malloc(len);
+    player->buffer= (uint8_t) malloc(len);
 
-    is->audio_callback(context, player->buffer, len);
+    is->audio_callback(context, &player->buffer, len);
     enqueue(&is->audio_player, (int16_t *)player->buffer, len);
 }
 
@@ -27,7 +27,7 @@ void createEngine(AudioPlayer **ps)
 {
     AudioPlayer *player=*ps;
 
-    player->buffer=NULL;
+    player->buffer= (uint8_t) NULL;
     SLresult result;
 
     result=slCreateEngine(&player->engineObject, 0, NULL, 0, NULL, NULL);
@@ -226,8 +226,8 @@ void shutdown(AudioPlayer **ps)
 
     if(player->buffer!=NULL)
     {
-        free(player->buffer);
-        player->buffer=NULL;
+        free(&player->buffer);
+        player->buffer= (uint8_t) NULL;
     }
 
 }
