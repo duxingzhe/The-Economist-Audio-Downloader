@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.4.1)
+project(musicapp)
 
 set(CURRENT_DIR ${CMAKE_SOURCE_DIR})
 set(distribution_DIR ${CURRENT_DIR}/../commonlib/src/main/jni)
