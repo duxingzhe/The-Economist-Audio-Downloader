@@ -64,7 +64,7 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.16.0'
     ksp 'com.github.bumptech.glide:ksp:4.16.0'
     implementation 'jp.wasabeef:glide-transformations:4.3.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.2.0-alpha12'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.0-alpha13'
     // If you want to use the GPU Filters
     implementation 'jp.co.cyberagent.android:gpuimage:2.1.0'
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
