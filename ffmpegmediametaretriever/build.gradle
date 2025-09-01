@@ -27,7 +27,7 @@ android {
         }
     }
 
-    ndkVersion '28.0.13004108'
+    ndkVersion '28.2.13676358'
     namespace 'com.luxuan.ffmpegmediametaretriever'
 
 }
@@ -36,6 +36,6 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test:runner:1.5.2'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    androidTestImplementation 'androidx.test:runner:1.6.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
 }
