@@ -10,6 +10,7 @@ dependencyResolutionManagement {
             url 'https://maven.aliyun.com/nexus/content/repositories/jcenter'
 
         }
+        maven { url 'https://jitpack.io' }
     }
 }
 rootProject.name = "The Economist Audio Downloader"
