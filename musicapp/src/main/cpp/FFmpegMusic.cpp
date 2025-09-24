@@ -61,19 +61,19 @@ int createFFmpeg(int *rate, int *channel)
     int got_frame;
 
     out_buffer=(uint8_t *) av_malloc(44100*2);
-    uint64_t out_ch_layout=AV_CH_LAYOUT_STEREO;
+    AVChannelLayout out_ch_layout = AV_CHANNEL_LAYOUT_STEREO;
 
-    enum AVSampleFormat out_format=AV_SAMPLE_FMT_S16;
+    AVSampleFormat out_format=AV_SAMPLE_FMT_S16;
 
     int out_sample_rate=codecContext->sample_rate;
 
-    swr_alloc_set_opts(swrContext, out_ch_layout, out_format, out_sample_rate,
-            codecContext->channel_layout, codecContext->sample_fmt, codecContext->sample_rate, 0, NULL);
+    swr_alloc_set_opts2(&swrContext, &out_ch_layout, out_format, out_sample_rate,
+            &codecContext->ch_layout, codecContext->sample_fmt, codecContext->sample_rate, 0, NULL);
 
     swr_init(swrContext);
-    out_channel_nb=av_get_channel_layout_nb_channels(AV_CH_LAYOUT_STEREO);
+    out_channel_nb=out_ch_layout.nb_channels;
     *rate=codecContext->sample_rate;
-    *channel=codecContext->channels;
+    *channel=codecContext->ch_layout.nb_channels;
     avcodec_free_context(&codecContext);
     return 0;
 }
