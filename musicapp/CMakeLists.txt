@@ -59,13 +59,6 @@ set_target_properties( avutil
         PROPERTIES IMPORTED_LOCATION
         ${distribution_DIR}/ffmpeg/${ANDROID_ABI}/libavutil.so)
 
-add_library( postproc
-        SHARED
-        IMPORTED)
-set_target_properties( postproc
-        PROPERTIES IMPORTED_LOCATION
-        ${distribution_DIR}/ffmpeg/${ANDROID_ABI}/libpostproc.so)
-
 add_library( swresample
         SHARED
         IMPORTED)
@@ -91,7 +84,6 @@ target_link_libraries( native-lib
                         avformat
                         avdevice
                         avutil
-                        postproc
                         swresample
                         swscale
                         ssl
