@@ -15,7 +15,7 @@ android {
             cmake {
                 cppFlags "-frtti -fexceptions"
                 abiFilters 'arm64-v8a', 'x86_64'
-                version "3.22.1"
+                version "4.1.0"
             }
         }
     }
