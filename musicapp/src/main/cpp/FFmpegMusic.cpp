@@ -113,6 +113,6 @@ void realseFFmpeg()
     av_free(out_buffer);
     av_frame_free(&frame);
     swr_free(&swrContext);
-    avcodec_close(codecContext);
+    avcodec_free_context(&codecContext);
     avformat_close_input(&formatContext);
 }

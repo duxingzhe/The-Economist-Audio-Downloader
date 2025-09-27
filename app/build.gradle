@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.theeconomist.audio.downloader"
-        minSdk 21
+        minSdk 22
         targetSdk 33
         versionCode 1
         versionName "1.0"
@@ -15,7 +15,7 @@ android {
             cmake {
                 cppFlags "-frtti -fexceptions"
                 abiFilters 'arm64-v8a', 'x86_64'
-                version "4.1.0"
+                version "3.4.1"
             }
         }
     }

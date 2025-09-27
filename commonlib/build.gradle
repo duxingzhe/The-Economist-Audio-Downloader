@@ -4,7 +4,7 @@ android {
     compileSdkVersion 35
 
     defaultConfig {
-        minSdk 21
+        minSdk 22
         targetSdk 33
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -22,7 +22,7 @@ android {
 
     externalNativeBuild {
         cmake {
-            version "4.1.0"
+            version "3.4.1"
         }
     }
     namespace 'com.luxuan.commonlib'
