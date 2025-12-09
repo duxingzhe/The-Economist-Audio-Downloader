@@ -710,14 +710,14 @@ void release(State **ps)
 
     if(state)
     {
-        if(state->audio_st&&state->audio_st->codecpar)
+        if(state->scaled_codecCtx)
         {
-            avcodec_close(state->audio_st->codecpar);
+            avcodec_free_context(&state->scaled_codecCtx);
         }
 
-        if(state->video_st&&state->video_st->codecpar)
+        if(state->codecCtx)
         {
-            avcodec_close(state->video_st->codecpar);
+            avcodec_free_context(&state->codecCtx);
         }
 
         if(state->pFormatCtx)

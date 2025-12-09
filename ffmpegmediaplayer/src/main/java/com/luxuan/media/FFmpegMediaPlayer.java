@@ -35,7 +35,7 @@ public class FFmpegMediaPlayer {
     private final static String TAG="FFmpegMediaPlayer";
 
     private static final String[] JNI_LIBRARIES={
-            "SDL2",
+            "SDL3",
             "avutil",
             "swscale",
             "swresample",
