@@ -1,12 +1,14 @@
-apply plugin: 'com.android.application'
+plugins {
+    id 'com.android.application'
+}
 
 android {
-    compileSdk 35
+    compileSdk 36
 
     defaultConfig {
         applicationId "com.luxuan.musicapp"
-        minSdk 22
-        targetSdk 33
+        minSdk 30
+        targetSdk 35
         versionCode 1
         versionName "1.0"
 

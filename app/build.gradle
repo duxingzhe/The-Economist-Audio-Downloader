@@ -1,13 +1,15 @@
-apply plugin: 'com.android.application'
-apply plugin: 'com.google.devtools.ksp'
+plugins {
+    id 'com.android.application'
+    id 'com.google.devtools.ksp'
+}
 
 android {
     compileSdk 36
 
     defaultConfig {
         applicationId "com.theeconomist.audio.downloader"
-        minSdk 22
-        targetSdk 33
+        minSdk 30
+        targetSdk 35
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
